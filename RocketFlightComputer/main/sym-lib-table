@@ -1,0 +1,9 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "DMG2305UX-7")(type "KiCad")(uri "${KIPRJMOD}/Libraries/DMG2305UX/DMG2305UX-7.kicad_sym")(options "")(descr ""))
+  (lib (name "KMR241GLFS")(type "KiCad")(uri "${KIPRJMOD}/Libraries/KMR241GLFS/KMR241GLFS.kicad_sym")(options "")(descr ""))
+  (lib (name "MIMXRT1062DVL6B")(type "KiCad")(uri "${KIPRJMOD}/Libraries/MIMXRT1062DVL6B/MIMXRT1062DVL6B.kicad_sym")(options "")(descr ""))
+  (lib (name "MKL02Z32VFG4")(type "KiCad")(uri "${KIPRJMOD}/Libraries/MKL02Z32VFG4/MKL02Z32VFG4.kicad_sym")(options "")(descr ""))
+  (lib (name "USB4105-GF-A")(type "KiCad")(uri "${KIPRJMOD}/Libraries/USB4105-GF-A/USB4105-GF-A.kicad_sym")(options "")(descr ""))
+  (lib (name "W25Q64JVXGIM_TR")(type "KiCad")(uri "${KIPRJMOD}/Libraries/W25Q64JVXGIM_TR/W25Q64JVXGIM_TR.kicad_sym")(options "")(descr ""))
+)

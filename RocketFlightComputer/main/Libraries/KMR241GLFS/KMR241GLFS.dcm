@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP KMR241GLFS
+D KMR241GLFS (Tactile Switches)
+K
+F https://www.ckswitches.com/media/1479/kmr2.pdf
+$ENDCMP
+#
+#End Doc Library
