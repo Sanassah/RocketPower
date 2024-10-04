@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP W25Q64JVXGIM_TR
+D NOR Flash spiFlash, 64M-bit, DTR, 4Kb Uniform Sector
+K
+F https://www.winbond.com/resource-files/w25q64jv_dtr%20revj%2003272018%20plus.pdf
+$ENDCMP
+#
+#End Doc Library
