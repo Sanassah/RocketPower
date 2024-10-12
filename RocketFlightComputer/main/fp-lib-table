@@ -1,4 +1,7 @@
 (fp_lib_table
   (version 7)
   (lib (name "footprint")(type "KiCad")(uri "${KIPRJMOD}/Libraries/footprint.pretty")(options "")(descr ""))
+  (lib (name "BNO08x")(type "KiCad")(uri "${KIPRJMOD}/Libraries/BNO08x.pretty")(options "")(descr ""))
+  (lib (name "BMP390")(type "KiCad")(uri "${KIPRJMOD}/Libraries/BMP390.pretty")(options "")(descr ""))
+  (lib (name "ADXL375")(type "KiCad")(uri "${KIPRJMOD}/Libraries/ADXL375.pretty")(options "")(descr ""))
 )
