@@ -474,15 +474,31 @@
     ],
     [
       "f1ce41f5-ec33-4382-82d9-21de8266ebc9",
-      "BNO085"
+      "IMU BNO085"
     ],
     [
       "cea4c1d7-5261-445d-b36e-014b1552505a",
-      "BMP390"
+      "ALTIMETER BMP390"
     ],
     [
       "ab53b5aa-f87c-4c4c-94f1-6ed73299a675",
-      "ADXL375"
+      "+-200G ACCELEROMETER"
+    ],
+    [
+      "29f0379a-3100-4813-a2e2-86f2e88b3e64",
+      "GPS ZOEM8"
+    ],
+    [
+      "690c10de-e6bf-48ef-8c3e-99868f905c19",
+      "MICROSD"
+    ],
+    [
+      "125f95e9-6bcc-4b33-8d0b-519410cf48bf",
+      "CURRENT VOLTAGE SENSOR"
+    ],
+    [
+      "0e1803fe-87c5-4468-8423-c8a2a10c7a51",
+      "I2C MULTIPLEX"
     ]
   ],
   "text_variables": {}

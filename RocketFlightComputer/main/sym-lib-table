@@ -6,4 +6,5 @@
   (lib (name "MKL02Z32VFG4")(type "KiCad")(uri "${KIPRJMOD}/Libraries/MKL02Z32VFG4/MKL02Z32VFG4.kicad_sym")(options "")(descr ""))
   (lib (name "USB4105-GF-A")(type "KiCad")(uri "${KIPRJMOD}/Libraries/USB4105-GF-A/USB4105-GF-A.kicad_sym")(options "")(descr ""))
   (lib (name "W25Q64JVXGIM_TR")(type "KiCad")(uri "${KIPRJMOD}/Libraries/W25Q64JVXGIM_TR/W25Q64JVXGIM_TR.kicad_sym")(options "")(descr ""))
+  (lib (name "APS6404L-3SQR-SN")(type "KiCad")(uri "${KIPRJMOD}/Libraries/APS6404L/APS6404L-3SQR-SN.kicad_sym")(options "")(descr ""))
 )

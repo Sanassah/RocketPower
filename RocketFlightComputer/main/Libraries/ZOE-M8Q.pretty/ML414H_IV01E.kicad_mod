@@ -1,0 +1,77 @@
+(footprint "ML414H_IV01E" (version 20221018) (generator pcbnew)
+  (layer "F.Cu")
+  (descr "<h3>SEIKO ML414H-IV01E Reflowable Lithium Battery</h3>\n\n<p>\nML414H is a rechargeable, coin type battery with features\nsuch as Pb-free reflowable (Peak temperature: 260 C) and\nhigh temperature heat resistance.\n</p>\n\n<ul>\n<li>3V</li>\n<li>1mAH</li>\n<li>4.8mm Diamter</li>\n</ul>")
+  (fp_text reference "REF**" (at -1.016 -2.921) (layer "F.SilkS")
+      (effects (font (size 0.35052 0.35052) (thickness 0.03048)) (justify left bottom))
+    (tstamp a526567c-cffc-4cbb-8a0c-57ea454acb4f)
+  )
+  (fp_text value "ML414H_IV01E" (at -1.016 3.302) (layer "F.Fab")
+      (effects (font (size 0.35052 0.35052) (thickness 0.03048)) (justify left bottom))
+    (tstamp 217286bc-f131-4477-855d-7abd2c98d465)
+  )
+  (fp_poly
+    (pts
+      (xy 2.705 -0.219645)
+      (xy 0.219645 -2.705)
+      (xy 2.705 -2.705)
+    )
+
+    (stroke (width 0) (type default)) (fill solid) (layer "F.Cu") (tstamp 8da5c27c-6e9f-4c9e-b0be-62cfc1d50afe))
+  (fp_poly
+    (pts
+      (xy 2.705 -0.219645)
+      (xy 0.219645 -2.705)
+      (xy 2.705 -2.705)
+    )
+
+    (stroke (width 0) (type default)) (fill solid) (layer "F.Paste") (tstamp 87336893-bb7a-4a4d-b56b-959e8395a153))
+  (fp_poly
+    (pts
+      (xy -1.5 2.7)
+      (xy 2.7 2.7)
+      (xy 2.7 1)
+      (xy -1.5 1)
+    )
+
+    (stroke (width 0) (type default)) (fill solid) (layer "F.Paste") (tstamp e6b8b13e-8c96-4c7e-8d92-d2a498d526fb))
+  (fp_poly
+    (pts
+      (xy 2.705 -0.219645)
+      (xy 0.219645 -2.705)
+      (xy 2.705 -2.705)
+    )
+
+    (stroke (width 0) (type default)) (fill solid) (layer "F.Mask") (tstamp 422ccd8c-b2da-4bed-8aaa-1bc7192dfb29))
+  (fp_poly
+    (pts
+      (xy -1.5 2.7)
+      (xy 2.7 2.7)
+      (xy 2.7 1)
+      (xy -1.5 1)
+    )
+
+    (stroke (width 0) (type default)) (fill solid) (layer "F.Mask") (tstamp c51b18a4-e137-4d37-80ae-f05cfd96517f))
+  (fp_circle (center 0 0) (end 2.4 0)
+    (stroke (width 0.0508) (type solid)) (fill none) (layer "F.Fab") (tstamp 4a2f90ec-774e-41e1-81ad-98b4ad8c7874))
+  (fp_poly
+    (pts
+      (xy 2.41 -0.775858)
+      (xy 0.775858 -2.41)
+      (xy 2.41 -2.41)
+    )
+
+    (stroke (width 0) (type default)) (fill solid) (layer "F.Fab") (tstamp 1a9de970-9a94-4663-b81d-3235fe828aa2))
+  (fp_poly
+    (pts
+      (xy 2.41 2.41)
+      (xy -1.11 2.41)
+      (xy -1.11 1)
+      (xy 2.41 1)
+    )
+
+    (stroke (width 0) (type default)) (fill solid) (layer "F.Fab") (tstamp 3c113a03-89aa-4831-a016-d0db91e1c470))
+  (pad "+" smd rect (at 2.022 -2.032) (size 1 1) (layers "F.Cu")
+    (solder_mask_margin 0.1016) (thermal_bridge_angle 45) (tstamp 4c8830c8-4e3f-4e27-bb71-de8aca8e27b9))
+  (pad "-" smd rect (at 0.6 1.85) (size 4.2 1.7) (layers "F.Cu")
+    (solder_mask_margin 0.1016) (thermal_bridge_angle 45) (tstamp ebd17c10-b0db-407b-b715-278ccd266cbb))
+)
