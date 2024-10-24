@@ -947,6 +947,10 @@
     (uuid f4704c65-2352-4499-8b00-4078f9d82964)
   )
 
+  (text "Max Current: 30 mA" (at 93.98 99.06 0)
+    (effects (font (size 1.778 1.5113)) (justify left bottom))
+    (uuid 4bdb0a3b-4471-48e9-ada7-f2514fd6f7df)
+  )
   (text "SA0 is default low, so I2C ADDR = 1001010 (0x4A)" (at 94.615 103.505 0)
     (effects (font (size 1.778 1.5113)) (justify left bottom))
     (uuid 5d0b03cc-6bd9-4764-a53b-62fec0ff5052)

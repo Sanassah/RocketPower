@@ -497,8 +497,8 @@
       "CURRENT VOLTAGE SENSOR"
     ],
     [
-      "0e1803fe-87c5-4468-8423-c8a2a10c7a51",
-      "I2C MULTIPLEX"
+      "03966d30-d016-427a-9db2-b49a5b43d133",
+      "HighCurrentComponents"
     ]
   ],
   "text_variables": {}
