@@ -1,0 +1,142 @@
+
+(footprint SOT666 (layer F.Cu) (tedit 670FA10C)
+  (descr "<b>SOT 666 Reflow soldering foorprint</b><p>Source: Philips - BAS70_1PS7XSB70_SER_8.pdf")
+  (attr smd)
+  (fp_text reference REF** (at 4.001875 -1.000468 0) (layer F.SilkS)
+    (effects (font (size 0.787771653543 0.787771653543) (thickness 0.15)))
+  )
+  (fp_text value SOT666 (at 4.50487 0.50054 0) (layer F.Fab)
+    (effects (font (size 0.788251968504 0.788251968504) (thickness 0.15)))
+  )
+  (pad 1 smd rect (at -0.537 0.85) (size 0.375 0.5) (layers F.Cu))
+  (pad 2 smd rect (at 0.0 0.925) (size 0.3 0.65) (layers F.Cu))
+  (pad 3 smd rect (at 0.538 0.85) (size 0.375 0.5) (layers F.Cu))
+  (pad 4 smd rect (at 0.538 -0.85) (size 0.375 0.5) (layers F.Cu))
+  (pad 5 smd rect (at 0.0 -0.925) (size 0.3 0.65) (layers F.Cu))
+  (pad 6 smd rect (at -0.538 -0.85) (size 0.375 0.5) (layers F.Cu))
+  (fp_line (start -0.8 0.6) (end 0.8 0.6) (layer F.Fab) (width 0.1016))
+  (fp_line (start 0.8 0.6) (end 0.8 -0.6) (layer F.Fab) (width 0.1016))
+  (fp_line (start 0.8 -0.6) (end -0.8 -0.6) (layer F.Fab) (width 0.1016))
+  (fp_line (start -0.8 -0.6) (end -0.8 0.6) (layer F.Fab) (width 0.1016))
+  (fp_circle (center -0.525 0.3) (end -0.375 0.3) (layer F.SilkS) (width 0.0))
+  (fp_poly
+    (pts
+      (xy -0.626334 0.625226)
+      (xy -0.374774 0.625226)
+      (xy -0.374774 0.851334)
+      (xy -0.626334 0.851334)
+    ) (layer F.Fab) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy -0.12513 0.6251)
+      (xy 0.1251 0.6251)
+      (xy 0.1251 0.85013)
+      (xy -0.12513 0.85013)
+    ) (layer F.Fab) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy 0.3745575 0.6261655)
+      (xy 0.6261655 0.6261655)
+      (xy 0.6261655 0.8504425)
+      (xy 0.3745575 0.8504425)
+    ) (layer F.Fab) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy 0.387792 -0.8625)
+      (xy 0.6125 -0.8625)
+      (xy 0.6125 -0.612961)
+      (xy 0.387792 -0.612961)
+    ) (layer F.Fab) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy -0.112714 -0.8625)
+      (xy 0.1125 -0.8625)
+      (xy 0.1125 -0.613667)
+      (xy -0.112714 -0.613667)
+    ) (layer F.Fab) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy -0.612508 -0.8625)
+      (xy -0.3875 -0.8625)
+      (xy -0.3875 -0.612508)
+      (xy -0.612508 -0.612508)
+    ) (layer F.Fab) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy -0.12506 0.625)
+      (xy 0.125 0.625)
+      (xy 0.125 1.22559)
+      (xy -0.12506 1.22559)
+    ) (layer F.Paste) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy -0.125036 -1.225)
+      (xy 0.125 -1.225)
+      (xy 0.125 -0.62518)
+      (xy -0.125036 -0.62518)
+    ) (layer F.Paste) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy 0.375545 -1.075)
+      (xy 0.7005 -1.075)
+      (xy 0.7005 -0.625075)
+      (xy 0.375545 -0.625075)
+    ) (layer F.Paste) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy -0.701598 -1.075)
+      (xy -0.3755 -1.075)
+      (xy -0.3755 -0.62598)
+      (xy -0.701598 -0.62598)
+    ) (layer F.Paste) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy 0.376043 0.625)
+      (xy 0.7005 0.625)
+      (xy 0.7005 1.07655)
+      (xy 0.376043 1.07655)
+    ) (layer F.Paste) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy -0.70163 0.625)
+      (xy -0.3755 0.625)
+      (xy -0.3755 1.07673)
+      (xy -0.70163 1.07673)
+    ) (layer F.Paste) (width 0.01)
+  )
+  (fp_poly
+    (pts
+      (xy -0.275 -1.375)
+      (xy -0.275 -1.225)
+      (xy -0.85 -1.225)
+      (xy -0.85 -0.475)
+      (xy 0.85 -0.475)
+      (xy 0.85 -1.225)
+      (xy 0.275 -1.225)
+      (xy 0.275 -1.375)
+    ) (layer F.Mask) (width 0.0)
+  )
+  (fp_poly
+    (pts
+      (xy -0.275 1.375)
+      (xy -0.275 1.225)
+      (xy -0.85 1.225)
+      (xy -0.85 0.475)
+      (xy 0.85 0.475)
+      (xy 0.85 1.225)
+      (xy 0.275 1.225)
+      (xy 0.275 1.375)
+    ) (layer F.Mask) (width 0.0)
+  )
+)
