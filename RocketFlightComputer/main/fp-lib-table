@@ -7,4 +7,6 @@
   (lib (name "ZOE-M8Q")(type "KiCad")(uri "${KIPRJMOD}/Libraries/ZOE-M8Q.pretty")(options "")(descr ""))
   (lib (name "INA260")(type "KiCad")(uri "${KIPRJMOD}/Libraries/INA260.pretty")(options "")(descr ""))
   (lib (name "TCA9548A")(type "KiCad")(uri "${KIPRJMOD}/Libraries/TCA9548A.pretty")(options "")(descr ""))
+  (lib (name "DM3DSF")(type "KiCad")(uri "${KIPRJMOD}/Libraries/DM3DSF.pretty")(options "")(descr ""))
+  (lib (name "PowerButton")(type "KiCad")(uri "${KIPRJMOD}/Libraries/PowerButton.pretty")(options "")(descr ""))
 )

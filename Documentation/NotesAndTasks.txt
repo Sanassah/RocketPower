@@ -1,0 +1,1 @@
+- Simulate the rocket to calculate fins loading to choose from 5v or 8.4v servos which would mean no need for a voltage regulator
