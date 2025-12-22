@@ -920,6 +920,70 @@
 			)
 		)
 	)
+	(no_connect
+		(at 139.7 62.23)
+		(uuid "09508bd8-a9d0-4f2c-9d88-17f0d0b20f69")
+	)
+	(no_connect
+		(at 116.84 67.31)
+		(uuid "1fb51c40-2879-4ef2-8f92-717d2fca5317")
+	)
+	(no_connect
+		(at 139.7 74.93)
+		(uuid "56f921a0-9ca0-415c-a89b-3b4651e20156")
+	)
+	(no_connect
+		(at 139.7 57.15)
+		(uuid "66b4d2da-cda7-4648-9a38-2b60924c8836")
+	)
+	(no_connect
+		(at 139.7 67.31)
+		(uuid "70c6fec9-6ca5-49c1-997b-2f6df2aa6cc5")
+	)
+	(no_connect
+		(at 139.7 64.77)
+		(uuid "7fbf9de7-ca60-479d-a015-45cacac0bfe2")
+	)
+	(no_connect
+		(at 139.7 59.69)
+		(uuid "83e42e6d-8631-4186-83c1-2f2e3433b60e")
+	)
+	(no_connect
+		(at 139.7 54.61)
+		(uuid "893193ec-4564-4093-8ccb-755e2307f6b7")
+	)
+	(no_connect
+		(at 139.7 52.07)
+		(uuid "8d1f84b9-16b4-4316-95b5-4b5f0a8d2f44")
+	)
+	(no_connect
+		(at 139.7 69.85)
+		(uuid "9bd81aa8-0405-4fe2-a127-a55a4327e2cb")
+	)
+	(no_connect
+		(at 116.84 62.23)
+		(uuid "ba49e96d-4185-48ea-9b01-9e57c724a229")
+	)
+	(no_connect
+		(at 116.84 72.39)
+		(uuid "bc4a2d12-9e54-4b29-8e83-a9e403203081")
+	)
+	(no_connect
+		(at 116.84 69.85)
+		(uuid "c1333ca5-b2cb-4cb2-9cc0-93baa33bae5b")
+	)
+	(no_connect
+		(at 139.7 72.39)
+		(uuid "c30abacc-e962-4c6e-9b75-657d8b794a81")
+	)
+	(no_connect
+		(at 116.84 64.77)
+		(uuid "e97fb2b9-6d2e-4c75-8d8b-e4167aecaeaa")
+	)
+	(no_connect
+		(at 116.84 59.69)
+		(uuid "fd1113c6-4f6b-483f-bccf-3d50f6d3820d")
+	)
 	(text "We will be using two XBP24CASIT (2.4 GHz, 200 ft, 4000 ft, 250 kb/s, 802.15.4, Zigbee)\nCurrent: 250mA"
 		(exclude_from_sim no)
 		(at 140.208 100.838 0)
@@ -1055,7 +1119,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "376c6ba8-9642-4d61-9f77-4c1565bf1e15")
-		(property "Reference" "XBEE"
+		(property "Reference" "XBEE1"
 			(at 128.27 44.45 0)
 			(effects
 				(font
@@ -1214,7 +1278,7 @@
 		(instances
 			(project ""
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e28c6e59-b6f8-4de5-b42d-020f37d4635d"
-					(reference "XBEE")
+					(reference "XBEE1")
 					(unit 1)
 				)
 			)
@@ -1432,7 +1496,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e9a8dea2-7693-42e8-88a3-d3d4eaae6404")
-		(property "Reference" "JST4PIN"
+		(property "Reference" "JST4PIN1"
 			(at 82.042 53.086 0)
 			(effects
 				(font
@@ -1545,7 +1609,7 @@
 		(instances
 			(project ""
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e28c6e59-b6f8-4de5-b42d-020f37d4635d"
-					(reference "JST4PIN")
+					(reference "JST4PIN1")
 					(unit 1)
 				)
 			)

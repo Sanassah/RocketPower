@@ -5,6 +5,157 @@
 	(uuid "94c137fa-bd7f-42f7-9056-468b9ec54ee6")
 	(paper "A4")
 	(lib_symbols
+		(symbol "1548130:1548130"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "ScrewTerminal"
+				(at 10.795 -6.35 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify right)
+				)
+			)
+			(property "Value" "1548130"
+				(at 8.255 -6.35 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify right)
+				)
+			)
+			(property "Footprint" "footprint:1548130"
+				(at 16.51 -94.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.phoenixcontact.com/en-pc/products/pcb-terminal-block-smkdsn-15-2-508-spe-1548130"
+				(at 16.51 -194.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Description" "Pluggable Terminal Blocks SMKDSN 1,5/ 2-5,08 SPE"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Height" ""
+				(at 16.51 -394.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Mouser Part Number" "651-1548130"
+				(at 16.51 -494.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Phoenix-Contact/1548130?qs=ulEaXIWI0c%252BRfEEFIHTrfw%3D%3D"
+				(at 16.51 -594.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Manufacturer_Name" "Phoenix Contact"
+				(at 16.51 -694.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Manufacturer_Part_Number" "1548130"
+				(at 16.51 -794.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(symbol "1548130_1_1"
+				(rectangle
+					(start 5.08 2.54)
+					(end 15.24 -5.08)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(pin passive line
+					(at 0 0 0)
+					(length 5.08)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "Pyro+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -2.54 0)
+					(length 5.08)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "Pyro-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "B2B-XH-A_LF__SN_:B2B-XH-A_LF__SN_"
 			(pin_names
 				(offset 1.016)
@@ -534,195 +685,6 @@
 						(effects
 							(font
 								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-			)
-		)
-		(symbol "Connector:Screw_Terminal_01x02"
-			(pin_names
-				(offset 1.016) hide)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "J2"
-				(at 1.2701 -5.08 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify right)
-				)
-			)
-			(property "Value" "Screw_Terminal_01x02"
-				(at -1.2699 -5.08 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify right)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "screw terminal"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "TerminalBlock*:*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "Screw_Terminal_01x02_1_1"
-				(rectangle
-					(start -1.27 1.27)
-					(end 1.27 -3.81)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(circle
-					(center 0 -2.54)
-					(radius 0.635)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.5334 -2.2098) (xy 0.3302 -3.048)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.5334 0.3302) (xy 0.3302 -0.508)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.3556 -2.032) (xy 0.508 -2.8702)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.3556 0.508) (xy 0.508 -0.3302)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 0)
-					(radius 0.635)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "Pyro+"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -2.54 0)
-					(length 3.81)
-					(name "Pyro-"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
 							)
 						)
 					)
@@ -2559,12 +2521,6 @@
 		(uuid "55ee4277-52c2-48fb-8365-1d2c70eac9b9")
 	)
 	(junction
-		(at 55.88 128.905)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "5d811ad1-cb89-4f14-b4e1-bab1771c6941")
-	)
-	(junction
 		(at 144.78 38.1)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2661,6 +2617,12 @@
 		(uuid "ccd69747-1386-4464-8d1d-8dbbef7ff879")
 	)
 	(junction
+		(at 55.245 128.905)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d97d8bd9-7405-47dd-b247-ae7e731cf30c")
+	)
+	(junction
 		(at 63.5 35.56)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2724,6 +2686,16 @@
 	)
 	(wire
 		(pts
+			(xy 129.54 123.825) (xy 129.54 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "133c99b4-9407-4081-8763-f71f8c926a29")
+	)
+	(wire
+		(pts
 			(xy 38.735 147.32) (xy 47.625 147.32)
 		)
 		(stroke
@@ -2741,16 +2713,6 @@
 			(type default)
 		)
 		(uuid "15566195-a01a-4b15-b5e8-d56df32fa8e9")
-	)
-	(wire
-		(pts
-			(xy 129.54 123.19) (xy 129.54 127)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "165bb360-ffcd-48eb-8c45-8d000dd5a182")
 	)
 	(wire
 		(pts
@@ -2831,6 +2793,16 @@
 			(type default)
 		)
 		(uuid "2c7f2c7e-d6d0-4b78-a6a2-1a7d5f21fa9a")
+	)
+	(wire
+		(pts
+			(xy 52.705 127) (xy 52.705 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2ca763eb-228f-435a-bc58-2368dfc567c9")
 	)
 	(wire
 		(pts
@@ -2954,16 +2926,6 @@
 	)
 	(wire
 		(pts
-			(xy 53.34 123.19) (xy 53.34 127)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5933a36f-f56f-4832-bc6a-c46294ec25a7")
-	)
-	(wire
-		(pts
 			(xy 129.54 127) (xy 129.54 130.175)
 		)
 		(stroke
@@ -3011,16 +2973,6 @@
 			(type default)
 		)
 		(uuid "74d1bce0-cda6-473e-a287-bc589de16508")
-	)
-	(wire
-		(pts
-			(xy 55.88 128.905) (xy 55.245 128.905)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "764daa91-fb6a-493e-a1b5-5084ac82a802")
 	)
 	(wire
 		(pts
@@ -3134,13 +3086,23 @@
 	)
 	(wire
 		(pts
-			(xy 127 123.19) (xy 127 126.365)
+			(xy 127 126.365) (xy 127 123.825)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "8a6a44a9-89e7-49db-a54b-a18d647e00bf")
+	)
+	(wire
+		(pts
+			(xy 209.55 127.635) (xy 209.55 125.095)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "91654fd3-106d-49de-b091-e5d7ca074534")
 	)
 	(wire
 		(pts
@@ -3344,23 +3306,13 @@
 	)
 	(wire
 		(pts
-			(xy 212.09 124.46) (xy 212.09 128.27)
+			(xy 212.09 125.095) (xy 212.09 128.27)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d74ad3f9-3704-4534-b82e-11f1f3d6331b")
-	)
-	(wire
-		(pts
-			(xy 209.55 124.46) (xy 209.55 127.635)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d97341eb-e7fb-4d0c-bde9-4a081bc1626b")
+		(uuid "d4dbcfde-a99b-4171-9976-e4bd3946b471")
 	)
 	(wire
 		(pts
@@ -3444,7 +3396,7 @@
 	)
 	(wire
 		(pts
-			(xy 55.88 123.19) (xy 55.88 128.905)
+			(xy 55.245 124.46) (xy 55.245 128.905)
 		)
 		(stroke
 			(width 0)
@@ -3464,7 +3416,7 @@
 	)
 	(wire
 		(pts
-			(xy 60.96 128.905) (xy 55.88 128.905)
+			(xy 60.96 128.905) (xy 55.245 128.905)
 		)
 		(stroke
 			(width 0)
@@ -3579,15 +3531,13 @@
 			(type default)
 		)
 		(fill
-			(type color)
-			(color 255 251 20 1)
+			(type none)
 		)
 		(effects
 			(font
 				(size 1.27 1.27)
 				(thickness 0.254)
 				(bold yes)
-				(italic yes)
 			)
 			(justify left top)
 		)
@@ -3637,7 +3587,7 @@
 		)
 		(uuid "982a2878-016e-4fe9-810e-15032148772c")
 	)
-	(text "Might not need a 5v regulator bcz pyro and \nservos are 8.4v servos and pyro can take \nwathever voltage"
+	(text "Might not need a regulator for pyro and servos \nsince there are 8.4v servos and pyro can take \nwathever voltage"
 		(exclude_from_sim no)
 		(at 209.55 40.64 0)
 		(effects
@@ -3682,7 +3632,7 @@
 		(uuid "24f7857b-b47a-482b-8394-fc7416af7605")
 	)
 	(label "7.5V_AftSwitch"
-		(at 53.34 127 180)
+		(at 52.705 127 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4880,7 +4830,7 @@
 		(dnp no)
 		(uuid "2dc8d216-0353-4bb4-93ab-6ffec9815fa1")
 		(property "Reference" "C42"
-			(at 99.568 45.466 0)
+			(at 100.965 45.085 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5010,76 +4960,6 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/03966d30-d016-427a-9db2-b49a5b43d133"
 					(reference "R29")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:Screw_Terminal_01x02")
-		(at 53.34 118.11 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "3685d7c8-fe4c-4fd0-9a73-58b0b4e01980")
-		(property "Reference" "ScrewTerminal1"
-			(at 49.276 115.062 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "Screw_Terminal_01x02"
-			(at 58.42 119.3799 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "ScrewTerminals:2.54mm"
-			(at 53.34 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 53.34 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 53.34 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "21a3af48-c0cf-42d9-a728-cf39e4d8ff5d")
-		)
-		(pin "1"
-			(uuid "e8dc0415-b6ed-4b59-9c0d-ce9b28fea3fd")
-		)
-		(instances
-			(project ""
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/03966d30-d016-427a-9db2-b49a5b43d133"
-					(reference "ScrewTerminal1")
 					(unit 1)
 				)
 			)
@@ -5474,7 +5354,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.mouser.ca/ProductDetail/JST-Commercial/B3P-VHLFSN?qs=sGAEpiMZZMvlX3nhDDO4AHguVQqtVxvAWRX3nCvDbmQ%3D&srsltid=AfmBOorScSaVSZrDscJrSDG17X6Xx3mLfLS9uU4Xya6IlCTTNikxOLNZ"
+		(property "Datasheet" ""
 			(at 212.09 91.44 0)
 			(effects
 				(font
@@ -5483,7 +5363,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Connector Header Through Hole 3 position 0.156 (3.96mm)"
+		(property "Description" "\nConnector Header Through Hole 3 position 0.156 (3.96mm)\n"
 			(at 212.09 91.44 0)
 			(effects
 				(font
@@ -5894,7 +5774,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.mouser.ca/ProductDetail/JST-Commercial/B3P-VHLFSN?qs=sGAEpiMZZMvlX3nhDDO4AHguVQqtVxvAWRX3nCvDbmQ%3D&srsltid=AfmBOorScSaVSZrDscJrSDG17X6Xx3mLfLS9uU4Xya6IlCTTNikxOLNZ"
+		(property "Datasheet" ""
 			(at 256.54 91.44 0)
 			(effects
 				(font
@@ -6176,7 +6056,7 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 90.17 38.0999 90)
+			(at 90.17 38.735 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6233,7 +6113,7 @@
 		(dnp no)
 		(uuid "6b7496a6-620f-4a49-9ed1-5e21b7ee195b")
 		(property "Reference" "C41"
-			(at 75.946 37.846 0)
+			(at 77.47 38.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6734,7 +6614,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.mouser.ca/ProductDetail/JST-Commercial/B3P-VHLFSN?qs=sGAEpiMZZMvlX3nhDDO4AHguVQqtVxvAWRX3nCvDbmQ%3D&srsltid=AfmBOorScSaVSZrDscJrSDG17X6Xx3mLfLS9uU4Xya6IlCTTNikxOLNZ"
+		(property "Datasheet" ""
 			(at 256.54 80.01 0)
 			(effects
 				(font
@@ -7122,6 +7002,128 @@
 		)
 	)
 	(symbol
+		(lib_id "1548130:1548130")
+		(at 52.705 124.46 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9d74e603-9644-43c5-b32d-d1f73e518453")
+		(property "Reference" "ScrewTerminal1"
+			(at 47.752 107.188 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "1548130"
+			(at 59.055 116.205 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "footprint:1548130"
+			(at 147.625 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.phoenixcontact.com/en-pc/products/pcb-terminal-block-smkdsn-15-2-508-spe-1548130"
+			(at 247.625 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 52.705 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" ""
+			(at 447.625 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" "651-1548130"
+			(at 547.625 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Phoenix-Contact/1548130?qs=ulEaXIWI0c%252BRfEEFIHTrfw%3D%3D"
+			(at 647.625 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "Phoenix Contact"
+			(at 747.625 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "1548130"
+			(at 847.625 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "Pyro+"
+			(uuid "b31c38e1-cab9-4aae-9a7d-e67ee28e76bb")
+		)
+		(pin "Pyro-"
+			(uuid "06bc2fa3-3dfd-4901-8491-b31ef9863e4b")
+		)
+		(instances
+			(project "main"
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/03966d30-d016-427a-9db2-b49a5b43d133"
+					(reference "ScrewTerminal1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+7.5V")
 		(at 63.5 38.1 180)
 		(unit 1)
@@ -7369,7 +7371,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.mouser.ca/ProductDetail/JST-Commercial/B3P-VHLFSN?qs=sGAEpiMZZMvlX3nhDDO4AHguVQqtVxvAWRX3nCvDbmQ%3D&srsltid=AfmBOorScSaVSZrDscJrSDG17X6Xx3mLfLS9uU4Xya6IlCTTNikxOLNZ"
+		(property "Datasheet" ""
 			(at 212.09 80.01 0)
 			(effects
 				(font
@@ -8033,16 +8035,16 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x02")
-		(at 127 118.11 90)
+		(lib_id "1548130:1548130")
+		(at 209.55 125.095 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "d44ffc71-b447-4c86-9fd5-850619d27ebf")
-		(property "Reference" "ScrewTerminal2"
-			(at 121.412 115.316 90)
+		(uuid "ceaccf83-a2d2-4203-8867-75b63dc70359")
+		(property "Reference" "ScrewTerminal3"
+			(at 203.2 107.95 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8050,8 +8052,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "Screw_Terminal_01x02"
-			(at 132.08 119.3799 90)
+		(property "Value" "1548130"
+			(at 215.9 116.84 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8060,8 +8062,28 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "ScrewTerminals:2.54mm"
-			(at 127 118.11 0)
+		(property "Footprint" "footprint:1548130"
+			(at 304.47 108.585 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.phoenixcontact.com/en-pc/products/pcb-terminal-block-smkdsn-15-2-508-spe-1548130"
+			(at 404.47 108.585 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 209.55 125.095 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8069,34 +8091,66 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
-			(at 127 118.11 0)
+		(property "Height" ""
+			(at 604.47 108.585 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left top)
 				(hide yes)
 			)
 		)
-		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 127 118.11 0)
+		(property "Mouser Part Number" "651-1548130"
+			(at 704.47 108.585 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left top)
 				(hide yes)
 			)
 		)
-		(pin "2"
-			(uuid "f6b15cc0-2ce9-49ee-af14-1002bb776f76")
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Phoenix-Contact/1548130?qs=ulEaXIWI0c%252BRfEEFIHTrfw%3D%3D"
+			(at 804.47 108.585 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
 		)
-		(pin "1"
-			(uuid "cc5f081f-ca99-471b-bd4b-1ed2b2d41786")
+		(property "Manufacturer_Name" "Phoenix Contact"
+			(at 904.47 108.585 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "1548130"
+			(at 1004.47 108.585 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "Pyro+"
+			(uuid "6b28f1c4-5b23-47ce-86c3-c0939df395a0")
+		)
+		(pin "Pyro-"
+			(uuid "9aa02c56-2c56-4b60-9e76-9ed38e2388d7")
 		)
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/03966d30-d016-427a-9db2-b49a5b43d133"
-					(reference "ScrewTerminal2")
+					(reference "ScrewTerminal3")
 					(unit 1)
 				)
 			)
@@ -8352,16 +8406,16 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x02")
-		(at 209.55 119.38 90)
+		(lib_id "1548130:1548130")
+		(at 127 123.825 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "e45060d6-04b9-495d-979d-1d38552694b7")
-		(property "Reference" "ScrewTerminal3"
-			(at 203.708 116.332 90)
+		(uuid "ee7358fc-812d-42ab-8a2f-cd4517fe0b76")
+		(property "Reference" "ScrewTerminal2"
+			(at 121.666 106.68 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8369,8 +8423,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "Screw_Terminal_01x02"
-			(at 214.63 120.6499 90)
+		(property "Value" "1548130"
+			(at 133.35 115.57 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8379,8 +8433,28 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "ScrewTerminals:2.54mm"
-			(at 209.55 119.38 0)
+		(property "Footprint" "footprint:1548130"
+			(at 221.92 107.315 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.phoenixcontact.com/en-pc/products/pcb-terminal-block-smkdsn-15-2-508-spe-1548130"
+			(at 321.92 107.315 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 127 123.825 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8388,34 +8462,66 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
-			(at 209.55 119.38 0)
+		(property "Height" ""
+			(at 521.92 107.315 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left top)
 				(hide yes)
 			)
 		)
-		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 209.55 119.38 0)
+		(property "Mouser Part Number" "651-1548130"
+			(at 621.92 107.315 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left top)
 				(hide yes)
 			)
 		)
-		(pin "2"
-			(uuid "7e1ff1cd-d8c1-4619-9e7e-fcc209961994")
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Phoenix-Contact/1548130?qs=ulEaXIWI0c%252BRfEEFIHTrfw%3D%3D"
+			(at 721.92 107.315 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
 		)
-		(pin "1"
-			(uuid "24cf3502-8a44-427d-890f-7ab2d5f1a702")
+		(property "Manufacturer_Name" "Phoenix Contact"
+			(at 821.92 107.315 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "1548130"
+			(at 921.92 107.315 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "Pyro+"
+			(uuid "7eaa809c-d3e5-4ff2-91a3-fafaae3cd3b5")
+		)
+		(pin "Pyro-"
+			(uuid "05b016fb-0838-4d20-bc1d-ef9866b66409")
 		)
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/03966d30-d016-427a-9db2-b49a5b43d133"
-					(reference "ScrewTerminal3")
+					(reference "ScrewTerminal2")
 					(unit 1)
 				)
 			)

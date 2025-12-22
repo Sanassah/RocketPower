@@ -1,4 +1,4 @@
-24656915394336144
+24658692175324839
 ADXL375
 1X04_ROUND
 
@@ -90957,6 +90957,13 @@ rotary encoder illuminated switch vertical
 0
 9
 8
+ScrewTerminals
+2.54mm
+1725656-5
+Connector
+0
+2
+2
 Sensor
 ASAIR_AM2302_P2.54mm_Lead2.75mm_TabDown
 Temperature and humidity module, http://akizukidenshi.com/download/ds/aosong/AM2302.pdf

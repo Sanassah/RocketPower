@@ -67,14 +67,8 @@
     "visible_layers": "fffffff_ffffffff",
     "zone_display_mode": 0
   },
-  "git": {
-    "repo_password": "",
-    "repo_type": "",
-    "repo_username": "",
-    "ssh_key": ""
-  },
   "meta": {
-    "filename": "main.kicad_prl",
+    "filename": "KiCAD_Custom_DRC_Rules_for_PCBWay.kicad_prl",
     "version": 3
   },
   "project": {

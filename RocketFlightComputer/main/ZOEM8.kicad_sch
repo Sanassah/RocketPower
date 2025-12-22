@@ -5,6 +5,174 @@
 	(uuid "3a83b966-b665-4570-aee7-7d7de199a862")
 	(paper "A4")
 	(lib_symbols
+		(symbol "Device:Crystal"
+			(pin_numbers hide)
+			(pin_names
+				(offset 1.016) hide)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "Y"
+				(at 0 3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Crystal"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Two pin crystal"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "quartz ceramic resonator oscillator"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Crystal*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Crystal_0_1"
+				(rectangle
+					(start -1.143 2.54)
+					(end 1.143 -2.54)
+					(stroke
+						(width 0.3048)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 0) (xy -1.905 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.905 -1.27) (xy -1.905 1.27)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.905 -1.27) (xy 1.905 1.27)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 0) (xy 1.905 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Crystal_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 1.27)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 1.27)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "SparkFun_ZOE-M8Q GPS-eagle-import:0.1UF-0603-25V-(+80/-20%)"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -205,210 +373,6 @@
 				)
 			)
 			(symbol "10OHM-0603-1/10W-1%_1_0"
-				(polyline
-					(pts
-						(xy -2.54 0) (xy -2.159 1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.159 1.016) (xy -1.524 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.524 -1.016) (xy -0.889 1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.889 1.016) (xy -0.254 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.254 -1.016) (xy 0.381 1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.381 1.016) (xy 1.016 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.016 -1.016) (xy 1.651 1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.651 1.016) (xy 2.286 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.286 -1.016) (xy 2.54 0)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-		)
-		(symbol "SparkFun_ZOE-M8Q GPS-eagle-import:2.2KOHM-0603-1/10W-1%"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "R"
-				(at 0 1.524 0)
-				(effects
-					(font
-						(size 1.778 1.778)
-					)
-					(justify bottom)
-				)
-			)
-			(property "Value" ""
-				(at 0 -1.524 0)
-				(effects
-					(font
-						(size 1.778 1.778)
-					)
-					(justify top)
-				)
-			)
-			(property "Footprint" "SparkFun_ZOE-M8Q GPS:0603"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_locked" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "2.2KOHM-0603-1/10W-1%_1_0"
 				(polyline
 					(pts
 						(xy -2.54 0) (xy -2.159 1.016)
@@ -974,216 +938,6 @@
 						)
 					)
 					(number "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-		)
-		(symbol "SparkFun_ZOE-M8Q GPS-eagle-import:CRYSTAL-32.768KHZSMD-3.2X1.5"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "Y"
-				(at 0 2.032 0)
-				(effects
-					(font
-						(size 1.778 1.778)
-					)
-					(justify bottom)
-				)
-			)
-			(property "Value" ""
-				(at 0 -2.032 0)
-				(effects
-					(font
-						(size 1.778 1.778)
-					)
-					(justify top)
-				)
-			)
-			(property "Footprint" "SparkFun_ZOE-M8Q GPS:CRYSTAL-SMD-3.2X1.5MM"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_locked" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "CRYSTAL-32.768KHZSMD-3.2X1.5_1_0"
-				(polyline
-					(pts
-						(xy -2.54 0) (xy -1.016 0)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.016 1.778) (xy -1.016 -1.778)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.381 -1.524) (xy 0.381 -1.524)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.381 1.524) (xy -0.381 -1.524)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.381 -1.524) (xy 0.381 1.524)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.381 1.524) (xy -0.381 1.524)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.016 0) (xy 2.54 0)
-					)
-					(stroke
-						(width 0.1524)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.016 1.778) (xy 1.016 -1.778)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(text "1"
-					(at -2.159 -1.143 0)
-					(effects
-						(font
-							(size 0.8636 0.734)
-						)
-						(justify left bottom)
-					)
-				)
-				(text "2"
-					(at 1.524 -1.143 0)
-					(effects
-						(font
-							(size 0.8636 0.734)
-						)
-						(justify left bottom)
-					)
-				)
-				(pin passive line
-					(at -2.54 0 0)
-					(length 0)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "P$1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 2.54 0 180)
-					(length 0)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "P$2"
 						(effects
 							(font
 								(size 0 0)
@@ -2777,6 +2531,102 @@
 				)
 			)
 		)
+		(symbol "power:PWR_FLAG"
+			(power)
+			(pin_numbers hide)
+			(pin_names
+				(offset 0) hide)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#FLG"
+				(at 0 1.905 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "PWR_FLAG"
+				(at 0 3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Special symbol for telling ERC where power comes from"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "flag power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "PWR_FLAG_0_0"
+				(pin power_out line
+					(at 0 0 90)
+					(length 0)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(symbol "PWR_FLAG_0_1"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 1.27) (xy -1.016 1.905) (xy 0 2.54) (xy 1.016 1.905) (xy 0 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+		)
 	)
 	(junction
 		(at 141.605 59.69)
@@ -2791,16 +2641,22 @@
 		(uuid "2f28d9a6-5cfe-4094-b80c-19ba69191832")
 	)
 	(junction
-		(at 207.645 59.69)
+		(at 138.43 62.23)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "63571423-8ab7-44e8-a90c-52fba65f8c14")
+		(uuid "54ed6116-ab16-41bb-b2cf-574db025dd3f")
 	)
 	(junction
 		(at 126.365 64.77)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "72167f2d-aa2e-4771-b192-1ac7d9e6e18a")
+	)
+	(junction
+		(at 143.51 64.77)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "79e2d0a5-1145-4b5a-8354-8204f774cd22")
 	)
 	(junction
 		(at 88.265 153.67)
@@ -2815,80 +2671,60 @@
 		(uuid "ba059226-caff-4e67-86fa-76f0d8aab55a")
 	)
 	(junction
-		(at 186.69 57.15)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "cd728299-c141-43b5-8e93-6c2356c805db")
-	)
-	(junction
 		(at 141.605 57.15)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "e902db17-094d-4c5e-8f20-2a2c66ec7715")
 	)
 	(no_connect
-		(at 182.245 62.23)
+		(at 181.61 62.23)
 		(uuid "250d70b3-4261-4918-a5d6-a88dc44708d2")
 	)
 	(no_connect
-		(at 182.245 67.31)
+		(at 181.61 67.31)
 		(uuid "456f5054-ea40-4c2c-b2b6-60ff997f6bba")
 	)
 	(no_connect
-		(at 182.245 64.77)
+		(at 181.61 87.63)
+		(uuid "4882699d-31b4-41bb-8d5f-2906bfe064d2")
+	)
+	(no_connect
+		(at 181.61 85.09)
+		(uuid "7fb24316-f204-4991-bb96-3d7a8fc4c86f")
+	)
+	(no_connect
+		(at 181.61 64.77)
 		(uuid "8819cd84-2b04-4799-9917-e26e6ded287f")
 	)
 	(no_connect
-		(at 182.245 90.17)
+		(at 181.61 90.17)
 		(uuid "959e09c4-4918-4400-96c1-7f51bf057655")
 	)
 	(no_connect
-		(at 182.245 82.55)
+		(at 181.61 82.55)
 		(uuid "b19ef3ff-7ac4-4f18-8c48-fa43b541c55b")
 	)
 	(no_connect
-		(at 182.245 80.01)
+		(at 181.61 77.47)
+		(uuid "c98c1818-c840-4cd6-bc77-360548ebf998")
+	)
+	(no_connect
+		(at 181.61 92.71)
+		(uuid "d2f623c0-7f15-4f66-b7f2-cab47a01efcc")
+	)
+	(no_connect
+		(at 181.61 80.01)
 		(uuid "e36221ea-f815-43de-9024-045074d55fb7")
 	)
 	(wire
 		(pts
-			(xy 194.945 72.39) (xy 194.945 67.31)
+			(xy 193.04 72.39) (xy 193.04 69.85)
 		)
 		(stroke
 			(width 0.1524)
 			(type solid)
 		)
 		(uuid "01223de2-6cf7-4a81-936e-d97df81d157e")
-	)
-	(wire
-		(pts
-			(xy 194.945 74.93) (xy 194.945 77.47)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "0d7996af-802c-46d1-b5d0-eafb4418db0e")
-	)
-	(wire
-		(pts
-			(xy 200.025 67.31) (xy 200.025 69.85)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "0e75228b-e5ae-4f4b-8ebe-c8309e0a85fc")
-	)
-	(wire
-		(pts
-			(xy 182.245 59.69) (xy 207.645 59.69)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "0fa5cf90-65a8-45fb-b9f1-699384adf39c")
 	)
 	(wire
 		(pts
@@ -2902,16 +2738,6 @@
 	)
 	(wire
 		(pts
-			(xy 207.645 59.69) (xy 206.375 59.69)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "207fc761-a133-4488-ac96-35222510663f")
-	)
-	(wire
-		(pts
 			(xy 70.485 153.67) (xy 73.025 153.67)
 		)
 		(stroke
@@ -2922,17 +2748,7 @@
 	)
 	(wire
 		(pts
-			(xy 182.245 87.63) (xy 184.785 87.63)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "21e2d5a9-8850-4f03-9f4c-de15ebd3c241")
-	)
-	(wire
-		(pts
-			(xy 194.945 67.31) (xy 200.025 67.31)
+			(xy 193.04 69.85) (xy 199.39 69.85)
 		)
 		(stroke
 			(width 0.1524)
@@ -2982,16 +2798,6 @@
 	)
 	(wire
 		(pts
-			(xy 182.245 77.47) (xy 184.785 77.47)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "3bfbb3a5-35dd-4f08-a09c-6695676e6094")
-	)
-	(wire
-		(pts
 			(xy 85.725 153.67) (xy 88.265 153.67)
 		)
 		(stroke
@@ -3012,23 +2818,23 @@
 	)
 	(wire
 		(pts
-			(xy 182.245 72.39) (xy 194.945 72.39)
+			(xy 193.04 77.47) (xy 193.04 74.93)
+		)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(uuid "4c34cdc4-32f9-46f2-ab7b-877c598b4318")
+	)
+	(wire
+		(pts
+			(xy 181.61 72.39) (xy 193.04 72.39)
 		)
 		(stroke
 			(width 0.1524)
 			(type solid)
 		)
 		(uuid "64fc4230-d787-4ec4-b7b0-90bb8d75fba8")
-	)
-	(wire
-		(pts
-			(xy 190.5 57.15) (xy 186.69 57.15)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6e8e284c-b305-4290-ac03-22bbaff2cbc8")
 	)
 	(wire
 		(pts
@@ -3042,7 +2848,7 @@
 	)
 	(wire
 		(pts
-			(xy 126.365 62.23) (xy 146.685 62.23)
+			(xy 126.365 62.23) (xy 138.43 62.23)
 		)
 		(stroke
 			(width 0.1524)
@@ -3052,7 +2858,7 @@
 	)
 	(wire
 		(pts
-			(xy 146.685 74.93) (xy 139.065 74.93)
+			(xy 146.05 74.93) (xy 139.065 74.93)
 		)
 		(stroke
 			(width 0.1524)
@@ -3072,7 +2878,7 @@
 	)
 	(wire
 		(pts
-			(xy 207.645 59.69) (xy 208.915 59.69)
+			(xy 181.61 59.69) (xy 190.5 59.69)
 		)
 		(stroke
 			(width 0.1524)
@@ -3092,53 +2898,13 @@
 	)
 	(wire
 		(pts
-			(xy 182.245 92.71) (xy 184.785 92.71)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "8b1236fe-2581-44ec-a64e-006f34948ebf")
-	)
-	(wire
-		(pts
-			(xy 182.245 85.09) (xy 184.785 85.09)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "98964ce4-e645-4a12-9c4d-0779c25d1904")
-	)
-	(wire
-		(pts
-			(xy 146.685 57.15) (xy 141.605 57.15)
+			(xy 146.05 57.15) (xy 141.605 57.15)
 		)
 		(stroke
 			(width 0.1524)
 			(type solid)
 		)
 		(uuid "9f2d8840-4fb7-421c-9c90-bb4fa9d5dabb")
-	)
-	(wire
-		(pts
-			(xy 194.945 77.47) (xy 200.025 77.47)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "a2afcb42-0acd-49d1-99cb-5ae890055f1e")
-	)
-	(wire
-		(pts
-			(xy 200.025 74.93) (xy 200.025 77.47)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "a3ce5619-2fb1-4ac1-a504-b551cd07dadc")
 	)
 	(wire
 		(pts
@@ -3152,6 +2918,16 @@
 	)
 	(wire
 		(pts
+			(xy 143.51 64.77) (xy 139.065 64.77)
+		)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(uuid "aa0e8df0-4134-4d59-83b9-3c2dc63da317")
+	)
+	(wire
+		(pts
 			(xy 88.265 151.13) (xy 88.265 153.67)
 		)
 		(stroke
@@ -3162,7 +2938,17 @@
 	)
 	(wire
 		(pts
-			(xy 182.245 74.93) (xy 194.945 74.93)
+			(xy 193.04 74.93) (xy 181.61 74.93)
+		)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(uuid "b490fbd2-2299-4294-985e-18dc21a45501")
+	)
+	(wire
+		(pts
+			(xy 193.04 77.47) (xy 194.945 77.47)
 		)
 		(stroke
 			(width 0.1524)
@@ -3172,13 +2958,33 @@
 	)
 	(wire
 		(pts
-			(xy 186.69 57.15) (xy 182.245 57.15)
+			(xy 181.61 57.15) (xy 190.5 57.15)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "bbf5aa28-cf0b-4e24-80b2-a72b96c5b285")
+	)
+	(wire
+		(pts
+			(xy 138.43 62.23) (xy 146.05 62.23)
+		)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(uuid "c4358f7d-d7dc-4707-9992-a4ee1e3c0dfa")
+	)
+	(wire
+		(pts
+			(xy 194.945 77.47) (xy 209.55 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c855f06b-435e-433f-b3c9-591311e931b4")
 	)
 	(wire
 		(pts
@@ -3192,13 +2998,23 @@
 	)
 	(wire
 		(pts
-			(xy 146.685 59.69) (xy 141.605 59.69)
+			(xy 146.05 59.69) (xy 141.605 59.69)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "d0466c49-d576-4e6b-8ef3-ce600fdab9b0")
+	)
+	(wire
+		(pts
+			(xy 199.39 69.85) (xy 209.55 69.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d7b5c263-1386-4d58-9d17-9624f1dd6a14")
 	)
 	(wire
 		(pts
@@ -3212,7 +3028,7 @@
 	)
 	(wire
 		(pts
-			(xy 146.685 100.33) (xy 141.605 100.33)
+			(xy 146.05 100.33) (xy 141.605 100.33)
 		)
 		(stroke
 			(width 0.1524)
@@ -3232,16 +3048,6 @@
 	)
 	(wire
 		(pts
-			(xy 139.065 54.61) (xy 139.065 57.15)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "eda27adb-0e16-4aeb-94bf-3a8c0f34b9d6")
-	)
-	(wire
-		(pts
 			(xy 128.905 64.77) (xy 126.365 64.77)
 		)
 		(stroke
@@ -3252,7 +3058,7 @@
 	)
 	(wire
 		(pts
-			(xy 146.685 64.77) (xy 139.065 64.77)
+			(xy 146.05 64.77) (xy 143.51 64.77)
 		)
 		(stroke
 			(width 0.1524)
@@ -3272,7 +3078,7 @@
 	)
 	(wire
 		(pts
-			(xy 141.605 57.15) (xy 139.065 57.15)
+			(xy 141.605 57.15) (xy 127 57.15)
 		)
 		(stroke
 			(width 0.1524)
@@ -3302,32 +3108,6 @@
 			(type none)
 		)
 		(uuid 5afb3b90-19bd-45e2-a945-7d02deb26f9a)
-	)
-	(arc
-		(start 191.77 86.995)
-		(mid 191.5521 90.0611)
-		(end 189.23 92.075)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(fill
-			(type none)
-		)
-		(uuid 928382c5-2150-4e5a-a751-100ba4ff9065)
-	)
-	(arc
-		(start 187.325 76.835)
-		(mid 191.4431 79.5929)
-		(end 192.405 84.455)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(fill
-			(type none)
-		)
-		(uuid cc71c91b-5855-4476-852f-080b3900a515)
 	)
 	(text "I2C Address: 0x42"
 		(exclude_from_sim no)
@@ -3405,39 +3185,6 @@
 		)
 		(uuid "0387a604-0155-49d9-8cf0-6f8bcb3f2153")
 	)
-	(label "~{INT}"
-		(at 184.785 77.47 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 0.889 0.889)
-			)
-			(justify left bottom)
-		)
-		(uuid "5cd8f6ff-9fa3-4ad6-abef-294f9ab883c6")
-	)
-	(label "TIMEPULSE"
-		(at 184.785 85.09 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 0.889 0.889)
-			)
-			(justify left bottom)
-		)
-		(uuid "a3d5b4ed-9689-4f0f-9fa2-350a97ebe50a")
-	)
-	(label "~{RESET}"
-		(at 184.785 92.71 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 0.889 0.889)
-			)
-			(justify left bottom)
-		)
-		(uuid "c05be098-cb81-4815-aa83-ab1e5cdadefe")
-	)
 	(label "ANT"
 		(at 139.065 74.93 180)
 		(fields_autoplaced yes)
@@ -3449,20 +3196,9 @@
 		)
 		(uuid "c3e011ca-5fe5-4c1e-b560-766460c6bba1")
 	)
-	(label "~{SAFEBOOT}"
-		(at 184.785 87.63 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 0.889 0.889)
-			)
-			(justify left bottom)
-		)
-		(uuid "ff1cfc46-8d5c-44eb-8669-989214691e25")
-	)
 	(hierarchical_label "ZOEM8_SCL1"
 		(shape bidirectional)
-		(at 208.915 59.69 0)
+		(at 190.5 59.69 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -3483,82 +3219,6 @@
 			(justify left)
 		)
 		(uuid "b891e851-caa6-4c0b-8918-6f0672d5e0ab")
-	)
-	(symbol
-		(lib_id "SparkFun_ZOE-M8Q GPS-eagle-import:CRYSTAL-32.768KHZSMD-3.2X1.5")
-		(at 200.025 72.39 270)
-		(mirror x)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "0d1f424a-ffda-4962-8557-cfa55fe3d085")
-		(property "Reference" "Y3"
-			(at 197.993 70.866 90)
-			(effects
-				(font
-					(size 1.778 1.778)
-				)
-				(justify top)
-			)
-		)
-		(property "Value" "32.768kHz"
-			(at 211.455 71.755 90)
-			(effects
-				(font
-					(size 1.778 1.778)
-				)
-				(justify bottom)
-			)
-		)
-		(property "Footprint" "SparkFun_ZOE-M8Q GPS:CRYSTAL-SMD-3.2X1.5MM"
-			(at 200.025 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 200.025 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 200.025 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "P$1"
-			(uuid "108e9512-f309-4eee-9aa9-7b836428fa00")
-		)
-		(pin "P$2"
-			(uuid "66190933-d3b4-41ed-90f9-71a0325cd046")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
-					(reference "Y3")
-					(unit 1)
-				)
-			)
-			(project "SparkFun_ZOE-M8Q GPS"
-				(path "/a2fafc4e-3680-4552-9473-a47b9718b8b3"
-					(reference "Y?")
-					(unit 1)
-				)
-			)
-		)
 	)
 	(symbol
 		(lib_id "SparkFun_ZOE-M8Q GPS-eagle-import:FERRITE_BEAD-120_OHM-0402")
@@ -3637,16 +3297,34 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+3.3V")
-		(at 186.69 46.99 0)
+		(lib_id "Device:Crystal")
+		(at 209.55 73.66 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "2457e7ef-c889-4d4b-a5bf-55afe9081281")
-		(property "Reference" "#PWR0102"
-			(at 186.69 50.8 0)
+		(uuid "11b0b746-ee7b-492d-bd0d-efbeeef33bed")
+		(property "Reference" "Y4"
+			(at 200.66 71.755 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "32.768kHz"
+			(at 195.58 73.66 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Crystal:Crystal_SMD_2012-2Pin_2.0x1.2mm"
+			(at 209.55 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3654,26 +3332,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+3.3V"
-			(at 185.42 43.815 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 186.69 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 186.69 46.99 0)
+		(property "Datasheet" "~"
+			(at 209.55 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3682,7 +3342,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 186.69 46.99 0)
+			(at 209.55 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3691,12 +3351,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "bdffeb6f-1f84-4531-ba01-7a4d3a863b48")
+			(uuid "f912211a-4305-4133-b0ba-24d5750740f3")
+		)
+		(pin "2"
+			(uuid "6b619fb6-ec83-4ab2-a5d5-df0110b4270c")
 		)
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
-					(reference "#PWR0102")
+					(reference "Y4")
 					(unit 1)
 				)
 			)
@@ -3704,7 +3367,7 @@
 	)
 	(symbol
 		(lib_id "SparkFun_ZOE-M8Q GPS-eagle-import:U-BLOX_ZOE_M8Q-0-10")
-		(at 164.465 80.01 0)
+		(at 163.83 80.01 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3712,7 +3375,7 @@
 		(dnp no)
 		(uuid "270a07d7-e2fc-4b1c-a7eb-d0294f9e5ce5")
 		(property "Reference" "U3"
-			(at 149.225 52.07 0)
+			(at 148.59 52.07 0)
 			(effects
 				(font
 					(size 2.54 2.159)
@@ -3721,7 +3384,7 @@
 			)
 		)
 		(property "Value" "U-BLOX_ZOE_M8Q-0-10"
-			(at 149.225 107.95 0)
+			(at 148.59 107.95 0)
 			(effects
 				(font
 					(size 2.54 2.159)
@@ -3731,7 +3394,7 @@
 			)
 		)
 		(property "Footprint" "ZOE-M8Q:UBLOX_ZOE_M8-0-10"
-			(at 164.465 80.01 0)
+			(at 163.83 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3740,7 +3403,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 164.465 80.01 0)
+			(at 163.83 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3749,7 +3412,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 164.465 80.01 0)
+			(at 163.83 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4006,7 +3669,7 @@
 	)
 	(symbol
 		(lib_id "power:GNDREF")
-		(at 182.245 95.25 90)
+		(at 181.61 95.25 90)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -4016,7 +3679,7 @@
 		(fields_autoplaced yes)
 		(uuid "42c540a7-f286-4854-ae55-ea1406b5bb15")
 		(property "Reference" "#PWR0101"
-			(at 188.595 95.25 0)
+			(at 187.96 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4025,7 +3688,7 @@
 			)
 		)
 		(property "Value" "GNDREF"
-			(at 186.055 94.615 90)
+			(at 185.42 94.615 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4035,7 +3698,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 182.245 95.25 0)
+			(at 181.61 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4044,7 +3707,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 182.245 95.25 0)
+			(at 181.61 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4053,7 +3716,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 182.245 95.25 0)
+			(at 181.61 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4068,72 +3731,6 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
 					(reference "#PWR0101")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3.3V")
-		(at 207.645 49.53 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "4ad6395d-d4e4-4d34-b41f-cb699b873210")
-		(property "Reference" "#PWR0103"
-			(at 207.645 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3.3V"
-			(at 206.375 46.355 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 207.645 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 207.645 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 207.645 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "9bd2adaa-4fe7-49fc-b2da-f637614c8f08")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
-					(reference "#PWR0103")
 					(unit 1)
 				)
 			)
@@ -4166,7 +3763,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" "SparkFun_ZOE-M8Q GPS:0603"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
 			(at 88.265 161.29 0)
 			(effects
 				(font
@@ -4215,35 +3812,16 @@
 		)
 	)
 	(symbol
-		(lib_id "SparkFun_ZOE-M8Q GPS-eagle-import:2.2KOHM-0603-1/10W-1%")
-		(at 207.645 54.61 90)
+		(lib_id "power:PWR_FLAG")
+		(at 138.43 62.23 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "59113972-6cfe-4ac6-8b51-630a51e14623")
-		(property "Reference" "R15"
-			(at 206.121 54.61 0)
-			(effects
-				(font
-					(size 1.778 1.778)
-				)
-				(justify bottom)
-			)
-		)
-		(property "Value" "2.2KOHM-0603-1/10W-1%"
-			(at 196.215 43.815 90)
-			(effects
-				(font
-					(size 1.778 1.778)
-				)
-				(justify top)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "SparkFun_ZOE-M8Q GPS:0603"
-			(at 207.645 54.61 0)
+		(uuid "554231ad-2e49-4a31-90dd-c2dedd5bbeed")
+		(property "Reference" "#FLG05"
+			(at 138.43 60.325 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4251,8 +3829,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
-			(at 207.645 54.61 0)
+		(property "Value" "PWR_FLAG"
+			(at 132.334 60.198 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4260,8 +3838,26 @@
 				(hide yes)
 			)
 		)
-		(property "Description" ""
-			(at 207.645 54.61 0)
+		(property "Footprint" ""
+			(at 138.43 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 138.43 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Special symbol for telling ERC where power comes from"
+			(at 138.43 62.23 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4270,21 +3866,78 @@
 			)
 		)
 		(pin "1"
-			(uuid "46874e76-9e4a-45f8-a16c-93f50a16843e")
+			(uuid "d3cfad48-e25d-41e3-80ff-55ac0a4a4639")
 		)
-		(pin "2"
-			(uuid "f5bddc83-3618-4de7-81c3-5653a41c28f6")
+		(instances
+			(project ""
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
+					(reference "#FLG05")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:PWR_FLAG")
+		(at 143.51 64.77 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "58580f45-6783-4643-937d-ad96818e6319")
+		(property "Reference" "#FLG06"
+			(at 143.51 66.675 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "PWR_FLAG"
+			(at 143.51 68.834 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 143.51 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 143.51 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Special symbol for telling ERC where power comes from"
+			(at 143.51 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2dd6ff8d-c92a-4afb-9443-0692814ed593")
 		)
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
-					(reference "R15")
-					(unit 1)
-				)
-			)
-			(project "SparkFun_ZOE-M8Q GPS"
-				(path "/a2fafc4e-3680-4552-9473-a47b9718b8b3"
-					(reference "R?")
+					(reference "#FLG06")
 					(unit 1)
 				)
 			)
@@ -4317,7 +3970,7 @@
 				(justify top)
 			)
 		)
-		(property "Footprint" "SparkFun_ZOE-M8Q GPS:0603"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
 			(at 88.265 146.05 0)
 			(effects
 				(font
@@ -4435,82 +4088,6 @@
 		)
 	)
 	(symbol
-		(lib_id "SparkFun_ZOE-M8Q GPS-eagle-import:2.2KOHM-0603-1/10W-1%")
-		(at 186.69 52.07 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "6829e810-853f-401b-a79d-dc216d02ae8a")
-		(property "Reference" "R14"
-			(at 185.166 52.07 0)
-			(effects
-				(font
-					(size 1.778 1.778)
-				)
-				(justify bottom)
-			)
-		)
-		(property "Value" "2.2KOHM-0603-1/10W-1%"
-			(at 188.214 52.07 0)
-			(effects
-				(font
-					(size 1.778 1.778)
-				)
-				(justify top)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "SparkFun_ZOE-M8Q GPS:0603"
-			(at 186.69 52.07 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 186.69 52.07 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 186.69 52.07 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "7536a657-44ee-4463-a91d-76c9baa83142")
-		)
-		(pin "2"
-			(uuid "bdb05f19-7d36-4282-a379-100fc71b2830")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
-					(reference "R14")
-					(unit 1)
-				)
-			)
-			(project "SparkFun_ZOE-M8Q GPS"
-				(path "/a2fafc4e-3680-4552-9473-a47b9718b8b3"
-					(reference "R?")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GNDREF")
 		(at 88.265 163.83 0)
 		(mirror y)
@@ -4581,15 +4158,15 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 139.065 54.61 0)
+		(at 127 57.15 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "968d772b-6788-4437-9754-3af3ef74e3be")
-		(property "Reference" "#PWR099"
-			(at 139.065 58.42 0)
+		(property "Reference" "#PWR0152"
+			(at 130.81 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4598,7 +4175,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 137.795 51.435 0)
+			(at 126.746 54.864 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4607,7 +4184,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 139.065 54.61 0)
+			(at 127 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4616,7 +4193,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 139.065 54.61 0)
+			(at 127 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4625,7 +4202,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 139.065 54.61 0)
+			(at 127 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4639,7 +4216,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
-					(reference "#PWR099")
+					(reference "#PWR0152")
 					(unit 1)
 				)
 			)
@@ -4798,8 +4375,8 @@
 				(justify left bottom)
 			)
 		)
-		(property "Value" "4.7UF-0603-6.3V-(10%)"
-			(at 96.52 80.01 0)
+		(property "Value" "4.7UF"
+			(at 117.094 81.026 0)
 			(effects
 				(font
 					(size 1.778 1.778)
@@ -4807,7 +4384,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" "SparkFun_ZOE-M8Q GPS:0603"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
 			(at 126.365 77.47 0)
 			(effects
 				(font
@@ -4942,8 +4519,8 @@
 				(justify left bottom)
 			)
 		)
-		(property "Value" "0.1UF-0603-25V-(+80/-20%)"
-			(at 127.635 92.71 0)
+		(property "Value" "0.1UF"
+			(at 132.842 88.138 0)
 			(effects
 				(font
 					(size 1.778 1.778)
@@ -4951,7 +4528,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" "SparkFun_ZOE-M8Q GPS:0603"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
 			(at 141.605 85.09 0)
 			(effects
 				(font
@@ -5017,8 +4594,8 @@
 				(justify left bottom)
 			)
 		)
-		(property "Value" "2.2μH_SHIELDED_INDUCTOR"
-			(at 140.335 70.485 90)
+		(property "Value" "2.2μ"
+			(at 137.414 70.612 90)
 			(effects
 				(font
 					(size 1.778 1.778)
@@ -5026,7 +4603,7 @@
 				(justify left top)
 			)
 		)
-		(property "Footprint" "SparkFun_ZOE-M8Q GPS:0806"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
 			(at 133.985 64.77 0)
 			(effects
 				(font
