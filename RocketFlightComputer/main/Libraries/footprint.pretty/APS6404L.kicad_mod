@@ -264,7 +264,7 @@
 		(layers "F.Cu" "F.Paste" "F.Mask")
 		(uuid "ce2d02ec-6643-4952-814c-3a6e3ba40061")
 	)
-	(model "APS6404L-3SQR-SN.stp"
+	(model "${KICAD8_3DMODEL_DIR}/APS6404L-3SQR-SN_APY.step"
 		(offset
 			(xyz 0 0 0)
 		)

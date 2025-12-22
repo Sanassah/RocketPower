@@ -210,15 +210,15 @@
 		(solder_mask_margin 0.102)
 		(uuid "29c9c3eb-4d25-4b4c-92eb-a0c2040ae3cf")
 	)
-	(model "${KICAD8_3DMODEL_DIR}/CONN3X1_B3P-VH_JST.step"
+	(model "${KICAD8_3DMODEL_DIR}/B3P-VH_LF__SN_.stp"
 		(offset
-			(xyz -4 0 0)
+			(xyz 0 -0.5 0)
 		)
 		(scale
 			(xyz 1 1 1)
 		)
 		(rotate
-			(xyz 0 0 0)
+			(xyz -90 0 0)
 		)
 	)
 )

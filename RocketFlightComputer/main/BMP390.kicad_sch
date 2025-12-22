@@ -550,407 +550,6 @@
 				)
 			)
 		)
-		(symbol "Adafruit_BNO08x-eagle-import:RESISTOR_4PACK"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "R"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.016 1.016)
-						(bold yes)
-					)
-				)
-			)
-			(property "Footprint" "Adafruit_BNO08x:RESPACK_4X0603"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_locked" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "RESISTOR_4PACK_1_0"
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy 2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -1.27) (xy -2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27) (xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "8"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-			(symbol "RESISTOR_4PACK_2_0"
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy 2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -1.27) (xy -2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27) (xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "7"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-			(symbol "RESISTOR_4PACK_3_0"
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy 2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -1.27) (xy -2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27) (xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "6"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-			(symbol "RESISTOR_4PACK_4_0"
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy 2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -1.27) (xy -2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27) (xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-		)
 		(symbol "power:+3.3V"
 			(power)
 			(pin_names
@@ -1211,16 +810,16 @@
 		(uuid "0089acc8-be45-4133-b00c-4ac3e6f77eb9")
 	)
 	(junction
-		(at 107.95 60.96)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "62477f6d-4a84-4ede-a8fc-9219e359e8b6")
-	)
-	(junction
 		(at 52.07 53.34)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "964f046f-145e-41be-8b1c-abd42805babe")
+	)
+	(junction
+		(at 59.69 53.34)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "abd2557e-be8e-42be-b9e7-df9f6fedda46")
 	)
 	(junction
 		(at 59.055 53.34)
@@ -1234,31 +833,23 @@
 		(color 0 0 0 0)
 		(uuid "d5f51bc5-373b-48fb-958b-78201e146f12")
 	)
-	(junction
-		(at 102.235 63.5)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f6a50db3-eab3-4332-9956-f1b54a1cded1")
-	)
-	(junction
-		(at 102.235 43.18)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f9102756-6155-4b0a-93b2-1b739b353ce3")
+	(no_connect
+		(at 86.36 58.42)
+		(uuid "fdcff065-d10e-4e7f-b0c0-cd1a47815f5b")
 	)
 	(wire
 		(pts
-			(xy 86.995 60.96) (xy 99.695 60.96)
+			(xy 59.055 43.18) (xy 88.265 43.18)
 		)
 		(stroke
-			(width 0.1524)
-			(type solid)
+			(width 0)
+			(type default)
 		)
-		(uuid "0b685ceb-8df9-4994-981b-d283e6b59c19")
+		(uuid "053cff29-47d5-4c8c-b842-4d75cb5670a1")
 	)
 	(wire
 		(pts
-			(xy 88.265 53.34) (xy 86.995 53.34)
+			(xy 88.265 53.34) (xy 86.36 53.34)
 		)
 		(stroke
 			(width 0)
@@ -1268,63 +859,13 @@
 	)
 	(wire
 		(pts
-			(xy 102.235 63.5) (xy 111.125 63.5)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2ca77c23-291b-4f6b-a23d-db168469e807")
-	)
-	(wire
-		(pts
-			(xy 107.95 53.975) (xy 107.95 60.96)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2e04f5b9-cf9f-4f0f-9587-f7b75bc12fa0")
-	)
-	(wire
-		(pts
-			(xy 59.055 55.88) (xy 61.595 55.88)
+			(xy 59.69 53.34) (xy 59.055 53.34)
 		)
 		(stroke
 			(width 0.1524)
 			(type solid)
 		)
-		(uuid "388079eb-8eab-43f0-a88a-3c84330d2638")
-	)
-	(wire
-		(pts
-			(xy 107.95 60.96) (xy 111.125 60.96)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3cb3a2dd-abf3-4422-8340-81217a4b0952")
-	)
-	(wire
-		(pts
-			(xy 25.4 53.34) (xy 42.545 53.34)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "3eb43cc6-c983-4407-8a79-ef419b452330")
-	)
-	(wire
-		(pts
-			(xy 88.265 43.18) (xy 59.055 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4025f145-e0f3-4b62-8b7a-25778587ee2d")
+		(uuid "4a706070-370c-4c98-8cd9-773e4ac3aa5e")
 	)
 	(wire
 		(pts
@@ -1348,16 +889,6 @@
 	)
 	(wire
 		(pts
-			(xy 102.235 43.18) (xy 102.235 43.815)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "722f4cbe-2f0b-498e-b86f-828d20e739e2")
-	)
-	(wire
-		(pts
 			(xy 52.07 53.34) (xy 59.055 53.34)
 		)
 		(stroke
@@ -1368,43 +899,33 @@
 	)
 	(wire
 		(pts
-			(xy 102.235 42.545) (xy 102.235 43.18)
+			(xy 27.94 53.34) (xy 42.545 53.34)
+		)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(uuid "8a1e8ed3-8cb4-4600-b160-3c48d86dd740")
+	)
+	(wire
+		(pts
+			(xy 60.96 63.5) (xy 61.595 63.5)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "8a96b708-a237-494a-9132-8fdcad634a01")
+		(uuid "8d5e459b-ae1d-4eb3-82bc-a5cdb20a4f78")
 	)
 	(wire
 		(pts
-			(xy 107.95 43.18) (xy 102.235 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "96150cae-b469-48f3-abb1-6990e938f38b")
-	)
-	(wire
-		(pts
-			(xy 88.265 55.88) (xy 86.995 55.88)
+			(xy 88.265 55.88) (xy 86.36 55.88)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "99a5f164-1e8d-4a2e-8b7a-788cda4a0e6f")
-	)
-	(wire
-		(pts
-			(xy 102.235 53.975) (xy 102.235 63.5)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a1446282-1ce5-4ee1-935e-4632bb234e6c")
 	)
 	(wire
 		(pts
@@ -1418,13 +939,13 @@
 	)
 	(wire
 		(pts
-			(xy 86.995 63.5) (xy 102.235 63.5)
+			(xy 60.96 55.88) (xy 59.69 55.88)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c2c4fd5b-34c7-4d0a-857c-b2af75d4d9e7")
+		(uuid "b32cee6c-078b-4d70-853f-8a1a62716614")
 	)
 	(wire
 		(pts
@@ -1438,17 +959,7 @@
 	)
 	(wire
 		(pts
-			(xy 107.95 60.96) (xy 99.695 60.96)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "cb08ca26-eecc-4677-a4dd-67821728be0a")
-	)
-	(wire
-		(pts
-			(xy 61.595 53.34) (xy 59.055 53.34)
+			(xy 60.96 53.34) (xy 59.69 53.34)
 		)
 		(stroke
 			(width 0.1524)
@@ -1458,28 +969,18 @@
 	)
 	(wire
 		(pts
-			(xy 59.055 53.34) (xy 59.055 55.88)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "edfbbf47-cdb5-4980-846c-a33a97647c89")
-	)
-	(wire
-		(pts
-			(xy 107.95 43.815) (xy 107.95 43.18)
+			(xy 59.69 55.88) (xy 59.69 53.34)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "f24942a3-3f6a-46a7-b5d7-0f8fc30dcc0a")
+		(uuid "f0ddb6d5-d201-4a24-b76c-ca58d0342cff")
 	)
-	(text_box "Adress when pulled high: 0x77\nAdress when pulled low: 0x76"
+	(text_box "Adress when SD0 pulled high: 0x77, \nAdress when SD0 pulled low: 0x76\nIf CSB pulled high: I2C active\nIf CSB pulled low: SPI active"
 		(exclude_from_sim no)
-		(at 65.405 33.02 0)
-		(size 19.685 10.16)
+		(at 53.34 30.48 0)
+		(size 43.18 8.89)
 		(stroke
 			(width 0)
 			(type default)
@@ -1530,7 +1031,7 @@
 	)
 	(hierarchical_label "BMP390_SCL1"
 		(shape input)
-		(at 111.125 60.96 0)
+		(at 86.36 60.96 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -1540,21 +1041,9 @@
 		)
 		(uuid "029ee47c-1918-455e-ad50-518e0d913ad0")
 	)
-	(hierarchical_label "BMP390_INT"
-		(shape input)
-		(at 86.995 58.42 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "0a0f55e0-633f-4d23-8075-9a6919256437")
-	)
 	(hierarchical_label "BMP390_SDA1"
 		(shape input)
-		(at 111.125 63.5 0)
+		(at 86.36 63.5 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -1566,7 +1055,7 @@
 	)
 	(symbol
 		(lib_id "Adafruit BMP388 QT-eagle-import:BMP388")
-		(at 74.295 58.42 0)
+		(at 73.66 58.42 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -1574,7 +1063,7 @@
 		(dnp no)
 		(uuid "04fd3f3d-010e-41a0-b49f-167e963dfe29")
 		(property "Reference" "IC1"
-			(at 64.135 44.45 0)
+			(at 63.5 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.0795)
@@ -1584,7 +1073,7 @@
 			)
 		)
 		(property "Value" "BMP390"
-			(at 64.135 73.66 0)
+			(at 63.5 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.0795)
@@ -1593,7 +1082,7 @@
 			)
 		)
 		(property "Footprint" "BMP390:BMP388"
-			(at 74.295 58.42 0)
+			(at 73.66 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1602,7 +1091,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 74.295 58.42 0)
+			(at 73.66 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1611,7 +1100,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 74.295 58.42 0)
+			(at 73.66 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1740,81 +1229,15 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 102.235 42.545 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "1e868104-97a3-4113-83bd-defb4d9a84d8")
-		(property "Reference" "#PWR088"
-			(at 102.235 46.355 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3.3V"
-			(at 101.6 38.735 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 102.235 42.545 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 102.235 42.545 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 102.235 42.545 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "8667eb6a-9345-46cc-88cc-1a175b1db1d5")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "#PWR088")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3.3V")
-		(at 25.4 53.34 90)
+		(at 27.94 53.34 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "41ee1466-74cc-4c2a-94ff-a3eb2b2c3042")
-		(property "Reference" "#PWR084"
-			(at 29.21 53.34 0)
+		(property "Reference" "#PWR0148"
+			(at 31.75 53.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1823,7 +1246,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 27.305 51.435 90)
+			(at 29.845 51.435 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1832,7 +1255,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 25.4 53.34 0)
+			(at 27.94 53.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1841,7 +1264,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 25.4 53.34 0)
+			(at 27.94 53.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1850,7 +1273,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 25.4 53.34 0)
+			(at 27.94 53.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1864,7 +1287,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "#PWR084")
+					(reference "#PWR0148")
 					(unit 1)
 				)
 			)
@@ -1934,99 +1357,6 @@
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
 					(reference "#PWR085")
 					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Adafruit_BNO08x-eagle-import:RESISTOR_4PACK")
-		(at 102.235 48.895 90)
-		(unit 4)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "99c073a3-935d-4f27-96aa-12da0f4470fd")
-		(property "Reference" "R12"
-			(at 98.425 48.895 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "4.7K"
-			(at 102.235 48.895 0)
-			(effects
-				(font
-					(size 1.016 1.016)
-					(bold yes)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
-			(at 102.235 48.895 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 102.235 48.895 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 102.235 48.895 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "a6050002-5104-4903-b09d-89f82a997a4c")
-		)
-		(pin "8"
-			(uuid "0cd6ba8c-8787-4adf-b72b-caa7a3bcfc36")
-		)
-		(pin "2"
-			(uuid "facf1699-528c-4976-937a-aecfbc6f9538")
-		)
-		(pin "7"
-			(uuid "b462bcd7-4a6c-4f24-ad77-f48f169a41c9")
-		)
-		(pin "3"
-			(uuid "1f623ed8-502e-40db-9d47-c065e92e6866")
-		)
-		(pin "6"
-			(uuid "5b856bb2-c4b3-4cec-9149-caaad0857b07")
-		)
-		(pin "4"
-			(uuid "e174ecaf-f59f-46cc-8fb2-7d5eaba8a622")
-		)
-		(pin "5"
-			(uuid "3f50b6aa-fd61-4af1-99f9-3d4daffd1c6a")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "R12")
-					(unit 4)
-				)
-			)
-			(project "Adafruit_BNO08x"
-				(path "/f4179d80-0429-4739-b162-4db0d08d7b34"
-					(reference "R?")
-					(unit 4)
 				)
 			)
 		)
@@ -2237,99 +1567,6 @@
 				(path "/f4179d80-0429-4739-b162-4db0d08d7b34"
 					(reference "C?")
 					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Adafruit_BNO08x-eagle-import:RESISTOR_4PACK")
-		(at 107.95 48.895 270)
-		(unit 3)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "c6bd1a9b-952b-4d1b-96de-a2fa05a00b16")
-		(property "Reference" "R12"
-			(at 111.76 48.895 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "4.7K"
-			(at 107.95 48.895 0)
-			(effects
-				(font
-					(size 1.016 1.016)
-					(bold yes)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
-			(at 107.95 48.895 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 107.95 48.895 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 107.95 48.895 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "819f12fa-16e8-427a-832d-cac8db521bc2")
-		)
-		(pin "8"
-			(uuid "37dd86c6-4304-4f19-9f58-4bc4776d68f5")
-		)
-		(pin "2"
-			(uuid "1221a7c4-a2a7-4103-8a1f-9651e0d4f7d2")
-		)
-		(pin "7"
-			(uuid "55cc4a19-c6f5-48ea-b6c2-c654ddd7f6b4")
-		)
-		(pin "3"
-			(uuid "ac49a8ea-7184-4264-8ca7-bba9a4551650")
-		)
-		(pin "6"
-			(uuid "1e7d1947-3129-4c80-979e-3e3f2f9a589e")
-		)
-		(pin "4"
-			(uuid "7680943a-b785-430d-990f-8d8d67802dec")
-		)
-		(pin "5"
-			(uuid "d0e0dddf-9336-425d-84f3-2dac06f2fb2d")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "R12")
-					(unit 3)
-				)
-			)
-			(project "Adafruit_BNO08x"
-				(path "/f4179d80-0429-4739-b162-4db0d08d7b34"
-					(reference "R?")
-					(unit 3)
 				)
 			)
 		)

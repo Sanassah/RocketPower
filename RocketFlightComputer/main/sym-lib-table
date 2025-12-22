@@ -17,4 +17,5 @@
   (lib (name "D2FC-F-7N_60M_")(type "KiCad")(uri "${KIPRJMOD}/Libraries/D2FC/D2FC-F-7N_60M_.kicad_sym")(options "")(descr ""))
   (lib (name "B3P-VH_LF__SN_")(type "KiCad")(uri "${KIPRJMOD}/Libraries/ServoConnectors/B3P-VH_LF__SN_.kicad_sym")(options "")(descr ""))
   (lib (name "L102011MS02Q")(type "KiCad")(uri "${KIPRJMOD}/Libraries/PowerButton/L102011MS02Q.kicad_sym")(options "")(descr ""))
+  (lib (name "main-eagle-import")(type "KiCad")(uri "${KIPRJMOD}/main-eagle-import.kicad_sym")(options "")(descr ""))
 )

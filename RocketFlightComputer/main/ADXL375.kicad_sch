@@ -481,407 +481,6 @@
 				)
 			)
 		)
-		(symbol "Adafruit ADXL375-eagle-import:RESISTOR_4PACK"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "R"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.016 1.016)
-						(bold yes)
-					)
-				)
-			)
-			(property "Footprint" "Adafruit ADXL375:RESPACK_4X0603"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_locked" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "RESISTOR_4PACK_1_0"
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy 2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -1.27) (xy -2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27) (xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "8"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-			(symbol "RESISTOR_4PACK_2_0"
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy 2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -1.27) (xy -2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27) (xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "7"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-			(symbol "RESISTOR_4PACK_3_0"
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy 2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -1.27) (xy -2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27) (xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "6"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-			(symbol "RESISTOR_4PACK_4_0"
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy 2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -1.27) (xy -2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27) (xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-		)
 		(symbol "Adafruit_BNO08x-eagle-import:CAP_CERAMIC0603_NO"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -1016,6 +615,127 @@
 						(effects
 							(font
 								(size 0 0)
+							)
+						)
+					)
+				)
+			)
+		)
+		(symbol "Device:R"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 2.032 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "R"
+				(at 0 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Resistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
 							)
 						)
 					)
@@ -1533,6 +1253,25 @@
 		)
 		(uuid "95023563-2625-4f88-97bc-d7ae3046f1ff")
 	)
+	(text_box "I2C mode"
+		(exclude_from_sim no)
+		(at 66.04 35.56 0)
+		(size 12.7 5.08)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "b2f6f975-8cd0-4030-b548-41fc5b5c169f")
+	)
 	(text "Max current: 145 uA\n"
 		(exclude_from_sim no)
 		(at 97.79 104.14 0)
@@ -1831,98 +1570,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Adafruit ADXL375-eagle-import:RESISTOR_4PACK")
-		(at 91.44 46.99 270)
-		(unit 2)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "b3839f87-7263-42f1-aa13-a84f467880a0")
-		(property "Reference" "R?"
-			(at 93.98 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10K"
-			(at 91.44 46.99 0)
-			(effects
-				(font
-					(size 1.016 1.016)
-					(bold yes)
-				)
-			)
-		)
-		(property "Footprint" "ADXL375:RESPACK_4X0603"
-			(at 91.44 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 91.44 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 91.44 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "ddce6072-c1ab-42ec-8854-1a2a4b708a1c")
-		)
-		(pin "8"
-			(uuid "3bfef871-ca17-445f-afc6-bee306356719")
-		)
-		(pin "2"
-			(uuid "df7bf8a6-65f8-48c0-b8ba-0434267faabf")
-		)
-		(pin "7"
-			(uuid "93049bfa-5fd1-4922-aa6c-92a468cf47a7")
-		)
-		(pin "3"
-			(uuid "50dacd7e-22cb-4908-a6ea-2141897296b9")
-		)
-		(pin "6"
-			(uuid "1aafe999-95e6-418e-88c6-7f01824a8105")
-		)
-		(pin "4"
-			(uuid "ccb367b3-b9c6-4a9a-b48c-c164c035bd87")
-		)
-		(pin "5"
-			(uuid "d21462e3-d22f-445b-9062-20d6d413fb01")
-		)
-		(instances
-			(project "Adafruit ADXL375"
-				(path "/0b998453-2602-4895-829b-1f2716a2f016"
-					(reference "R?")
-					(unit 2)
-				)
-			)
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
-					(reference "R11")
-					(unit 2)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Adafruit_BNO08x-eagle-import:CAP_CERAMIC0603_NO")
 		(at 49.53 45.72 180)
 		(unit 1)
@@ -2007,7 +1654,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 91.44 41.91 0)
+		(at 91.44 44.45 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2015,7 +1662,7 @@
 		(dnp no)
 		(uuid "d053c50a-14e8-4b04-a92b-91619a97069c")
 		(property "Reference" "#PWR094"
-			(at 91.44 45.72 0)
+			(at 91.44 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2024,7 +1671,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 85.09 38.1 0)
+			(at 90.424 40.386 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2033,7 +1680,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 91.44 41.91 0)
+			(at 91.44 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2042,7 +1689,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 91.44 41.91 0)
+			(at 91.44 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2051,7 +1698,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 91.44 41.91 0)
+			(at 91.44 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2080,7 +1727,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d71ca762-2004-4138-8f64-564bed4a2b55")
-		(property "Reference" "#PWR090"
+		(property "Reference" "#PWR0150"
 			(at 48.895 53.34 0)
 			(effects
 				(font
@@ -2131,7 +1778,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
-					(reference "#PWR090")
+					(reference "#PWR0150")
 					(unit 1)
 				)
 			)
@@ -2200,6 +1847,74 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
 					(reference "#PWR091")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 91.44 48.26 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "dfa0eeaf-e40e-45a1-b8be-eb56925bc733")
+		(property "Reference" "R14"
+			(at 93.98 48.26 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 91.44 45.974 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
+			(at 89.662 48.26 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 91.44 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 91.44 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "22d83dd9-b7ee-443e-8e80-982346c8868c")
+		)
+		(pin "2"
+			(uuid "ac8464d0-530c-4495-89ec-df1df382df7d")
+		)
+		(instances
+			(project "main"
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
+					(reference "R14")
 					(unit 1)
 				)
 			)
@@ -2282,7 +1997,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e5557a42-b162-49d1-bdc0-6b1baac6e6eb")
-		(property "Reference" "#PWR089"
+		(property "Reference" "#PWR0151"
 			(at 48.895 50.8 0)
 			(effects
 				(font
@@ -2333,7 +2048,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
-					(reference "#PWR089")
+					(reference "#PWR0151")
 					(unit 1)
 				)
 			)

@@ -949,7 +949,7 @@
 				)
 			)
 		)
-		(property "Footprint" "DM3DSF"
+		(property "Footprint" "DM3DSF:DM3DSF"
 			(at 78.74 131.75 0)
 			(effects
 				(font
