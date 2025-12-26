@@ -12046,10 +12046,10 @@
 		)
 		(uuid eaf9b0fd-0837-4dc7-9789-d274a750b66b)
 	)
-	(text_box "Rationales:"
+	(text_box "Rationales:\nReserve needed: \n	Extra pads for 5v, 8v and 3v and ground\n	Extra servo outputs connected to mcu\n	Extra pyro channels\n	IDC Connector for ribbon cable for second layer pcb\n"
 		(exclude_from_sim no)
-		(at 467.36 15.24 0)
-		(size 109.855 80.01)
+		(at 457.2 15.24 0)
+		(size 120.015 80.01)
 		(stroke
 			(width 0)
 			(type default)
@@ -12059,7 +12059,7 @@
 		)
 		(effects
 			(font
-				(size 3 3)
+				(size 2.5 2.5)
 				(thickness 0.254)
 				(bold yes)
 			)
