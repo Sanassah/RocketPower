@@ -120,8 +120,8 @@
 	)
 	(net 0 "")
 	(gr_circle
-		(center 166.5 128)
-		(end 197.5 128)
+		(center 179.5 133.75)
+		(end 210.5 133.75)
 		(stroke
 			(width 0.1)
 			(type default)
