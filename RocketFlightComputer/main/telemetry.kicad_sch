@@ -1515,7 +1515,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "footprint:S4B"
+		(property "Footprint" "Connector_JST:JST_GH_BM04B-GHS-TBT_1x04-1MP_P1.25mm_Vertical"
 			(at 91.44 152.07 0)
 			(effects
 				(font
