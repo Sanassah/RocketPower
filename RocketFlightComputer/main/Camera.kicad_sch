@@ -565,7 +565,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b29cb636-55f1-415e-b2cf-98d87b10b1dc")
-		(property "Reference" "JST4PIN2"
+		(property "Reference" "Camera1"
 			(at 130.048 85.852 0)
 			(effects
 				(font
@@ -678,7 +678,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e516ca7f-4a7c-4d6f-878d-eb9fde5d9c52"
-					(reference "JST4PIN2")
+					(reference "Camera1")
 					(unit 1)
 				)
 			)

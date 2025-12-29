@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP CONMHF1-SMD-G-T
+D Body Features: Body Material Copper Alloy | Body Plating Material Gold | Configuration Features: Number of Positions 1 | Number of Coaxial Contacts 1 | Electrical Characteristics: Impedance 50 OHM | Mechanical Attachment: RF Connector Coupling Mechanism Snap-On | Connector Mounting Type Board Mount | Operation/Application: Circuit Application Signal | Operating Frequency 6 GHZ | Other: Dielectric Material LCP | Product Type Features: Connector & Contact Terminates To Printed Circuit Board | Connector System
+K
+F https://www.te.com/commerce/DocumentDelivery/DDEController?Action=srchrtrv&DocNm=conmhf1-smd-g-t-ds&DocType=Data%20Sheet&DocLang=English&PartCntxt=CONMHF1-SMD-G-T&DocFormat=pdf
+$ENDCMP
+#
+#End Doc Library

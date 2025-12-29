@@ -689,12 +689,12 @@
       "CURRENT VOLTAGE SENSOR"
     ],
     [
-      "03966d30-d016-427a-9db2-b49a5b43d133",
-      "HighCurrentComponents"
-    ],
-    [
       "e28c6e59-b6f8-4de5-b42d-020f37d4635d",
       "Telemetry"
+    ],
+    [
+      "03966d30-d016-427a-9db2-b49a5b43d133",
+      "HighCurrentComponents"
     ],
     [
       "d88c534c-db56-4afc-838f-d7c058479ac8",
