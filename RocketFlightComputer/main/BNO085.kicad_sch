@@ -3370,16 +3370,17 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d71abdaf-03b1-40a4-bef9-30154b052536")
-		(property "Reference" "U1"
+		(property "Reference" "BNO85"
 			(at 71.12 27.94 0)
 			(effects
 				(font
 					(size 1.27 1.0795)
 				)
 				(justify left bottom)
+				(hide yes)
 			)
 		)
-		(property "Value" "BNO085"
+		(property "Value" "IMU"
 			(at 71.12 87.63 0)
 			(effects
 				(font
@@ -3388,7 +3389,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" "BNO08x:BNO080"
+		(property "Footprint" "footprint:BNO085"
 			(at 88.9 57.15 0)
 			(effects
 				(font
@@ -3475,7 +3476,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/f1ce41f5-ec33-4382-82d9-21de8266ebc9"
-					(reference "U1")
+					(reference "BNO85")
 					(unit 1)
 				)
 			)

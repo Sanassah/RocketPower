@@ -1186,6 +1186,12 @@
 		)
 	)
 	(junction
+		(at 97.79 53.975)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "97a3e6a6-d431-4602-9758-c67cf3d012c4")
+	)
+	(junction
 		(at 77.47 63.5)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1198,26 +1204,10 @@
 		(uuid "d6dcfe25-c01f-401b-91b0-efe65f358f95")
 	)
 	(junction
-		(at 98.425 53.975)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "db433a64-269c-48e7-ad83-ae5689be8ce5")
-	)
-	(junction
 		(at 140.97 78.74)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "e166a0ae-dae1-4372-b423-13766995918c")
-	)
-	(wire
-		(pts
-			(xy 98.425 51.435) (xy 98.425 53.975)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0d5817e2-2013-4268-af01-81dafd40748a")
 	)
 	(wire
 		(pts
@@ -1321,6 +1311,16 @@
 	)
 	(wire
 		(pts
+			(xy 97.79 50.8) (xy 97.79 53.975)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8b0768f5-25fb-40f7-bda5-85986cc0da06")
+	)
+	(wire
+		(pts
 			(xy 77.47 54.61) (xy 77.47 63.5)
 		)
 		(stroke
@@ -1341,23 +1341,13 @@
 	)
 	(wire
 		(pts
-			(xy 97.79 53.975) (xy 98.425 53.975)
+			(xy 97.79 53.975) (xy 101.6 53.975)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b847b3a4-9187-422e-9cf0-1749b519fccc")
-	)
-	(wire
-		(pts
-			(xy 101.6 53.975) (xy 98.425 53.975)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c78483ac-7e42-4ed6-8b61-d44072cef8fe")
+		(uuid "d2aa94a7-c832-47ee-a5c0-3f55b12a91a3")
 	)
 	(wire
 		(pts
@@ -1400,10 +1390,10 @@
 		)
 		(uuid "005c8390-1c6f-4110-ba7a-7bc019e3c756")
 	)
-	(text_box "Alert pin to trigger cut off switch or..."
+	(text_box "Alert pin to trigger cut off switch if possible"
 		(exclude_from_sim no)
-		(at 59.69 81.915 0)
-		(size 19.05 10.16)
+		(at 60.96 81.915 0)
+		(size 20.955 12.065)
 		(stroke
 			(width 0)
 			(type default)
@@ -1431,17 +1421,6 @@
 			(justify left bottom)
 		)
 		(uuid "449469cb-d62e-4d0d-9ffa-bda25bb1533b")
-	)
-	(label "VBUS"
-		(at 93.345 54.61 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.2446 1.2446)
-			)
-			(justify right bottom)
-		)
-		(uuid "3fb67597-e5f5-4d3e-919e-e6ece6c637ec")
 	)
 	(label "ALERT"
 		(at 67.945 81.28 0)
@@ -1961,22 +1940,22 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6a239948-c8f7-4440-bd24-bb3f288bf88d")
-		(property "Reference" "VoltageSensor1"
+		(property "Reference" "INA260"
 			(at 52.959 67.818 0)
 			(effects
 				(font
 					(size 2.54 2.54)
 				)
 				(justify left bottom)
+				(hide yes)
 			)
 		)
 		(property "Value" "INA260"
-			(at 95.25 71.12 0)
+			(at 86.106 59.182 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "INA260:TSSOP16"
@@ -2057,7 +2036,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf"
-					(reference "VoltageSensor1")
+					(reference "INA260")
 					(unit 1)
 				)
 			)
@@ -2143,7 +2122,7 @@
 		(dnp no)
 		(uuid "7eb047af-373f-4274-bd5b-769a591ec1f3")
 		(property "Reference" "C40"
-			(at 106.68 50.165 90)
+			(at 106.934 50.038 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2204,7 +2183,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 98.425 51.435 0)
+		(at 97.79 50.8 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2212,7 +2191,7 @@
 		(dnp no)
 		(uuid "b14e6873-d78b-4ded-9128-dcf6e404e300")
 		(property "Reference" "#PWR0110"
-			(at 98.425 55.245 0)
+			(at 97.79 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2221,7 +2200,7 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 100.33 52.07 90)
+			(at 99.695 51.435 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2230,7 +2209,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 98.425 51.435 0)
+			(at 97.79 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2239,7 +2218,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 98.425 51.435 0)
+			(at 97.79 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2248,7 +2227,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 98.425 51.435 0)
+			(at 97.79 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)

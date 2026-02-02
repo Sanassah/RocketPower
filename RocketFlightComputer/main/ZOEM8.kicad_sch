@@ -3482,23 +3482,23 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "270a07d7-e2fc-4b1c-a7eb-d0294f9e5ce5")
-		(property "Reference" "U3"
+		(property "Reference" "U-BLOX_ZOE_M8Q-0-10"
 			(at 148.59 52.07 0)
 			(effects
 				(font
 					(size 2.54 2.159)
 				)
 				(justify left bottom)
+				(hide yes)
 			)
 		)
-		(property "Value" "U-BLOX_ZOE_M8Q-0-10"
+		(property "Value" "GPS"
 			(at 148.59 107.95 0)
 			(effects
 				(font
 					(size 2.54 2.159)
 				)
 				(justify left bottom)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "ZOE-M8Q:UBLOX_ZOE_M8-0-10"
@@ -3519,7 +3519,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "U-BLOX_ZOE_M8Q-0-10"
 			(at 163.83 80.01 0)
 			(effects
 				(font
@@ -3684,7 +3684,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
-					(reference "U3")
+					(reference "U-BLOX_ZOE_M8Q-0-10")
 					(unit 1)
 				)
 			)
@@ -4056,21 +4056,21 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5f47d3fa-df96-4754-83e1-60d71b8d402b")
-		(property "Reference" "Antenna1"
+		(property "Reference" "CONMHF1-SMD-G-T1"
 			(at 45.212 156.464 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
-		(property "Value" "CONMHF1-SMD-G-T"
+		(property "Value" "ANTENNA"
 			(at 74.93 167.6714 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "footprint:CONMHF1SMDGT"
@@ -4093,7 +4093,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Body Features: Body Material Copper Alloy | Body Plating Material Gold | Configuration Features: Number of Positions 1 | Number of Coaxial Contacts 1 | Electrical Characteristics: Impedance 50 OHM | Mechanical Attachment: RF Connector Coupling Mechanism Snap-On | Connector Mounting Type Board Mount | Operation/Application: Circuit Application Signal | Operating Frequency 6 GHZ | Other: Dielectric Material LCP | Product Type Features: Connector & Contact Terminates To Printed Circuit Board | Connector System"
+		(property "Description" "CONMHF1-SMD-G-T"
 			(at 38.1 171.45 0)
 			(effects
 				(font
@@ -4167,7 +4167,7 @@
 		(instances
 			(project ""
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/29f0379a-3100-4813-a2e2-86f2e88b3e64"
-					(reference "Antenna1")
+					(reference "CONMHF1-SMD-G-T1")
 					(unit 1)
 				)
 			)

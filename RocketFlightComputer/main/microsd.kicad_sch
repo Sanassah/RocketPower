@@ -933,15 +933,16 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "a005f31d-83b9-486a-9b01-30921f8cb055")
-		(property "Reference" "MicroSDreceptacle1"
+		(property "Reference" "DM3D-SF1"
 			(at 66.04 29.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
-		(property "Value" "DM3D-SF"
+		(property "Value" "MicroSD"
 			(at 66.04 31.75 0)
 			(effects
 				(font
@@ -1073,7 +1074,7 @@
 		(instances
 			(project ""
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/690c10de-e6bf-48ef-8c3e-99868f905c19"
-					(reference "MicroSDreceptacle1")
+					(reference "DM3D-SF1")
 					(unit 1)
 				)
 			)
