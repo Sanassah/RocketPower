@@ -1467,16 +1467,17 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "a51a181b-53d7-4314-a760-01466317748d")
-		(property "Reference" "U2"
+		(property "Reference" "ADXL375"
 			(at 60.325 37.338 0)
 			(effects
 				(font
 					(size 1.778 1.5113)
 				)
 				(justify left bottom)
+				(hide yes)
 			)
 		)
-		(property "Value" "ADXL375"
+		(property "Value" "ACC"
 			(at 60.325 88.9 0)
 			(effects
 				(font
@@ -1485,7 +1486,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" "ADXL375:LGA14"
+		(property "Footprint" "footprint:ADXL375BCCZRL"
 			(at 73.025 63.5 0)
 			(effects
 				(font
@@ -1557,7 +1558,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
-					(reference "U2")
+					(reference "ADXL375")
 					(unit 1)
 				)
 			)

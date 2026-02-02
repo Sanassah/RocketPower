@@ -565,23 +565,23 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b29cb636-55f1-415e-b2cf-98d87b10b1dc")
-		(property "Reference" "Camera1"
+		(property "Reference" "S4B-PH-K-S_LF__SN_2"
 			(at 130.048 85.852 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
 			)
 		)
-		(property "Value" "S4B-PH-K-S_LF__SN_"
-			(at 140.97 95.2499 0)
+		(property "Value" "CAMERA"
+			(at 129.794 86.106 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "Connector_JST:JST_GH_BM04B-GHS-TBT_1x04-1MP_P1.25mm_Vertical"
@@ -678,7 +678,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e516ca7f-4a7c-4d6f-878d-eb9fde5d9c52"
-					(reference "Camera1")
+					(reference "S4B-PH-K-S_LF__SN_2")
 					(unit 1)
 				)
 			)

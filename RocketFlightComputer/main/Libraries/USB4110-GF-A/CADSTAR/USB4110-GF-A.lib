@@ -1,0 +1,17 @@
+.USB4110-GF-A :1 ;CONN USB 2.0 TYPE-C R/A SMT
+USB4110GFA
+*STM J
+*NGS
+*PNM 1=A1 2=A4 3=A5 4=A6 5=A7 6=A8 7=A9 8=A12 9=B1 10=B4 11=B5 12=B6 13=B7 14=B8 15=B9 16=B12 17=MP1 18=MP2 19=MP3 20=MP4
+*PLB 1="A1" 2="A4" 3="A5" 4="A6" 5="A7" 6="A8" 7="A9" 8="A12" 9="B1" 10="B4" 11="B5" 12="B6" 13="B7" 14="B8" 15="B9" 16="B12" 17="MP1" 18="MP2" 19="MP3" 20="MP4"
+*MXP 22
+*DFN USB4110-GF-A
+~!Mouser Part Number (640-USB4110-GF-A)
+~!Link Mouser Price/Stock (https://www.mouser.co.uk/ProductDetail/GCT/USB4110-GF-A?qs=KUoIvG%2F9IlYiZvIXQjyJeA%3D%3D)
+~!Manufacturer_Name (GCT (GLOBAL CONNECTOR TECHNOLOGY))
+~!Manufacturer_Part_Number (USB4110-GF-A)
+~!Link Datasheet (https://gct.co/files/drawings/usb4110.pdf)
+~!Height (3.26mm)
+~!3D_Model (USB4110-GF-A)
+USB4110-GF-A
+1.1!U 2.1!U 3.1!U 4.1!U 5.1!U 6.1!U 7.1!U 8.1!U 9.1!U 10.1!U 11.1!U 12.1!U 13.1!U 14.1!U 15.1!U 16.1!U 17.1!U 18.1!U 19.1!U 20.1!U 

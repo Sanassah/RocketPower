@@ -1,0 +1,9 @@
+Manufacturer=GCT (GLOBAL CONNECTOR TECHNOLOGY)
+PartNumber=USB4110-GF-A
+PartCategory=Connector
+PackageCategory=Other
+PinCount=20
+Version=1.2
+Released=2019-10-08 10:32:17
+Downloaded=2026-01-04 03:09:18
+3D=Y

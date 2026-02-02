@@ -3,4 +3,6 @@
   (lib (name "xt30")(type "KiCad")(uri "${KIPRJMOD}/Libraries/xt30.kicad_sym")(options "")(descr ""))
   (lib (name "1725711")(type "KiCad")(uri "${KIPRJMOD}/Libraries/Term_Block/1725711.kicad_sym")(options "")(descr ""))
   (lib (name "CONMHF1-SMD-G-T")(type "KiCad")(uri "${KIPRJMOD}/Libraries/Antenna/CONMHF1-SMD-G-T.kicad_sym")(options "")(descr ""))
+  (lib (name "USB4110-GF-A")(type "KiCad")(uri "${KIPRJMOD}/Libraries/USB4110-GF-A.kicad_sym")(options "")(descr ""))
+  (lib (name "1725656")(type "KiCad")(uri "${KIPRJMOD}/Libraries/1725656.kicad_sym")(options "")(descr ""))
 )

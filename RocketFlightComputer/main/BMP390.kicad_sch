@@ -1062,7 +1062,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "04fd3f3d-010e-41a0-b49f-167e963dfe29")
-		(property "Reference" "IC1"
+		(property "Reference" "BMP390"
 			(at 63.5 44.45 0)
 			(effects
 				(font
@@ -1072,7 +1072,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "BMP390"
+		(property "Value" "ALTIMETER"
 			(at 63.5 73.66 0)
 			(effects
 				(font
@@ -1141,7 +1141,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "IC1")
+					(reference "BMP390")
 					(unit 1)
 				)
 			)

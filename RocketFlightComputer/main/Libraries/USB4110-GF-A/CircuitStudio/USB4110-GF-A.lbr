@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--/2528439/1501278/2.50/20/4/Connector/-->
+<!DOCTYPE curve SYSTEM "eagle.dtd">
+<eagle version="7.7.0">
+<drawing>
+<settings>
+<setting alwaysvectorfont="no"/>
+<setting verticaltext="up"/>
+</settings>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<layers>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
+<layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
+<layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
+<layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
+<layer number="33" name="tFinish" color="6" fill="3" visible="no" active="yes"/>
+<layer number="34" name="bFinish" color="6" fill="6" visible="no" active="yes"/>
+<layer number="35" name="tGlue" color="7" fill="4" visible="no" active="yes"/>
+<layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
+<layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
+<layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
+<layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
+<layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
+<layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
+<layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="97" name="Info" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="98" name="Guide" color="6" fill="1" visible="yes" active="yes"/>
+</layers>
+<library>
+<description>&lt;CONN USB 2.0 TYPE-C R/A SMT&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by SamacSys&lt;/author&gt;</description>
+<packages>
+<package name="USB4110GFA">
+<description>&lt;b&gt;USB4110-GF-A-1&lt;/b&gt;&lt;br&gt;
+</description>
+<smd name="A1" x="-3.350" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="A4" x="-2.550" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="A5" x="-1.250" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="A6" x="-0.250" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="A7" x="0.250" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="A8" x="1.250" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="A9" x="2.550" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="A12" x="3.350" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="B1" x="3.050" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="B4" x="2.250" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="B5" x="1.750" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="B6" x="0.750" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="B7" x="-0.750" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="B8" x="-1.750" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="B9" x="-2.250" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<smd name="B12" x="-3.050" y="3.678" dx="1.150" dy="0.300" layer="1" rot="R90"/>
+<hole x="-2.890" y="2.603" drill="0.65"/>
+<hole x="2.890" y="2.603" drill="0.65"/>
+<smd name="MP1" x="-5.110" y="-0.827" dx="2.180" dy="2.000" layer="1" rot="R0"/>
+<smd name="MP2" x="5.110" y="-0.827" dx="2.180" dy="2.000" layer="1" rot="R0"/>
+<smd name="MP3" x="-5.110" y="3.103" dx="2.180" dy="2.000" layer="1" rot="R0"/>
+<smd name="MP4" x="5.110" y="3.103" dx="2.180" dy="2.000" layer="1" rot="R0"/>
+<text x="0.000" y="0.536" align="center" size="1.27" layer="25" rot="R0" >&gt;NAME</text>
+<text x="0.000" y="0.536" align="center" size="1.27" layer="27" rot="R0" >&gt;VALUE</text>
+<wire x1="-4.47" y1="-3.677" x2="4.47" y2="-3.677" width="0.2" layer="51"/>
+<wire x1="4.47" y1="-3.677" x2="4.47" y2="3.673" width="0.2" layer="51"/>
+<wire x1="4.47" y1="3.673" x2="-4.47" y2="3.673" width="0.2" layer="51"/>
+<wire x1="-4.47" y1="3.673" x2="-4.47" y2="-3.677" width="0.2" layer="51"/>
+<wire x1="-4.47" y1="1.5" x2="-4.5" y2="1.5" width="0.1" layer="21"/>
+<wire x1="-4.5" y1="1.5" x2="-4.5" y2="0.75" width="0.1" layer="21"/>
+<wire x1="-4.5" y1="0.75" x2="-4.47" y2="0.75" width="0.1" layer="21"/>
+<wire x1="-4.47" y1="0.75" x2="-4.47" y2="1.5" width="0.1" layer="21"/>
+<wire x1="-4.47" y1="-2.5" x2="-4.47" y2="-2.5" width="0.1" layer="21"/>
+<wire x1="-4.47" y1="-2.5" x2="-4.47" y2="-3.677" width="0.1" layer="21"/>
+<wire x1="-4.47" y1="-3.677" x2="-4.47" y2="-3.677" width="0.1" layer="21"/>
+<wire x1="-4.47" y1="-3.677" x2="-4.47" y2="-2.5" width="0.1" layer="21"/>
+<wire x1="-4.47" y1="-3.677" x2="4.47" y2="-3.677" width="0.1" layer="21"/>
+<wire x1="4.47" y1="-3.677" x2="4.47" y2="-3.677" width="0.1" layer="21"/>
+<wire x1="4.47" y1="-3.677" x2="-4.47" y2="-3.677" width="0.1" layer="21"/>
+<wire x1="-4.47" y1="-3.677" x2="-4.47" y2="-3.677" width="0.1" layer="21"/>
+<wire x1="4.47" y1="-3.677" x2="4.47" y2="-3.677" width="0.1" layer="21"/>
+<wire x1="4.47" y1="-3.677" x2="4.47" y2="-2.25" width="0.1" layer="21"/>
+<wire x1="4.47" y1="-2.25" x2="4.47" y2="-2.25" width="0.1" layer="21"/>
+<wire x1="4.47" y1="-2.25" x2="4.47" y2="-3.677" width="0.1" layer="21"/>
+<wire x1="4.47" y1="0.75" x2="4.47" y2="0.75" width="0.1" layer="21"/>
+<wire x1="4.47" y1="0.75" x2="4.47" y2="1.75" width="0.1" layer="21"/>
+<wire x1="4.47" y1="1.75" x2="4.47" y2="1.75" width="0.1" layer="21"/>
+<wire x1="4.47" y1="1.75" x2="4.47" y2="0.75" width="0.1" layer="21"/>
+<wire x1="-7.2" y1="5.75" x2="7.2" y2="5.75" width="0.1" layer="51"/>
+<wire x1="7.2" y1="5.75" x2="7.2" y2="-4.677" width="0.1" layer="51"/>
+<wire x1="7.2" y1="-4.677" x2="-7.2" y2="-4.677" width="0.1" layer="51"/>
+<wire x1="-7.2" y1="-4.677" x2="-7.2" y2="5.75" width="0.1" layer="51"/>
+<wire x1="-3.4" y1="4.7" x2="-3.4" y2="4.7" width="0.2" layer="21"/>
+<wire x1="-3.400" y1="4.700" x2="-3.300" y2="4.700" width="0.2" layer="21" curve="180.0"/>
+<wire x1="-3.3" y1="4.7" x2="-3.3" y2="4.7" width="0.2" layer="21"/>
+<wire x1="-3.300" y1="4.700" x2="-3.400" y2="4.700" width="0.2" layer="21" curve="180.0"/>
+<wire x1="-3.4" y1="4.7" x2="-3.4" y2="4.7" width="0.2" layer="21"/>
+<wire x1="-3.400" y1="4.700" x2="-3.300" y2="4.700" width="0.2" layer="21" curve="180.0"/>
+</package>
+</packages>
+<symbols>
+<symbol name="USB4110-GF-A">
+<wire x1="5.08" y1="2.54" x2="20.32" y2="2.54" width="0.254" layer="94"/>
+<wire x1="20.32" y1="-25.4" x2="20.32" y2="2.54" width="0.254" layer="94"/>
+<wire x1="20.32" y1="-25.4" x2="5.08" y2="-25.4" width="0.254" layer="94"/>
+<wire x1="5.08" y1="2.54" x2="5.08" y2="-25.4" width="0.254" layer="94"/>
+<text x="21.59" y="7.62" align="center-left" size="1.778" layer="95">&gt;NAME</text>
+<text x="21.59" y="5.08" align="center-left" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="A1" x="0" y="0" length="middle" direction="io" rot="R0"/>
+<pin name="A4" x="0" y="-2.54" length="middle" direction="io" rot="R0"/>
+<pin name="A5" x="0" y="-5.08" length="middle" direction="io" rot="R0"/>
+<pin name="A6" x="0" y="-7.62" length="middle" direction="io" rot="R0"/>
+<pin name="A7" x="0" y="-10.16" length="middle" direction="io" rot="R0"/>
+<pin name="A8" x="0" y="-12.7" length="middle" direction="io" rot="R0"/>
+<pin name="A9" x="0" y="-15.24" length="middle" direction="io" rot="R0"/>
+<pin name="A12" x="0" y="-17.78" length="middle" direction="io" rot="R0"/>
+<pin name="B1" x="0" y="-20.32" length="middle" direction="io" rot="R0"/>
+<pin name="B4" x="0" y="-22.86" length="middle" direction="io" rot="R0"/>
+<pin name="B5" x="25.4" y="0" length="middle" direction="io" rot="R180"/>
+<pin name="B6" x="25.4" y="-2.54" length="middle" direction="io" rot="R180"/>
+<pin name="B7" x="25.4" y="-5.08" length="middle" direction="io" rot="R180"/>
+<pin name="B8" x="25.4" y="-7.62" length="middle" direction="io" rot="R180"/>
+<pin name="B9" x="25.4" y="-10.16" length="middle" direction="io" rot="R180"/>
+<pin name="B12" x="25.4" y="-12.7" length="middle" direction="io" rot="R180"/>
+<pin name="MP1" x="25.4" y="-15.24" length="middle" direction="io" rot="R180"/>
+<pin name="MP2" x="25.4" y="-17.78" length="middle" direction="io" rot="R180"/>
+<pin name="MP3" x="25.4" y="-20.32" length="middle" direction="io" rot="R180"/>
+<pin name="MP4" x="25.4" y="-22.86" length="middle" direction="io" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="USB4110-GF-A" prefix="J">
+<description>&lt;b&gt;CONN USB 2.0 TYPE-C R/A SMT&lt;/b&gt;&lt;p&gt;
+Source: &lt;a href="https://gct.co/files/drawings/usb4110.pdf"&gt; Datasheet &lt;/a&gt;</description>
+<gates>
+<gate name="G$1" symbol="USB4110-GF-A" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="USB4110GFA">
+<connects>
+<connect gate="G$1" pin="A1" pad="A1"/>
+<connect gate="G$1" pin="A4" pad="A4"/>
+<connect gate="G$1" pin="A5" pad="A5"/>
+<connect gate="G$1" pin="A6" pad="A6"/>
+<connect gate="G$1" pin="A7" pad="A7"/>
+<connect gate="G$1" pin="A8" pad="A8"/>
+<connect gate="G$1" pin="A9" pad="A9"/>
+<connect gate="G$1" pin="A12" pad="A12"/>
+<connect gate="G$1" pin="B1" pad="B1"/>
+<connect gate="G$1" pin="B4" pad="B4"/>
+<connect gate="G$1" pin="B5" pad="B5"/>
+<connect gate="G$1" pin="B6" pad="B6"/>
+<connect gate="G$1" pin="B7" pad="B7"/>
+<connect gate="G$1" pin="B8" pad="B8"/>
+<connect gate="G$1" pin="B9" pad="B9"/>
+<connect gate="G$1" pin="B12" pad="B12"/>
+<connect gate="G$1" pin="MP1" pad="MP1"/>
+<connect gate="G$1" pin="MP2" pad="MP2"/>
+<connect gate="G$1" pin="MP3" pad="MP3"/>
+<connect gate="G$1" pin="MP4" pad="MP4"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="Mouser_Part_Number" value="640-USB4110-GF-A" constant="no"/>
+<attribute name="Mouser_Price-Stock" value="https://www.mouser.co.uk/ProductDetail/GCT/USB4110-GF-A?qs=KUoIvG%2F9IlYiZvIXQjyJeA%3D%3D" constant="no"/>
+<attribute name="Manufacturer_Name" value="GCT (GLOBAL CONNECTOR TECHNOLOGY)" constant="no"/>
+<attribute name="Manufacturer_Part_Number" value="USB4110-GF-A" constant="no"/>
+<attribute name="Description" value="CONN USB 2.0 TYPE-C R/A SMT" constant="no"/>
+<attribute name="Height" value="3.26mm" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
+</drawing>
+</eagle>

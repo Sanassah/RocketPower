@@ -1,4 +1,4 @@
-24664053563034304
+24674699663658652
 ADXL375
 1X04_ROUND
 
@@ -99463,6 +99463,13 @@ Connector
 2
 2
 footprint
+1725656
+1725656-5
+Connector
+0
+2
+2
+footprint
 1725698
 1725698
 Connector
@@ -99477,6 +99484,13 @@ Connector
 8
 8
 footprint
+ADXL375BCCZRL
+CC-14-1_2022
+Integrated Circuit
+0
+14
+14
+footprint
 APS6404L
 SOP-8L(150), package code SN
 Integrated Circuit
@@ -99490,6 +99504,27 @@ Integrated Circuit
 0
 196
 196
+footprint
+BGA196C80P14X14_1200X1200X152
+12 mm x 12 mm x 1.37 mm
+Integrated Circuit
+0
+196
+196
+footprint
+BNO085
+BNO085-3
+Integrated Circuit
+0
+28
+28
+footprint
+CC-14-1
+CC-14-1
+Integrated Circuit
+0
+14
+14
 footprint
 CMT32265SMTTR
 CMT-322-65-SMT-TR-1
@@ -99602,6 +99637,13 @@ Power Supply
 0
 11
 11
+footprint
+USB4110GFA
+USB4110-GF-A-1
+Connector
+0
+20
+20
 footprint
 XB24CAPIT-001
 Digi XBee 802.15.4
