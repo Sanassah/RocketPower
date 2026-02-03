@@ -3362,7 +3362,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Crystal:Crystal_SMD_2012-2Pin_2.0x1.2mm"
+		(property "Footprint" "footprint:830050789"
 			(at 209.55 73.66 0)
 			(effects
 				(font
