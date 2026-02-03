@@ -1,4 +1,4 @@
-24674699663658652
+24676469758422818
 ADXL375
 1X04_ROUND
 
@@ -99483,6 +99483,13 @@ Connector
 0
 8
 8
+footprint
+830050789
+SMD Crystal 2012/2 http://txccrystal.com/images/pdf/9ht11.pdf, hand-soldering, 2.0x1.2mm^2 package
+SMD SMT crystal hand-soldering
+0
+2
+2
 footprint
 ADXL375BCCZRL
 CC-14-1_2022
