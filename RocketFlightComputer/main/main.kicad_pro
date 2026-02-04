@@ -126,7 +126,7 @@
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.0,
+        "min_clearance": 0.15,
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.0,
         "min_hole_clearance": 0.0,
@@ -279,6 +279,7 @@
         "layers": [
           31,
           32,
+          36,
           38,
           44,
           46
@@ -326,6 +327,7 @@
         "activeLayer": -2,
         "layers": [
           0,
+          37,
           39,
           44,
           47
@@ -341,7 +343,6 @@
           133,
           134,
           135,
-          136,
           137,
           138,
           140,
