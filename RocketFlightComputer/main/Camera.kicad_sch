@@ -445,6 +445,27 @@
 			)
 		)
 	)
+	(text_box "from 80ms to 200ma according to voltage, RunCam Split 4-25 has the DVR inside already. Other choices to look at, \nwould need to connect a bypass capacitor before cam in case of noise + inductor"
+		(exclude_from_sim no)
+		(at 177.165 121.92 0)
+		(size 87.63 31.75)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 2.5 2.5)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left top)
+		)
+		(uuid "bbdd5b1a-2424-48b9-8a70-7fd63a5d4126")
+	)
 	(text_box "Cameras use JST GH connectors"
 		(exclude_from_sim no)
 		(at 207.01 12.7 0)
