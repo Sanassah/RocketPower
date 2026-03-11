@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.762,
-          "height": 1.524,
-          "width": 1.524
+          "drill": 1.1,
+          "height": 1.65,
+          "width": 1.65
         },
         "silk_line_width": 0.15,
         "silk_text_italic": false,
@@ -48,7 +48,7 @@
         "silk_text_thickness": 0.15,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.5
+          "min_clearance": 0.0
         }
       },
       "diff_pair_dimensions": [
@@ -126,7 +126,7 @@
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.15,
+        "min_clearance": 0.0,
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.0,
         "min_hole_clearance": 0.0,
@@ -277,6 +277,7 @@
       {
         "activeLayer": -2,
         "layers": [
+          0,
           31,
           32,
           36,
@@ -295,7 +296,6 @@
           133,
           134,
           135,
-          136,
           137,
           138,
           140,
@@ -319,7 +319,6 @@
           159,
           160,
           161,
-          164,
           165
         ]
       },
@@ -327,6 +326,7 @@
         "activeLayer": -2,
         "layers": [
           0,
+          31,
           37,
           39,
           44,
@@ -366,7 +366,6 @@
           159,
           160,
           161,
-          164,
           165
         ]
       }

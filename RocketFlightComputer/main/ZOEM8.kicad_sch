@@ -4728,6 +4728,7 @@
 	(symbol
 		(lib_id "SparkFun_ZOE-M8Q GPS-eagle-import:0.1UF-0603-25V-(+80/-20%)")
 		(at 141.605 85.09 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4735,7 +4736,7 @@
 		(dnp no)
 		(uuid "e221311d-ac56-447a-b661-bd57dad7c721")
 		(property "Reference" "C39"
-			(at 143.129 82.169 0)
+			(at 140.081 82.169 0)
 			(effects
 				(font
 					(size 1.778 1.778)
@@ -4744,7 +4745,7 @@
 			)
 		)
 		(property "Value" "0.1UF"
-			(at 132.842 88.138 0)
+			(at 150.368 88.138 0)
 			(effects
 				(font
 					(size 1.778 1.778)

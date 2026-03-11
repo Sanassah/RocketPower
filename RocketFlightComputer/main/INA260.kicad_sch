@@ -1209,6 +1209,10 @@
 		(color 0 0 0 0)
 		(uuid "e166a0ae-dae1-4372-b423-13766995918c")
 	)
+	(no_connect
+		(at 77.47 81.28)
+		(uuid "34eb900c-b516-4d15-8191-ccdfae91f6bd")
+	)
 	(wire
 		(pts
 			(xy 95.25 88.9) (xy 95.885 88.9)
@@ -1268,16 +1272,6 @@
 			(type default)
 		)
 		(uuid "4d8be048-b2ea-4743-a80a-63ea9b3d6365")
-	)
-	(wire
-		(pts
-			(xy 77.47 81.28) (xy 67.945 81.28)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "672f6ef2-2bd1-4f09-ac88-68e42e7acf1a")
 	)
 	(wire
 		(pts
@@ -1421,17 +1415,6 @@
 			(justify left bottom)
 		)
 		(uuid "449469cb-d62e-4d0d-9ffa-bda25bb1533b")
-	)
-	(label "ALERT"
-		(at 67.945 81.28 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.2446 1.2446)
-			)
-			(justify left bottom)
-		)
-		(uuid "9f56a67d-e981-4578-9096-b015ba922e1c")
 	)
 	(hierarchical_label "INA260_SCL1"
 		(shape input)
@@ -1932,6 +1915,72 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+3.3V")
+		(at 97.79 50.8 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "54b43e57-fb72-407d-8c01-6cfa54478ccb")
+		(property "Reference" "#PWR0110"
+			(at 97.79 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 89.916 48.514 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 97.79 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 97.79 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 97.79 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f693a8b2-54b3-4a40-8861-c6ee1da03534")
+		)
+		(instances
+			(project "main"
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf"
+					(reference "#PWR0110")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Adafruit INA260-eagle-import:INA260")
 		(at 95.25 71.12 0)
 		(unit 1)
@@ -2176,72 +2225,6 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf"
 					(reference "C40")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3.3V")
-		(at 97.79 50.8 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "b14e6873-d78b-4ded-9128-dcf6e404e300")
-		(property "Reference" "#PWR0110"
-			(at 97.79 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 99.695 51.435 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 97.79 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 97.79 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 97.79 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f3f63d3a-3c7d-4703-81c0-6eb2cf241f51")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf"
-					(reference "#PWR0110")
 					(unit 1)
 				)
 			)

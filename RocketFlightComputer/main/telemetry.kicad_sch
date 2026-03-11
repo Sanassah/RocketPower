@@ -984,7 +984,7 @@
 		(at 116.84 59.69)
 		(uuid "fd1113c6-4f6b-483f-bccf-3d50f6d3820d")
 	)
-	(text "We will be using two XBP24CASIT (2.4 GHz, 200 ft, 4000 ft, 250 kb/s, 802.15.4, Zigbee)\nCurrent: 250mA"
+	(text "We will be using two XBP24CASIT (2.4 GHz, 200 ft, 4000 ft, 250 kb/s, 802.15.4, Zigbee)\nCurrent: 33mA"
 		(exclude_from_sim no)
 		(at 140.208 100.838 0)
 		(effects

@@ -2259,7 +2259,8 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 113.03 59.69 270)
+		(at 113.03 59.69 90)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2275,7 +2276,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 115.316 59.69 90)
+			(at 110.744 59.69 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2674,7 +2675,8 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 64.77 59.69 270)
+		(at 64.77 59.69 90)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2682,7 +2684,7 @@
 		(dnp no)
 		(uuid "5df44891-3c2e-43f2-8179-8c3cbe25e164")
 		(property "Reference" "R10"
-			(at 64.262 57.404 90)
+			(at 65.278 57.404 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2690,7 +2692,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 67.056 59.69 90)
+			(at 62.484 59.69 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2811,6 +2813,7 @@
 	(symbol
 		(lib_id "Device:R")
 		(at 33.02 45.72 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2818,7 +2821,7 @@
 		(dnp no)
 		(uuid "668c2c6d-2d01-4d88-a1f3-31ec01204bc0")
 		(property "Reference" "R15"
-			(at 30.734 45.72 90)
+			(at 35.306 45.72 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2826,7 +2829,7 @@
 			)
 		)
 		(property "Value" "4.7k"
-			(at 33.274 43.688 90)
+			(at 32.766 43.688 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2835,7 +2838,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
-			(at 31.242 45.72 90)
+			(at 34.798 45.72 90)
 			(effects
 				(font
 					(size 1.27 1.27)
