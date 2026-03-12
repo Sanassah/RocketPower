@@ -2,32 +2,52 @@
 	(version 20231120)
 	(generator "eeschema")
 	(generator_version "8.0")
-	(uuid "eb9b8cd5-e700-47ce-918f-8ddbd88de740")
+	(uuid "5e17c4b4-aab2-4d15-9c90-90f1271e63e8")
 	(paper "A5")
 	(lib_symbols
-		(symbol "Connector:TestPoint_2Pole"
-			(pin_names
-				(offset 0.762) hide)
+		(symbol "B3P-VH_LF__SN_:S4B-PH-K-S_LF__SN_"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "TP"
-				(at 0 1.524 0)
+			(property "Reference" "J"
+				(at 16.51 7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 				)
 			)
-			(property "Value" "TestPoint_2Pole"
-				(at 0 -1.778 0)
+			(property "Value" "S4B-PH-K-S_LF__SN_"
+				(at 16.51 5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 				)
 			)
-			(property "Footprint" ""
+			(property "Footprint" "SHDRRA4W50P0X200_1X4_990X760X480P"
+				(at 16.51 -94.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://datasheet.lcsc.com/szlcsc/JST-Sales-America-PHsocket-1-4P-Curved-needle-pitch2mm_C157926.pdf"
+				(at 16.51 -194.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(property "Description" "CONN HEADER R/A 4POS 2MM"
 				(at 0 0 0)
 				(effects
 					(font
@@ -36,68 +56,71 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
+			(property "Height" "4.8"
+				(at 16.51 -394.92 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 					(hide yes)
 				)
 			)
-			(property "Description" "2-polar test point"
-				(at 0 0 0)
+			(property "Mouser Part Number" "N/A"
+				(at 16.51 -494.92 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "point tp"
-				(at 0 0 0)
+			(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/JST-Commercial/S4B-PH-K-SLFSN?qs=QpmGXVUTftEGA16rwNx4xw%3D%3D"
+				(at 16.51 -594.92 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "Pin* Test*"
-				(at 0 0 0)
+			(property "Manufacturer_Name" "JST (JAPAN SOLDERLESS TERMINALS)"
+				(at 16.51 -694.92 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left top)
 					(hide yes)
 				)
 			)
-			(symbol "TestPoint_2Pole_0_1"
-				(circle
-					(center -1.778 0)
-					(radius 0.762)
+			(property "Manufacturer_Part_Number" "S4B-PH-K-S(LF)(SN)"
+				(at 16.51 -794.92 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+					(hide yes)
+				)
+			)
+			(symbol "S4B-PH-K-S_LF__SN__1_1"
+				(rectangle
+					(start 5.08 2.54)
+					(end 15.24 -10.16)
 					(stroke
-						(width 0)
+						(width 0.254)
 						(type default)
 					)
 					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 1.778 0)
-					(radius 0.762)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
+						(type background)
 					)
 				)
 				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
+					(at 0 0 0)
+					(length 5.08)
 					(name "1"
 						(effects
 							(font
@@ -114,8 +137,8 @@
 					)
 				)
 				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
+					(at 0 -2.54 0)
+					(length 5.08)
 					(name "2"
 						(effects
 							(font
@@ -124,6 +147,42 @@
 						)
 					)
 					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -5.08 0)
+					(length 5.08)
+					(name "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -7.62 0)
+					(length 5.08)
+					(name "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -386,65 +445,19 @@
 			)
 		)
 	)
-	(rectangle
-		(start 12.7 53.34)
-		(end 102.87 83.82)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(fill
-			(type none)
-		)
-		(uuid 20d28e20-4b8e-40a8-86e3-7d3f84801273)
-	)
-	(rectangle
-		(start 12.7 12.7)
-		(end 73.025 38.1)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(fill
-			(type none)
-		)
-		(uuid 4e20c3a4-1ee9-4816-8f4b-f1804701f357)
-	)
-	(text "Power Reserve"
+	(text "We will be using two XBP24CASIT (2.4 GHz, 200 ft, 4000 ft, 250 kb/s, 802.15.4, Zigbee)\nCurrent: 33mA"
 		(exclude_from_sim no)
-		(at 20.828 15.494 0)
+		(at 140.208 100.838 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 		)
-		(uuid "2756ed76-d181-4c51-9c9e-77cd6a9e3563")
+		(uuid "6e3f3af8-c98b-456d-b7ad-fe8ed8ff3928")
 	)
-	(text "UART Reserve"
-		(exclude_from_sim no)
-		(at 20.828 55.88 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "dd52cc13-3bbf-4086-8d2c-6e21eda4c00a")
-	)
-	(hierarchical_label "Reserve_RX"
+	(hierarchical_label "Xbee_RX"
 		(shape input)
-		(at 39.37 71.12 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "8ce25a18-07aa-4add-8a25-e6b9af845d3b")
-	)
-	(hierarchical_label "Reserve_TX"
-		(shape input)
-		(at 29.21 71.12 180)
+		(at 74.93 62.23 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -452,19 +465,32 @@
 			)
 			(justify right)
 		)
-		(uuid "bf5ae140-a488-497a-b32b-cea6c5f774c5")
+		(uuid "21f87232-feb7-4821-b57e-7be6d24b4aa7")
+	)
+	(hierarchical_label "Xbee_TX"
+		(shape input)
+		(at 74.93 64.77 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "6b80a2cf-11b0-4016-ba2e-36de1f555b23")
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 26.67 27.94 90)
+		(at 74.93 59.69 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "6d0d580c-79a5-4a56-a9b8-22e3ae1ea34d")
-		(property "Reference" "#PWR089"
-			(at 30.48 27.94 0)
+		(fields_autoplaced yes)
+		(uuid "168ee57c-6362-4ec3-b58c-7beb66030b7e")
+		(property "Reference" "#PWR0142"
+			(at 78.74 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -473,7 +499,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 25.4 25.908 90)
+			(at 71.12 59.6899 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -482,7 +508,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 26.67 27.94 0)
+			(at 74.93 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -491,7 +517,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 26.67 27.94 0)
+			(at 74.93 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -500,7 +526,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 26.67 27.94 0)
+			(at 74.93 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -509,28 +535,29 @@
 			)
 		)
 		(pin "1"
-			(uuid "81a9cfd8-d595-4a46-8917-7618fd657969")
+			(uuid "889b4186-1734-4d5c-b134-23183e293a13")
 		)
 		(instances
 			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "#PWR089")
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e28c6e59-b6f8-4de5-b42d-020f37d4635d"
+					(reference "#PWR0142")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "power:+3.3V")
-		(at 53.34 27.94 90)
+		(lib_id "power:GNDREF")
+		(at 74.93 57.15 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "7b21ef79-713c-4338-b924-45ff13f9306f")
-		(property "Reference" "#PWR0102"
-			(at 57.15 27.94 0)
+		(fields_autoplaced yes)
+		(uuid "9fd1fc2f-4099-459e-b65c-10f45406cebb")
+		(property "Reference" "#PWR0143"
+			(at 68.58 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -538,8 +565,76 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+7.5V"
-			(at 52.07 25.908 90)
+		(property "Value" "GNDREF"
+			(at 71.12 56.515 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 74.93 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 74.93 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 74.93 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bef5366e-5519-4ad4-8402-12678608ff6b")
+		)
+		(instances
+			(project "main"
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e28c6e59-b6f8-4de5-b42d-020f37d4635d"
+					(reference "#PWR0143")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "B3P-VH_LF__SN_:S4B-PH-K-S_LF__SN_")
+		(at 74.93 57.15 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e9a8dea2-7693-42e8-88a3-d3d4eaae6404")
+		(property "Reference" "S4B-PH-K-S_LF__SN_1"
+			(at 80.264 53.086 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Value" "TELEMETRY"
+			(at 79.756 52.832 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -547,8 +642,28 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
-			(at 53.34 27.94 0)
+		(property "Footprint" "Connector_JST:JST_GH_BM04B-GHS-TBT_1x04-1MP_P1.25mm_Vertical"
+			(at 91.44 152.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://datasheet.lcsc.com/szlcsc/JST-Sales-America-PHsocket-1-4P-Curved-needle-pitch2mm_C157926.pdf"
+			(at 91.44 252.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "Description" "CONN HEADER R/A 4POS 2MM"
+			(at 74.93 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -556,373 +671,72 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
-			(at 53.34 27.94 0)
+		(property "Height" "4.8"
+			(at 91.44 452.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left top)
 				(hide yes)
 			)
 		)
-		(property "Description" ""
-			(at 53.34 27.94 0)
+		(property "Mouser Part Number" "N/A"
+			(at 91.44 552.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left top)
 				(hide yes)
 			)
 		)
-		(pin "1"
-			(uuid "1f81def2-b2ac-4d30-b491-1c85bfa7cb07")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "#PWR0102")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint_2Pole")
-		(at 31.75 27.94 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "8f939bbd-bcb5-43c2-813d-10b927a07cf2")
-		(property "Reference" "TP1"
-			(at 32.004 24.892 0)
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/JST-Commercial/S4B-PH-K-SLFSN?qs=QpmGXVUTftEGA16rwNx4xw%3D%3D"
+			(at 91.44 652.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-			)
-		)
-		(property "Value" "TestPoint_2Pole"
-			(at 31.75 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
+				(justify left top)
 				(hide yes)
 			)
 		)
-		(property "Footprint" "TestPoint:TestPoint_2Pads_Pitch2.54mm_Drill0.8mm"
-			(at 31.75 27.94 0)
+		(property "Manufacturer_Name" "JST (JAPAN SOLDERLESS TERMINALS)"
+			(at 91.44 752.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left top)
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
-			(at 31.75 27.94 0)
+		(property "Manufacturer_Part_Number" "S4B-PH-K-S(LF)(SN)"
+			(at 91.44 852.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
-			)
-		)
-		(property "Description" "2-polar test point"
-			(at 31.75 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
+				(justify left top)
 				(hide yes)
 			)
 		)
 		(pin "2"
-			(uuid "3ff16e4d-796e-42f5-bfaf-63508a7d3b83")
+			(uuid "151a9ff2-c3ae-475d-a92a-90f236194631")
+		)
+		(pin "4"
+			(uuid "a3f5bb15-dcd7-4438-a0c3-bad872e0dd98")
 		)
 		(pin "1"
-			(uuid "3e1328a2-d9bf-4b02-a750-3079c8f52896")
+			(uuid "8db1ed69-573f-4f9d-87ec-a46260ac7549")
+		)
+		(pin "3"
+			(uuid "75d3d4dc-969f-4127-8b8a-2ae03be7a8ec")
 		)
 		(instances
 			(project ""
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "TP1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint_2Pole")
-		(at 58.42 27.94 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "95083f6b-ae1c-44ba-8204-2e95121a4e5f")
-		(property "Reference" "TP2"
-			(at 58.674 24.892 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "TestPoint_2Pole"
-			(at 58.42 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_2Pads_Pitch2.54mm_Drill0.8mm"
-			(at 58.42 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 58.42 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "2-polar test point"
-			(at 58.42 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "9425bcc4-b3ad-4fbb-94ba-cd7ae5429467")
-		)
-		(pin "1"
-			(uuid "85d25c7a-8f31-4926-b327-26e36e8ab29b")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "TP2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GNDREF")
-		(at 36.83 27.94 90)
-		(mirror x)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "b6994768-24a0-42bb-8b9e-bf6a2b251925")
-		(property "Reference" "#PWR099"
-			(at 43.18 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GNDREF"
-			(at 40.64 27.305 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 36.83 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 36.83 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 36.83 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "1f07b099-6d80-4f05-a90d-f92ef727e3df")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "#PWR099")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GNDREF")
-		(at 63.5 27.94 90)
-		(mirror x)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "ba726bcf-20be-4393-bd1f-a2737b873cc5")
-		(property "Reference" "#PWR0103"
-			(at 69.85 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GNDREF"
-			(at 67.31 27.305 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 63.5 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 63.5 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 63.5 27.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "b2f8c4b6-7992-42cf-af99-5b7814b47839")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "#PWR0103")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint_2Pole")
-		(at 34.29 71.12 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "fe14559d-9ab1-4feb-991e-10c44dc2eb59")
-		(property "Reference" "TP5"
-			(at 34.544 68.072 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "TestPoint_2Pole"
-			(at 34.29 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_2Pads_Pitch2.54mm_Drill0.8mm"
-			(at 34.29 71.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 34.29 71.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "2-polar test point"
-			(at 34.29 71.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "d5258b43-46f9-4575-ad0a-b9e04f0d2f59")
-		)
-		(pin "1"
-			(uuid "cc1ce71c-1863-434f-80ad-387eac65fbdb")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "TP5")
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e28c6e59-b6f8-4de5-b42d-020f37d4635d"
+					(reference "S4B-PH-K-S_LF__SN_1")
 					(unit 1)
 				)
 			)
