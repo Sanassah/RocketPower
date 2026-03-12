@@ -3,7 +3,7 @@
 	(generator "eeschema")
 	(generator_version "8.0")
 	(uuid "eb9b8cd5-e700-47ce-918f-8ddbd88de740")
-	(paper "A4")
+	(paper "A5")
 	(lib_symbols
 		(symbol "Connector:TestPoint_2Pole"
 			(pin_names
@@ -387,18 +387,6 @@
 		)
 	)
 	(rectangle
-		(start 12.7 89.535)
-		(end 102.87 120.015)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(fill
-			(type none)
-		)
-		(uuid 1ddcc23c-31a9-449f-8e0c-9498d8e57ed4)
-	)
-	(rectangle
 		(start 12.7 53.34)
 		(end 102.87 83.82)
 		(stroke
@@ -432,16 +420,6 @@
 		)
 		(uuid "2756ed76-d181-4c51-9c9e-77cd6a9e3563")
 	)
-	(text "CAN Reserve"
-		(exclude_from_sim no)
-		(at 21.082 92.456 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "c7335ce5-e18f-4576-b5e2-28f636ae0284")
-	)
 	(text "UART Reserve"
 		(exclude_from_sim no)
 		(at 20.828 55.88 0)
@@ -452,55 +430,7 @@
 		)
 		(uuid "dd52cc13-3bbf-4086-8d2c-6e21eda4c00a")
 	)
-	(hierarchical_label "Reserve_CTX"
-		(shape input)
-		(at 29.21 101.6 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "1d363b42-3c0c-4459-85a3-2388ce49d2a2")
-	)
-	(hierarchical_label "Reserve_RX1"
-		(shape input)
-		(at 39.37 62.23 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "42f162d9-ea00-42d9-861f-b3ff91c526d0")
-	)
-	(hierarchical_label "Reserve_CRX"
-		(shape input)
-		(at 39.37 101.6 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "53230fd2-a5aa-454e-829d-167791a79203")
-	)
-	(hierarchical_label "Reserve_RX3"
-		(shape input)
-		(at 39.37 78.74 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "81ae4d2d-9871-4ac6-8138-4c1a69ea074a")
-	)
-	(hierarchical_label "Reserve_RX2"
+	(hierarchical_label "Reserve_RX"
 		(shape input)
 		(at 39.37 71.12 0)
 		(fields_autoplaced yes)
@@ -512,19 +442,7 @@
 		)
 		(uuid "8ce25a18-07aa-4add-8a25-e6b9af845d3b")
 	)
-	(hierarchical_label "Reserve_TX3"
-		(shape input)
-		(at 29.21 78.74 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "bb852306-526b-4a8f-8839-42b098cf776f")
-	)
-	(hierarchical_label "Reserve_TX2"
+	(hierarchical_label "Reserve_TX"
 		(shape input)
 		(at 29.21 71.12 180)
 		(fields_autoplaced yes)
@@ -535,18 +453,6 @@
 			(justify right)
 		)
 		(uuid "bf5ae140-a488-497a-b32b-cea6c5f774c5")
-	)
-	(hierarchical_label "Reserve_TX1"
-		(shape input)
-		(at 29.21 62.23 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "d665e4d1-79d3-422b-bfd6-1822c19d2b50")
 	)
 	(symbol
 		(lib_id "power:+3.3V")
@@ -615,74 +521,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:TestPoint_2Pole")
-		(at 34.29 101.6 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "7ab10ed6-6ca1-4cfc-a7c8-69645cdd4680")
-		(property "Reference" "TP7"
-			(at 34.544 98.552 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "TestPoint_2Pole"
-			(at 34.29 99.06 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_2Pads_Pitch2.54mm_Drill0.8mm"
-			(at 34.29 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 34.29 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "2-polar test point"
-			(at 34.29 101.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "82d9d70f-67ca-4c55-8698-759b797f85f8")
-		)
-		(pin "1"
-			(uuid "eb681238-d897-4686-85fb-0834cb34650a")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "TP7")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:+3.3V")
 		(at 53.34 27.94 90)
 		(unit 1)
@@ -743,74 +581,6 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
 					(reference "#PWR0102")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint_2Pole")
-		(at 34.29 62.23 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "8ea6f49f-e8ee-4562-b38d-cfcffd82cc18")
-		(property "Reference" "TP4"
-			(at 34.544 59.182 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "TestPoint_2Pole"
-			(at 34.29 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_2Pads_Pitch2.54mm_Drill0.8mm"
-			(at 34.29 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 34.29 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "2-polar test point"
-			(at 34.29 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "e10b9f69-55f0-47dc-9ac9-51afb2c29efc")
-		)
-		(pin "1"
-			(uuid "eb689679-e7c5-4e2e-8479-f995a95b4f80")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "TP4")
 					(unit 1)
 				)
 			)
@@ -1085,74 +855,6 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
 					(reference "#PWR0103")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint_2Pole")
-		(at 34.29 78.74 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "df19ab5a-d46f-4e68-beb5-96535f1665dc")
-		(property "Reference" "TP6"
-			(at 34.544 75.692 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "TestPoint_2Pole"
-			(at 34.29 76.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_2Pads_Pitch2.54mm_Drill0.8mm"
-			(at 34.29 78.74 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 34.29 78.74 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "2-polar test point"
-			(at 34.29 78.74 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "9e88a3b8-1604-4ed9-b587-abcd90c43992")
-		)
-		(pin "1"
-			(uuid "462ac927-9041-4533-948f-ca26e537cd40")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/d88c534c-db56-4afc-838f-d7c058479ac8"
-					(reference "TP6")
 					(unit 1)
 				)
 			)

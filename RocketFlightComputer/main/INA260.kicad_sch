@@ -549,149 +549,6 @@
 				)
 			)
 		)
-		(symbol "Adafruit INA260-eagle-import:RESISTOR_0603_NOOUT"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "R"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.016 1.016)
-						(bold yes)
-					)
-				)
-			)
-			(property "Footprint" "Adafruit INA260:0603-NO"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_locked" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "RESISTOR_0603_NOOUT_1_0"
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy 2.54 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -1.27) (xy -2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 1.27) (xy 2.54 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 0 0)
-							)
-						)
-					)
-				)
-			)
-		)
 		(symbol "power:+3.3V"
 			(power)
 			(pin_names
@@ -1197,18 +1054,6 @@
 		(color 0 0 0 0)
 		(uuid "a96defd4-1a1e-4f8a-aeda-0d4a5bdc0dba")
 	)
-	(junction
-		(at 120.65 76.2)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d6dcfe25-c01f-401b-91b0-efe65f358f95")
-	)
-	(junction
-		(at 140.97 78.74)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "e166a0ae-dae1-4372-b423-13766995918c")
-	)
 	(no_connect
 		(at 77.47 81.28)
 		(uuid "34eb900c-b516-4d15-8191-ccdfae91f6bd")
@@ -1235,16 +1080,6 @@
 	)
 	(wire
 		(pts
-			(xy 113.03 78.74) (xy 140.97 78.74)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "28d0a47f-0b7b-4b8f-8cb6-49c0f9c587aa")
-	)
-	(wire
-		(pts
 			(xy 77.47 78.74) (xy 78.105 78.74)
 		)
 		(stroke
@@ -1252,16 +1087,6 @@
 			(type default)
 		)
 		(uuid "381b0e8e-0e01-4538-aecf-c892c7eb4178")
-	)
-	(wire
-		(pts
-			(xy 140.97 78.74) (xy 143.51 78.74)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "3ddc3715-663c-4dff-a123-ba76b9072b74")
 	)
 	(wire
 		(pts
@@ -1285,7 +1110,7 @@
 	)
 	(wire
 		(pts
-			(xy 113.03 76.2) (xy 120.65 76.2)
+			(xy 113.03 76.2) (xy 122.555 76.2)
 		)
 		(stroke
 			(width 0.1524)
@@ -1295,7 +1120,7 @@
 	)
 	(wire
 		(pts
-			(xy 143.51 78.74) (xy 140.97 78.74)
+			(xy 113.03 78.74) (xy 143.51 78.74)
 		)
 		(stroke
 			(width 0)
@@ -1322,16 +1147,6 @@
 			(type solid)
 		)
 		(uuid "a994d1e6-6d50-4d0a-bc41-634152167e25")
-	)
-	(wire
-		(pts
-			(xy 120.65 76.2) (xy 122.555 76.2)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ad0121f0-2880-4430-955e-75f2008359e5")
 	)
 	(wire
 		(pts
@@ -1850,72 +1665,6 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 140.97 68.58 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "380f8710-6c43-4fcb-aca9-bca27af682dc")
-		(property "Reference" "#PWR0113"
-			(at 140.97 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3.3V"
-			(at 141.986 67.818 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 140.97 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 140.97 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 140.97 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "375e4840-926a-4029-bf22-18851d043c89")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf"
-					(reference "#PWR0113")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3.3V")
 		(at 97.79 50.8 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -2092,76 +1841,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Adafruit INA260-eagle-import:RESISTOR_0603_NOOUT")
-		(at 120.65 71.12 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "7ea1c58d-460d-4653-99ec-b3a6947c458d")
-		(property "Reference" "R166"
-			(at 122.428 71.374 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "10K"
-			(at 119.888 69.596 0)
-			(effects
-				(font
-					(size 1.016 1.016)
-					(bold yes)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
-			(at 120.65 71.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 120.65 71.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 120.65 71.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "4c99249d-a883-46e7-901e-4195ab2cf440")
-		)
-		(pin "2"
-			(uuid "255ed5d2-6651-4613-a3dc-904ed50b5f78")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf"
-					(reference "R166")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Adafruit INA260-eagle-import:CAP_CERAMIC0603_NO")
 		(at 106.68 53.975 90)
 		(unit 1)
@@ -2225,142 +1904,6 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf"
 					(reference "C40")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Adafruit INA260-eagle-import:RESISTOR_0603_NOOUT")
-		(at 140.97 73.66 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "bd04cf3f-4d72-4829-bc6c-19f029b8768e")
-		(property "Reference" "R177"
-			(at 142.748 74.168 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "10K"
-			(at 141.605 76.2 0)
-			(effects
-				(font
-					(size 1.016 1.016)
-					(bold yes)
-				)
-				(justify right top)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
-			(at 140.97 73.66 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 140.97 73.66 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 140.97 73.66 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "634520a8-b05d-46dc-b63b-e62971bebffa")
-		)
-		(pin "2"
-			(uuid "fded57db-3f27-49f7-9452-e5f5065156ef")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf"
-					(reference "R177")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3.3V")
-		(at 120.65 66.04 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "c1ae6ddc-9894-4c58-8cf9-59fbe504e2e8")
-		(property "Reference" "#PWR0112"
-			(at 120.65 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3.3V"
-			(at 121.666 65.278 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 120.65 66.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 120.65 66.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 120.65 66.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "bde4cbd0-c6bf-4a99-9abb-f7b22a455b23")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf"
-					(reference "#PWR0112")
 					(unit 1)
 				)
 			)
