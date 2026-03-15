@@ -1217,8 +1217,8 @@
 	)
 	(text_box "Clear BIT D6 in DATA_FORMAT register (0x31)"
 		(exclude_from_sim no)
-		(at 100.33 55.245 0)
-		(size 30.48 5.08)
+		(at 97.79 54.61 0)
+		(size 31.115 5.08)
 		(stroke
 			(width 0)
 			(type default)
@@ -1274,7 +1274,7 @@
 	)
 	(text "Max current: 145 uA\n"
 		(exclude_from_sim no)
-		(at 97.79 104.14 0)
+		(at 112.268 104.648 0)
 		(effects
 			(font
 				(size 1.778 1.5113)

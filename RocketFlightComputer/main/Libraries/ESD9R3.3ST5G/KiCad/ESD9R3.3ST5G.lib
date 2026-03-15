@@ -1,0 +1,26 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model ESD9R3.3ST5G
+#/224676/1501278/2.50/2/2/Diode
+DEF ESD9R3.3ST5G D 0 30 Y Y 1 F N
+F0 "D" 450 200 50 H V L CNN
+F1 "ESD9R3.3ST5G" 450 100 50 H V L CNN
+F2 "SODFL1006X40N" 450 0 50 H I L CNN
+F3 "https://www.onsemi.com/pub/Collateral/ESD9R3.3S-D.PDF" 450 -100 50 H I L CNN
+F4 "Low Body Height: 0.016 (0.4 mm); Small Body Outline Dimensions: 0.039 x 0.024 (1.00 mm x 0.60 mm); UltraLow Leakage < 1 nA; UltraLow Capacitance 0.5 pF; Low Clamping Voltage; Standoff Voltage: 3.3 V; Response Time < 1.0 ns; IEC6100042 Level 4 ESD Protection; This is a PbFree and HalogenFree Device" 450 -200 50 H I L CNN "Description"
+F5 "0.4" 450 -300 50 H I L CNN "Height"
+F6 "863-ESD9R3.3ST5G" 450 -400 50 H I L CNN "Mouser Part Number"
+F7 "https://www.mouser.co.uk/ProductDetail/onsemi/ESD9R3.3ST5G?qs=N5dOQkml4H9504itvxWhoA%3D%3D" 450 -500 50 H I L CNN "Mouser Price/Stock"
+F8 "onsemi" 450 -600 50 H I L CNN "Manufacturer_Name"
+F9 "ESD9R3.3ST5G" 450 -700 50 H I L CNN "Manufacturer_Part_Number"
+DRAW
+X ~ 1 0 0 100 R 50 50 0 0 P
+X ~ 2 600 0 100 L 50 50 0 0 P
+P 2 0 1 6 200 100 200 -100 N
+P 2 0 1 6 100 0 200 0 N
+P 2 0 1 6 400 0 500 0 N
+P 4 0 1 10 200 0 400 100 400 -100 200 0 F
+ENDDRAW
+ENDDEF
+#
+#End Library

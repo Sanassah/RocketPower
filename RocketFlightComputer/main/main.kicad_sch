@@ -11671,19 +11671,6 @@
 		)
 		(uuid "0b7d3a8f-bbc2-4b15-be81-49825c7ceb5b")
 	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 469.9 66.04 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "0cdd6529-9478-4d0d-a46a-25275a3735df")
-	)
 	(text "0 (RX1)"
 		(exclude_from_sim no)
 		(at 273.05 264.16 0)
@@ -11719,6 +11706,19 @@
 	)
 	(text "VERIFIED"
 		(exclude_from_sim no)
+		(at 469.138 95.758 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "2d410fc3-193c-48b7-8b1a-fc22403a8c42")
+	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
 		(at 421.64 160.02 0)
 		(effects
 			(font
@@ -11751,19 +11751,6 @@
 			(justify right bottom)
 		)
 		(uuid "31c33e18-6f27-4c83-8a59-ffb5b3ddf621")
-	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 466.725 130.175 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "34808136-529e-4c86-a8a3-5256b897a6b5")
 	)
 	(text "41"
 		(exclude_from_sim no)
@@ -11846,6 +11833,19 @@
 		)
 		(uuid "4c7e9c7e-f931-4bc3-8e63-db183ac9c9b0")
 	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 469.138 35.306 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "4e5a16e2-f2d4-416c-b93f-45ed16d8cc0d")
+	)
 	(text "37"
 		(exclude_from_sim no)
 		(at 281.94 157.48 0)
@@ -11856,6 +11856,19 @@
 			(justify left bottom)
 		)
 		(uuid "4e9d9cb2-1bdc-4358-bac9-dfecaefa2f85")
+	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 469.646 66.294 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "546a8853-3b48-48f4-a715-5b390c375c95")
 	)
 	(text "29"
 		(exclude_from_sim no)
@@ -11870,7 +11883,7 @@
 	)
 	(text "VERIFIED"
 		(exclude_from_sim no)
-		(at 476.25 203.835 0)
+		(at 423.164 68.072 0)
 		(effects
 			(font
 				(size 1 1)
@@ -11879,7 +11892,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "59e697c6-aab7-4d27-ab5e-f2a07eec0172")
+		(uuid "5e4cec7b-0ee2-49bb-8456-556bd86a8e8b")
 	)
 	(text "6"
 		(exclude_from_sim no)
@@ -11891,19 +11904,6 @@
 			(justify left bottom)
 		)
 		(uuid "5e9aa2ee-8a4c-4045-94be-d99898a5d58c")
-	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 423.545 95.885 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "5ebc3a60-0d2b-42e1-8b87-72e937ba65d0")
 	)
 	(text "7"
 		(exclude_from_sim no)
@@ -12015,19 +12015,6 @@
 		)
 		(uuid "8596cee0-9d2c-42d0-ac3d-c75eaeeed73c")
 	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 241.3 314.96 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "891946c1-c537-4207-ad2d-40086d55c7ad")
-	)
 	(text "16"
 		(exclude_from_sim no)
 		(at 271.78 118.745 0)
@@ -12050,32 +12037,6 @@
 		)
 		(uuid "8c95471f-6b48-4df7-adbb-6cac7e5237b4")
 	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 468.63 34.925 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "8eaecc91-d966-4565-8c1f-8a4278903388")
-	)
-	(text "Check for the LED voltage to \ncurrent to check resistor value"
-		(exclude_from_sim no)
-		(at 317.5 180.975 0)
-		(effects
-			(font
-				(size 1.524 1.524)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "96b0550b-814e-4d86-828e-c80940d381d2")
-	)
 	(text "34"
 		(exclude_from_sim no)
 		(at 281.94 165.1 0)
@@ -12086,19 +12047,6 @@
 			(justify left bottom)
 		)
 		(uuid "9742892b-011b-4944-b2f3-d4ff83c16d66")
-	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 13.97 214.63 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "98817816-dcfb-489d-ac63-6bc507aa56ab")
 	)
 	(text "33"
 		(exclude_from_sim no)
@@ -12111,19 +12059,6 @@
 		)
 		(uuid "9a3eb93c-5aba-41ea-a6b3-0a1a5fcd51b5")
 	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 469.265 95.25 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "9c2e8c1c-5441-4284-a795-e82faa80da3e")
-	)
 	(text "38"
 		(exclude_from_sim no)
 		(at 271.78 53.34 0)
@@ -12134,19 +12069,6 @@
 			(justify left bottom)
 		)
 		(uuid "a1abba75-f1d5-4099-8434-e3105269bb93")
-	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 419.1 128.905 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "a2cd7f50-3bf9-4969-9df4-395b848198b6")
 	)
 	(text "5"
 		(exclude_from_sim no)
@@ -12181,19 +12103,6 @@
 		)
 		(uuid "b510f75a-7708-4675-a26e-989a3277a221")
 	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 422.91 67.31 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "b6a798d5-7d6d-4016-8429-f88ce62f5437")
-	)
 	(text "2"
 		(exclude_from_sim no)
 		(at 281.94 205.74 0)
@@ -12204,17 +12113,6 @@
 			(justify left bottom)
 		)
 		(uuid "b91265fb-f4f8-4071-9632-be1aa2907234")
-	)
-	(text "Not necessary since no USB2 external peripheral"
-		(exclude_from_sim no)
-		(at 305.435 40.005 0)
-		(effects
-			(font
-				(size 0.762 0.762)
-			)
-			(justify left bottom)
-		)
-		(uuid "c021afdd-4af5-4af0-b896-d555e891a9e9")
 	)
 	(text "11"
 		(exclude_from_sim no)
@@ -12251,7 +12149,7 @@
 	)
 	(text "VERIFIED"
 		(exclude_from_sim no)
-		(at 132.715 172.72 0)
+		(at 422.402 96.52 0)
 		(effects
 			(font
 				(size 1 1)
@@ -12260,7 +12158,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "c7bb8841-4fb7-4884-9698-f80f3c645008")
+		(uuid "c762257e-7e25-4248-8403-3c60c44776bf")
 	)
 	(text "15"
 		(exclude_from_sim no)
@@ -12316,19 +12214,6 @@
 			(justify left bottom)
 		)
 		(uuid "dc2c8905-7b64-44f5-8ce6-04dc0b549d08")
-	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 120.015 322.58 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "e000210f-bc64-431d-9095-756371bd1201")
 	)
 	(text "Not necessary \n(no external usb)"
 		(exclude_from_sim no)
@@ -14441,7 +14326,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "1k"
 			(at 171.704 344.678 90)
 			(effects
 				(font
@@ -19727,7 +19612,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "1k"
 			(at 305.943 265.43 90)
 			(effects
 				(font
@@ -20138,7 +20023,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "1k"
 			(at 244.094 29.21 90)
 			(effects
 				(font
@@ -20891,7 +20776,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "1k"
 			(at 101.6 368.808 90)
 			(effects
 				(font
@@ -22366,7 +22251,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "1k"
 			(at 314.706 148.59 90)
 			(effects
 				(font

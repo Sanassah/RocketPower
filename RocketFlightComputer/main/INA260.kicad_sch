@@ -1060,16 +1060,6 @@
 	)
 	(wire
 		(pts
-			(xy 95.25 88.9) (xy 95.885 88.9)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "108b3477-c9a3-4ba4-a6ef-0738b6847180")
-	)
-	(wire
-		(pts
 			(xy 77.47 54.61) (xy 95.25 54.61)
 		)
 		(stroke
@@ -1395,7 +1385,7 @@
 	)
 	(symbol
 		(lib_id "power:GNDREF")
-		(at 95.885 88.9 0)
+		(at 95.25 88.9 0)
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
@@ -1405,7 +1395,7 @@
 		(fields_autoplaced yes)
 		(uuid "13f517c1-2ec7-4bf7-b417-4c1657e8ccaa")
 		(property "Reference" "#PWR0109"
-			(at 95.885 95.25 0)
+			(at 95.25 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1414,7 +1404,7 @@
 			)
 		)
 		(property "Value" "GNDREF"
-			(at 96.52 92.71 90)
+			(at 95.885 92.71 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1424,7 +1414,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 95.885 88.9 0)
+			(at 95.25 88.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1433,7 +1423,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 95.885 88.9 0)
+			(at 95.25 88.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1442,7 +1432,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 95.885 88.9 0)
+			(at 95.25 88.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)

@@ -1,0 +1,202 @@
+(footprint "ESD9R3_3ST5G"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(descr "SOD-923 CASE 514AB")
+	(tags "Diode")
+	(property "Reference" "D**"
+		(at -3.5 -1.5 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "d1a2aa32-a5cb-4ae1-8938-248ceec55664")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Value" "SODFL1006X40N"
+		(at 0 -3.5 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "d34019bc-33c3-4769-ae31-6e9c6514d304")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "cba1da62-95ba-4ed3-91de-8534faba200c")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "eb88c2d3-3665-48a3-84b5-13898cb1d7e3")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "2a07af8c-fe5c-4a2b-a5ad-d995a0bc047d")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_line
+		(start -0.755 -0.3)
+		(end 0.4 -0.3)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "a632717a-6baf-4f8a-8312-cd0138da4732")
+	)
+	(fp_line
+		(start -0.4 0.3)
+		(end 0.4 0.3)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "30877ac8-653f-4eab-8ad2-9882011258ff")
+	)
+	(fp_line
+		(start -0.905 -0.475)
+		(end 0.905 -0.475)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "a1058dc1-55ad-459d-84d3-821d1adeefef")
+	)
+	(fp_line
+		(start -0.905 0.475)
+		(end -0.905 -0.475)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "570b9f65-3650-4f71-80e2-d3f5069fc211")
+	)
+	(fp_line
+		(start 0.905 -0.475)
+		(end 0.905 0.475)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "b07a5d2b-caa4-4be0-a932-699b457e16cb")
+	)
+	(fp_line
+		(start 0.905 0.475)
+		(end -0.905 0.475)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "f51a75f8-96e1-4f96-a273-187ded744b74")
+	)
+	(fp_line
+		(start -0.4 -0.3)
+		(end 0.4 -0.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "cd1542ec-ec80-47e7-9696-3a911b8f25ec")
+	)
+	(fp_line
+		(start -0.4 -0.045)
+		(end -0.145 -0.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "b0af7890-b72d-4fbe-a563-6968830f8cad")
+	)
+	(fp_line
+		(start -0.4 0.3)
+		(end -0.4 -0.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "e65607e1-1256-4e27-8d47-6bab585ad41a")
+	)
+	(fp_line
+		(start 0.4 -0.3)
+		(end 0.4 0.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "0f146910-6734-43fc-bba7-0f799ced64e7")
+	)
+	(fp_line
+		(start 0.4 0.3)
+		(end -0.4 0.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "a22b51a9-ff57-4b03-8856-f3d03b41848f")
+	)
+	(pad "1" smd rect
+		(at -0.5 0 90)
+		(size 0.32 0.51)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "7c430e52-fe7a-48c1-85a9-20afca204f25")
+	)
+	(pad "2" smd rect
+		(at 0.5 0 90)
+		(size 0.32 0.51)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "886191a9-022c-48ce-a133-0aa6eec1d6c0")
+	)
+	(model "C:/Users/alger/OneDrive/Bureau/RocketPower/RocketFlightComputer/FootsPrints3DModels/ESD9R3.3ST5G.stp"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
