@@ -455,7 +455,7 @@
 		)
 		(uuid "6e3f3af8-c98b-456d-b7ad-fe8ed8ff3928")
 	)
-	(hierarchical_label "Xbee_RX"
+	(hierarchical_label "Xbee_TX"
 		(shape input)
 		(at 74.93 62.23 180)
 		(fields_autoplaced yes)
@@ -465,9 +465,9 @@
 			)
 			(justify right)
 		)
-		(uuid "21f87232-feb7-4821-b57e-7be6d24b4aa7")
+		(uuid "7c358131-73ad-4c3c-9ccd-fc06ef84156b")
 	)
-	(hierarchical_label "Xbee_TX"
+	(hierarchical_label "Xbee_RX"
 		(shape input)
 		(at 74.93 64.77 180)
 		(fields_autoplaced yes)
@@ -477,20 +477,20 @@
 			)
 			(justify right)
 		)
-		(uuid "6b80a2cf-11b0-4016-ba2e-36de1f555b23")
+		(uuid "f1158f39-c882-4d71-ba85-ade7e7fe6bd0")
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 74.93 59.69 90)
+		(at 74.93 57.15 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "168ee57c-6362-4ec3-b58c-7beb66030b7e")
-		(property "Reference" "#PWR0142"
-			(at 78.74 59.69 0)
+		(uuid "218ec872-7643-4434-b9f7-7094b0800e83")
+		(property "Reference" "#PWR076"
+			(at 78.74 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -499,7 +499,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 71.12 59.6899 90)
+			(at 71.12 57.1499 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -508,7 +508,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 74.93 59.69 0)
+			(at 74.93 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -517,7 +517,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 74.93 59.69 0)
+			(at 74.93 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -526,7 +526,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 74.93 59.69 0)
+			(at 74.93 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -535,12 +535,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "889b4186-1734-4d5c-b134-23183e293a13")
+			(uuid "51f25353-caed-4273-bedb-5671dcc9e78c")
 		)
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e28c6e59-b6f8-4de5-b42d-020f37d4635d"
-					(reference "#PWR0142")
+					(reference "#PWR076")
 					(unit 1)
 				)
 			)
@@ -548,16 +548,16 @@
 	)
 	(symbol
 		(lib_id "power:GNDREF")
-		(at 74.93 57.15 270)
+		(at 74.93 59.69 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "9fd1fc2f-4099-459e-b65c-10f45406cebb")
-		(property "Reference" "#PWR0143"
-			(at 68.58 57.15 0)
+		(uuid "6e1989bb-5acf-4d58-a96a-9cf1139a1bbf")
+		(property "Reference" "#PWR096"
+			(at 68.58 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -566,7 +566,7 @@
 			)
 		)
 		(property "Value" "GNDREF"
-			(at 71.12 56.515 90)
+			(at 71.12 59.055 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -576,7 +576,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 74.93 57.15 0)
+			(at 74.93 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -585,7 +585,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 74.93 57.15 0)
+			(at 74.93 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -594,7 +594,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 74.93 57.15 0)
+			(at 74.93 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -603,12 +603,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "bef5366e-5519-4ad4-8402-12678608ff6b")
+			(uuid "8c6deba7-33b9-4762-88c3-9c956b08f1ae")
 		)
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e28c6e59-b6f8-4de5-b42d-020f37d4635d"
-					(reference "#PWR0143")
+					(reference "#PWR096")
 					(unit 1)
 				)
 			)

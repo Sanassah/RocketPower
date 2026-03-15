@@ -489,18 +489,6 @@
 	)
 	(hierarchical_label "Cam_TX"
 		(shape input)
-		(at 124.46 97.79 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "0b1675e6-af48-49ff-9343-bdfa4288e0c1")
-	)
-	(hierarchical_label "Cam_RX"
-		(shape input)
 		(at 124.46 95.25 180)
 		(fields_autoplaced yes)
 		(effects
@@ -509,19 +497,31 @@
 			)
 			(justify right)
 		)
-		(uuid "cf8e3d05-3f5a-4c50-a52b-631944ceae22")
+		(uuid "1aca818f-d8e4-49a4-a8b2-ab721ea04a8d")
+	)
+	(hierarchical_label "Cam_RX"
+		(shape input)
+		(at 124.46 97.79 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "c617a386-62bd-46f8-b0d2-fde4e3bd6639")
 	)
 	(symbol
 		(lib_id "power:+7.5V")
-		(at 124.46 92.71 90)
+		(at 124.46 90.17 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "3a49d96c-a6f3-4681-914b-b75cd06a7054")
+		(uuid "10d48aca-d190-4612-95ba-9b7d7094b24b")
 		(property "Reference" "#PWR088"
-			(at 128.27 92.71 0)
+			(at 128.27 90.17 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -530,7 +530,7 @@
 			)
 		)
 		(property "Value" "+7.5V"
-			(at 120.65 92.075 90)
+			(at 120.65 89.535 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -539,7 +539,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 124.46 92.71 0)
+			(at 124.46 90.17 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -548,7 +548,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 124.46 92.71 0)
+			(at 124.46 90.17 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -557,7 +557,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 124.46 92.71 0)
+			(at 124.46 90.17 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -566,7 +566,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "470e5b2e-1136-4215-b046-f7907770a22c")
+			(uuid "af014ac2-6793-4efa-ba5c-f43633dbe8db")
 		)
 		(instances
 			(project "main"
@@ -707,16 +707,16 @@
 	)
 	(symbol
 		(lib_id "power:GNDREF")
-		(at 124.46 90.17 270)
+		(at 124.46 92.71 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "b41e2fe5-078f-4cba-8d13-be184a8a0537")
+		(uuid "b99df3a4-8f38-4f6c-9989-86d72d287164")
 		(property "Reference" "#PWR090"
-			(at 118.11 90.17 0)
+			(at 118.11 92.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -725,7 +725,7 @@
 			)
 		)
 		(property "Value" "GNDREF"
-			(at 120.65 89.535 90)
+			(at 120.65 92.075 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -735,7 +735,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 124.46 90.17 0)
+			(at 124.46 92.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -744,7 +744,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 124.46 90.17 0)
+			(at 124.46 92.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -753,7 +753,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 124.46 90.17 0)
+			(at 124.46 92.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -762,7 +762,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "6f4b1794-8a4b-4163-a904-b176f1aceffe")
+			(uuid "908b00ee-56aa-4404-bd98-e2847250ba41")
 		)
 		(instances
 			(project "main"

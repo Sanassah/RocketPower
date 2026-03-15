@@ -1,0 +1,130 @@
+
+(EDIF
+  (rename &ESD9R3_3ST5G "ESD9R3_3ST5G")
+  (EDIFVersion 2 0 0)
+  (EDIFLevel 0)
+  (keywordMap (keywordLevel 0))
+  (status
+    (written
+      (timestamp 2026 03 13 06 03 40)
+      (dataOrigin "224676/1501278/2.50/2/2/Diode")
+      (program "SamacSys ECAD Model ESD9R3_3ST5G"
+        (version "2.2"))))
+  (library
+  (rename &ESD9R3_3ST5G "ESD9R3_3ST5G")
+    (EDIFLevel 0)
+    (technology
+      (numberDefinition (scale 1 (e 254 -6) (unit DISTANCE)))
+      (userData GRIDRESOLUTION (integer 50 50))
+      (figureGroup DEFAULT (pathWidth 10) (textHeight 100))
+      (figureGroup PROPERTY (pathWidth 10) (textHeight 90))
+      (figureGroup PINNUMBER (pathWidth 10) (textHeight 90))
+      (figureGroup PINNAME (pathWidth 10) (textHeight 90))
+      (figureGroup COMMENT (pathWidth 10) (textHeight 90))
+      (figureGroup PIN (pathWidth 10) (textHeight 90))
+      (figureGroup GRAPHIC (pathWidth 10) (textHeight 100))
+    )
+    (cell
+      (rename &ESD9R3_3ST5G "ESD9R3_3ST5G")
+      (cellType GENERIC)
+      (view
+        (rename NORMAL "Normal")
+        (viewType SCHEMATIC)
+        (interface
+          (designator "D")
+          (property (rename PACKAGENAME "PackageName") (string "ESD9R3_3ST5G"))
+          (property (rename ISHETEROGENEOUS "IsHeterogeneous") (string "False"))
+          (property (rename DEVICESINVIEW "DevicesInView") (string "1"))
+          (property (rename DEVICESINPACKAGE "DevicesInPackage") (string "1"))
+          (property (rename DEVICEDESIGNATOR "DeviceDesignator") (string "A"))
+          (property (rename DEVICENUMBERING "DeviceNumbering") (string "Alpha"))
+          (property (rename PCB_32_FOOTPRINT "PCB Footprint") (string "SODFL1006X40N"))
+          (property (rename &Mouser_Part_Number "Mouser Part Number") (string "863-ESD9R3.3ST5G"))
+          (property (rename &Mouser_Price_Stock "Mouser Price/Stock") (string "https://www.mouser.co.uk/ProductDetail/onsemi/ESD9R3.3ST5G?qs=N5dOQkml4H9504itvxWhoA%3D%3D"))
+          (property (rename &Manufacturer_Name "Manufacturer_Name") (string "onsemi"))
+          (property (rename &Manufacturer_Part_Number "Manufacturer_Part_Number") (string "ESD9R3.3ST5G"))
+          (property (rename &Description "Description") (string "Low Body Height: 0.016 (0.4 mm); Small Body Outline Dimensions: 0.039 x 0.024 (1.00 mm x 0.60 mm); UltraLow Leakage < 1 nA; UltraLow Capacitance 0.5 pF; Low Clamping Voltage; Standoff Voltage: 3.3 V; Response Time < 1.0 ns; IEC6100042 Level 4 ESD Protection; This is a PbFree and HalogenFree Device"))
+          (property (rename &Datasheet_Link "Datasheet Link") (string "https://www.onsemi.com/pub/Collateral/ESD9R3.3S-D.PDF"))
+          (property (rename &Height "Height") (string "0.4 mm"))
+          (property (rename &_60__32_VALUE_32__62_ "Value") (string "ESD9R3_3ST5G"))
+          (property (rename VALUE "Value") (string "Value"))
+          (port
+            (rename &K "K")
+            (designator "1")
+            (property (rename ORDER "Order") (string "0") (owner "OrCAD"))
+          )
+          (port
+            (rename &A "A")
+            (designator "2")
+            (property (rename ORDER "Order") (string "1") (owner "OrCAD"))
+          )
+          (symbol
+            (portImplementation
+              (name &K)
+              (keywordDisplay DESIGNATOR (display PINNUMBER))
+              (figure PIN (path (pointList (pt -100 -100) (pt 0 -100))))
+              (connectLocation (figure GRAPHIC (dot (pt -100 -100))))
+            )
+            (portImplementation
+              (name &A)
+              (keywordDisplay DESIGNATOR (display PINNUMBER))
+              (figure PIN (path (pointList (pt 400 -100) (pt 500 -100))))
+              (connectLocation (figure GRAPHIC (dot (pt 500 -100))))
+            )
+            (figure GRAPHIC
+              (figureGroupOverride GRAPHIC
+                (pathWidth 10))
+              (path
+                (pointList
+                  (pt 100 0)
+                  (pt 100 -200)
+                )
+              )
+            )
+            (figure GRAPHIC
+              (figureGroupOverride GRAPHIC
+                (pathWidth 10))
+              (path
+                (pointList
+                  (pt 0 -100)
+                  (pt 100 -100)
+                )
+              )
+            )
+            (figure GRAPHIC
+              (figureGroupOverride GRAPHIC
+                (pathWidth 10))
+              (path
+                (pointList
+                  (pt 300 -100)
+                  (pt 400 -100)
+                )
+              )
+            )
+              (figure GRAPHIC
+                (figureGroupOverride GRAPHIC
+	              (fillPattern 1 1
+                    (boolean
+                      (boolean
+                        (true)
+                      )
+                    )
+                  )
+                )
+              (polygon
+                (pointList
+                  (pt 100 -100)
+                  (pt 300 0)
+                  (pt 300 -200)
+                  (pt 100 -100)
+                )
+              )
+            )
+            (keywordDisplay DESIGNATOR (display PROPERTY (justify LOWERLEFT) (orientation R0) (origin (pt 350 30))))
+            (propertyDisplay &_60__32_VALUE_32__62_ (display PROPERTY (justify LOWERLEFT) (orientation R0) (origin (pt 350 -70))))
+          )
+        )
+      )
+    )
+  )
+)
