@@ -1,4 +1,4 @@
-24678243140982036
+24680017086353660
 ADXL375
 1X04_ROUND
 
@@ -99525,6 +99525,13 @@ Integrated Circuit
 0
 28
 28
+footprint
+CAPAE1030X1050N
+case code ja0
+Capacitor Polarised
+0
+2
+2
 footprint
 CC-14-1
 CC-14-1
