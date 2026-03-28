@@ -1062,7 +1062,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "04fd3f3d-010e-41a0-b49f-167e963dfe29")
-		(property "Reference" "BMP390"
+		(property "Reference" "BMP1"
 			(at 63.5 44.45 0)
 			(effects
 				(font
@@ -1108,6 +1108,24 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C2684802 "
+			(at 73.66 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" "262-BMP390"
+			(at 73.66 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "4ce5508a-0245-41eb-a115-84660bf979c5")
 		)
@@ -1141,7 +1159,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "BMP390")
+					(reference "BMP1")
 					(unit 1)
 				)
 			)
@@ -1162,7 +1180,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0ffa899a-804a-469c-8bfb-fc46d2e6f818")
-		(property "Reference" "C34"
+		(property "Reference" "C35"
 			(at 49.78 57.17 0)
 			(effects
 				(font
@@ -1206,6 +1224,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C48579250"
+			(at 52.07 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "4a5ed3ca-3a72-4797-ba47-398d07a477b6")
 		)
@@ -1215,7 +1242,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "C34")
+					(reference "C35")
 					(unit 1)
 				)
 			)
@@ -1236,7 +1263,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "41ee1466-74cc-4c2a-94ff-a3eb2b2c3042")
-		(property "Reference" "#PWR0148"
+		(property "Reference" "#PWR092"
 			(at 31.75 53.34 0)
 			(effects
 				(font
@@ -1287,7 +1314,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "#PWR0148")
+					(reference "#PWR092")
 					(unit 1)
 				)
 			)
@@ -1303,7 +1330,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "69c2f3b4-d20b-4d70-9d8b-4c8e236d7360")
-		(property "Reference" "#PWR085"
+		(property "Reference" "#PWR093"
 			(at 42.545 67.31 0)
 			(effects
 				(font
@@ -1355,7 +1382,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "#PWR085")
+					(reference "#PWR093")
 					(unit 1)
 				)
 			)
@@ -1371,7 +1398,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ad53c45b-3fb7-491c-9a89-9061193693b9")
-		(property "Reference" "#PWR087"
+		(property "Reference" "#PWR095"
 			(at 55.245 63.5 0)
 			(effects
 				(font
@@ -1423,7 +1450,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "#PWR087")
+					(reference "#PWR095")
 					(unit 1)
 				)
 			)
@@ -1439,7 +1466,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "bcda82e8-406a-4ae5-827c-210ff2acd147")
-		(property "Reference" "#PWR086"
+		(property "Reference" "#PWR094"
 			(at 52.07 67.31 0)
 			(effects
 				(font
@@ -1491,7 +1518,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "#PWR086")
+					(reference "#PWR094")
 					(unit 1)
 				)
 			)
@@ -1506,7 +1533,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c0ccf6c9-62e6-40a4-a315-295a189d75a9")
-		(property "Reference" "C33"
+		(property "Reference" "C34"
 			(at 40.255 57.17 0)
 			(effects
 				(font
@@ -1550,6 +1577,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C48579250"
+			(at 42.545 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "0c544f9b-8d03-4687-ba02-80d169060719")
 		)
@@ -1559,7 +1595,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a"
-					(reference "C33")
+					(reference "C34")
 					(unit 1)
 				)
 			)

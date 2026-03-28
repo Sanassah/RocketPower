@@ -489,7 +489,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "218ec872-7643-4434-b9f7-7094b0800e83")
-		(property "Reference" "#PWR076"
+		(property "Reference" "#PWR0137"
 			(at 78.74 57.15 0)
 			(effects
 				(font
@@ -540,7 +540,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e28c6e59-b6f8-4de5-b42d-020f37d4635d"
-					(reference "#PWR076")
+					(reference "#PWR0137")
 					(unit 1)
 				)
 			)
@@ -556,7 +556,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6e1989bb-5acf-4d58-a96a-9cf1139a1bbf")
-		(property "Reference" "#PWR096"
+		(property "Reference" "#PWR0138"
 			(at 68.58 59.69 0)
 			(effects
 				(font
@@ -608,7 +608,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e28c6e59-b6f8-4de5-b42d-020f37d4635d"
-					(reference "#PWR096")
+					(reference "#PWR0138")
 					(unit 1)
 				)
 			)
@@ -681,7 +681,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mouser Part Number" "N/A"
+		(property "Mouser Part Number" "306-BM04BGHSTBTLFSNN"
 			(at 91.44 552.07 0)
 			(effects
 				(font
@@ -718,6 +718,15 @@
 					(size 1.27 1.27)
 				)
 				(justify left top)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C161692"
+			(at 74.93 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 				(hide yes)
 			)
 		)
