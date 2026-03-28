@@ -1,4 +1,4 @@
-24680017086353660
+24683566162267895
 ADXL375
 1X04_ROUND
 
@@ -99533,6 +99533,13 @@ Capacitor Polarised
 2
 2
 footprint
+CAPPRD250W55D630H1200
+A750EQ477M1CAAE015-
+Capacitor Polarised
+0
+2
+2
+footprint
 CC-14-1
 CC-14-1
 Integrated Circuit
@@ -99672,3 +99679,10 @@ Undefined or Miscellaneous
 0
 20
 20
+footprint
+XRCGB
+XRCGB
+Crystal or Oscillator
+0
+4
+4

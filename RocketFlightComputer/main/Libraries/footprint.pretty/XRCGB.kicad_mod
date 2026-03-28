@@ -1,0 +1,236 @@
+(footprint "XRCGB"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(descr "XRCGB")
+	(tags "Crystal or Oscillator")
+	(property "Reference" "Y**"
+		(at 0 0 0)
+		(layer "F.SilkS")
+		(uuid "abc90dc4-f91f-4b4e-b7b9-ee99cea13cf0")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Value" "XRCGB"
+		(at 0 0 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "4c2870ec-0b10-49b9-bd7d-f684ce030984")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "755d2c1c-2031-494c-92a3-bbe4d8d28496")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "c1469dfa-3059-4a38-b381-eb3b1b59e999")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "52119a66-2959-490a-8316-dc2d7134b08c")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_line
+		(start -1.6 0.5)
+		(end -1.6 0.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "b8992a92-5e7f-48d5-9d7b-970815de8e44")
+	)
+	(fp_line
+		(start -1.5 0.5)
+		(end -1.5 0.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "a8b4025a-d8c4-4ff6-a73d-74aff4e0c144")
+	)
+	(fp_arc
+		(start -1.6 0.5)
+		(mid -1.55 0.45)
+		(end -1.5 0.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "13c04513-584d-4551-b90c-f4781230cf50")
+	)
+	(fp_arc
+		(start -1.5 0.5)
+		(mid -1.55 0.55)
+		(end -1.6 0.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "c34d286e-93a7-445e-a3ee-37df6a01f75b")
+	)
+	(fp_line
+		(start -2.05 -1.85)
+		(end 2.05 -1.85)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "c4920e0b-e048-487b-9ec8-07dba443816c")
+	)
+	(fp_line
+		(start -2.05 1.85)
+		(end -2.05 -1.85)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "b9ee7eed-e425-4adc-95ae-5d0321a1da9e")
+	)
+	(fp_line
+		(start 2.05 -1.85)
+		(end 2.05 1.85)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "05cb20e3-eff6-4e97-bca2-2510a8087ea2")
+	)
+	(fp_line
+		(start 2.05 1.85)
+		(end -2.05 1.85)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "6788f5aa-2cb9-43e0-a9fe-605d0e36d756")
+	)
+	(fp_line
+		(start -1 -0.8)
+		(end -1 0.8)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "9a384eba-4d81-43c9-9d52-f1aa4b6e89c0")
+	)
+	(fp_line
+		(start -1 0.8)
+		(end 1 0.8)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "afd38012-f061-4a7e-8807-93408981c5e9")
+	)
+	(fp_line
+		(start 1 -0.8)
+		(end -1 -0.8)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "741072c2-b490-405f-b82c-b11f11c4bdf1")
+	)
+	(fp_line
+		(start 1 0.8)
+		(end 1 -0.8)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "c16b51ee-db53-459a-8e1b-acac19b8885d")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "b200c2eb-2c45-460b-bec1-0f95742f2db5")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(pad "1" smd rect
+		(at -0.675 0.5 90)
+		(size 0.7 0.75)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "e3c1d19e-7d08-49d6-9785-4164a74258ed")
+	)
+	(pad "2" smd rect
+		(at 0.675 0.5 90)
+		(size 0.7 0.75)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "d841bb6c-905c-445d-85be-fae2917fd2a4")
+	)
+	(pad "3" smd rect
+		(at 0.675 -0.5 90)
+		(size 0.7 0.75)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "a9079072-33f9-4c2e-98fe-257223482ff8")
+	)
+	(pad "4" smd rect
+		(at -0.675 -0.5 90)
+		(size 0.7 0.75)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "9cb5450e-c742-4d0c-bc87-a53b583722bf")
+	)
+	(model "${KICAD}/FootsPrints3DModels/XRCGB24M000F2P29R0.stp"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
