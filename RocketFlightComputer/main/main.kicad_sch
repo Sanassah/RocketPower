@@ -7743,6 +7743,12 @@
 		(uuid "88f9bff0-10f4-4634-92bb-a40b10d1d1bd")
 	)
 	(junction
+		(at 302.26 346.71)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "8ad16cca-1f2e-425d-8adb-84e93b763852")
+	)
+	(junction
 		(at 234.95 186.69)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7879,12 +7885,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ce75fcdc-9702-47b9-80e1-9f5fc20b18c4")
-	)
-	(junction
-		(at 302.26 347.98)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "e38042de-8137-4757-a64b-38cf0dc14da1")
 	)
 	(junction
 		(at 229.87 118.11)
@@ -8538,7 +8538,7 @@
 	)
 	(wire
 		(pts
-			(xy 302.26 336.55) (xy 302.26 347.98)
+			(xy 302.26 336.55) (xy 302.26 346.71)
 		)
 		(stroke
 			(width 0)
@@ -8615,6 +8615,16 @@
 			(type default)
 		)
 		(uuid "1a472d15-9967-4c8a-8296-f879699c70af")
+	)
+	(wire
+		(pts
+			(xy 302.26 346.71) (xy 302.26 353.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "20200dee-789b-48a4-9f16-f006b673e42e")
 	)
 	(wire
 		(pts
@@ -9808,7 +9818,7 @@
 	)
 	(wire
 		(pts
-			(xy 283.21 336.55) (xy 283.21 347.98)
+			(xy 283.21 336.55) (xy 283.21 346.71)
 		)
 		(stroke
 			(width 0)
@@ -10588,7 +10598,7 @@
 	)
 	(wire
 		(pts
-			(xy 283.21 347.98) (xy 290.83 347.98)
+			(xy 283.21 346.71) (xy 289.56 346.71)
 		)
 		(stroke
 			(width 0)
@@ -10608,7 +10618,7 @@
 	)
 	(wire
 		(pts
-			(xy 302.26 347.98) (xy 298.45 347.98)
+			(xy 302.26 346.71) (xy 297.18 346.71)
 		)
 		(stroke
 			(width 0)
@@ -10855,16 +10865,6 @@
 			(type default)
 		)
 		(uuid "e1d76104-ed4f-4d98-a3f3-7baaf26825bd")
-	)
-	(wire
-		(pts
-			(xy 302.26 347.98) (xy 302.26 353.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e2ead934-0424-4120-aae9-8b2a91cf922f")
 	)
 	(wire
 		(pts
@@ -14317,7 +14317,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "0b37eded-f476-42e3-bb98-79fbffce5f40")
 		(property "Reference" "FID7"
@@ -16325,7 +16325,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "2c59a0bb-1d9e-4d1a-8041-e0a1982aa385")
 		(property "Reference" "FID4"
@@ -18588,7 +18588,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "57659709-b5e4-41c1-a0b5-819fdde58389")
 		(property "Reference" "FID6"
@@ -18652,7 +18652,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "5853dd8b-404e-406d-9962-1e0ad64d8837")
 		(property "Reference" "FID3"
@@ -19359,7 +19359,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 294.64 347.98 270)
+		(at 293.37 346.71 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -19367,7 +19367,7 @@
 		(dnp no)
 		(uuid "6a569899-50d6-44f4-a234-e03fd34e392a")
 		(property "Reference" "R10"
-			(at 288.925 344.17 90)
+			(at 287.655 342.9 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19375,7 +19375,7 @@
 			)
 		)
 		(property "Value" "2.2M"
-			(at 288.925 346.71 90)
+			(at 287.655 345.44 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19383,7 +19383,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
-			(at 294.64 346.202 90)
+			(at 293.37 344.932 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19392,7 +19392,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 294.64 347.98 0)
+			(at 293.37 346.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19401,7 +19401,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 294.64 347.98 0)
+			(at 293.37 346.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19410,7 +19410,7 @@
 			)
 		)
 		(property "LCSC" "C18679 "
-			(at 294.64 347.98 0)
+			(at 293.37 346.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20211,7 +20211,7 @@
 		(dnp no)
 		(uuid "7449bb5f-c7bc-4025-817a-ca6f96c33778")
 		(property "Reference" "R11"
-			(at 303.022 264.414 90)
+			(at 311.912 264.414 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20219,7 +20219,7 @@
 			)
 		)
 		(property "Value" "470"
-			(at 305.943 265.43 90)
+			(at 305.562 265.43 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22575,7 +22575,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "b1ea7d62-2db5-471d-a279-0f23b0809619")
 		(property "Reference" "FID8"
@@ -22859,7 +22859,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "b68275cc-b506-4b29-907a-9b2d93e5a8c5")
 		(property "Reference" "FID2"
@@ -24031,7 +24031,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "cbcd6b6d-9e12-48ed-9d14-656f1dac67d4")
 		(property "Reference" "FID5"
@@ -25118,7 +25118,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "f40aab4f-1a11-4438-81d6-7961bd9495c3")
 		(property "Reference" "FID1"

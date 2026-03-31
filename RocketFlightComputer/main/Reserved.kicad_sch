@@ -593,7 +593,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "8f939bbd-bcb5-43c2-813d-10b927a07cf2")
 		(property "Reference" "TP1"
 			(at 32.004 24.892 0)
@@ -661,7 +661,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "95083f6b-ae1c-44ba-8204-2e95121a4e5f")
 		(property "Reference" "TP3"
 			(at 58.674 24.892 0)
@@ -867,7 +867,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "fe14559d-9ab1-4feb-991e-10c44dc2eb59")
 		(property "Reference" "TP2"
 			(at 34.544 68.072 0)
