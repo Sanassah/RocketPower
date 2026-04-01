@@ -1929,7 +1929,7 @@
 		)
 		(uuid "a72d5733-fc6e-4769-849e-1ec77bb7fd5b")
 	)
-	(hierarchical_label "BMO085_SCL"
+	(hierarchical_label "BNO085_SCL"
 		(shape bidirectional)
 		(at 27.305 54.61 180)
 		(fields_autoplaced yes)
@@ -1941,7 +1941,7 @@
 		)
 		(uuid "1f40d208-e35e-4578-af3f-05a8f7ee547f")
 	)
-	(hierarchical_label "BMO085_SDA"
+	(hierarchical_label "BNO085_SDA"
 		(shape bidirectional)
 		(at 27.305 52.07 180)
 		(fields_autoplaced yes)

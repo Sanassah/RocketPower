@@ -116,31 +116,31 @@
         "text_thickness": "warning",
         "through_hole_pad_without_hole": "error",
         "too_many_vias": "error",
-        "track_dangling": "warning",
+        "track_dangling": "error",
         "track_width": "error",
         "tracks_crossing": "error",
         "unconnected_items": "error",
         "unresolved_variable": "error",
-        "via_dangling": "warning",
+        "via_dangling": "error",
         "zones_intersect": "error"
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.1,
+        "min_clearance": 0.15,
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.1,
         "min_hole_clearance": 0.1,
         "min_hole_to_hole": 0.25,
-        "min_microvia_diameter": 0.5,
+        "min_microvia_diameter": 0.43,
         "min_microvia_drill": 0.2,
         "min_resolved_spokes": 2,
         "min_silk_clearance": 0.0,
         "min_text_height": 0.8,
         "min_text_thickness": 0.15,
         "min_through_hole_diameter": 0.2,
-        "min_track_width": 0.15,
+        "min_track_width": 0.1,
         "min_via_annular_width": 0.05,
-        "min_via_diameter": 0.5,
+        "min_via_diameter": 0.43,
         "solder_mask_clearance": 0.0,
         "solder_mask_min_width": 0.0,
         "solder_mask_to_copper_clearance": 0.005,
@@ -191,6 +191,7 @@
       ],
       "track_widths": [
         0.0,
+        0.1,
         0.155,
         0.2,
         0.25,
@@ -234,6 +235,10 @@
         {
           "diameter": 0.0,
           "drill": 0.0
+        },
+        {
+          "diameter": 0.43,
+          "drill": 0.2
         },
         {
           "diameter": 0.45,
@@ -607,7 +612,7 @@
     "classes": [
       {
         "bus_width": 12,
-        "clearance": 0.125,
+        "clearance": 0.15,
         "diff_pair_gap": 0.217,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.155,
@@ -617,8 +622,8 @@
         "name": "Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.2,
-        "via_diameter": 0.45,
+        "track_width": 0.1,
+        "via_diameter": 0.43,
         "via_drill": 0.2,
         "wire_width": 6
       },

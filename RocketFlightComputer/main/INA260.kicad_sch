@@ -1866,7 +1866,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Value" "1uF"
+		(property "Value" "0.1uF"
 			(at 107.315 55.245 90)
 			(effects
 				(font
@@ -1902,7 +1902,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C1592 "
+		(property "LCSC" ""
 			(at 106.68 53.975 0)
 			(effects
 				(font
