@@ -953,16 +953,16 @@
       {
         "filename": "main.kicad_sch",
         "name": "main",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "uuid": "27195d1d-92b2-40df-ada5-3b20841577e7"
       }
     ],
-    "used_designators": "",
+    "used_designators": "IC1-2,#PWR37,FLASH1",
     "variants": []
   },
   "sheets": [
     [
       "27195d1d-92b2-40df-ada5-3b20841577e7",
-      "Root"
+      "main"
     ],
     [
       "f1ce41f5-ec33-4382-82d9-21de8266ebc9",
