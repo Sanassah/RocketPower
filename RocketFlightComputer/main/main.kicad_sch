@@ -8193,6 +8193,17 @@
 		)
 		(uuid "11248707-8713-44c0-9729-fc61cc92f191")
 	)
+	(text "2.55ma to LED"
+		(exclude_from_sim no)
+		(at 230.378 32.258 0)
+		(effects
+			(font
+				(size 0.7 0.7)
+			)
+			(justify left)
+		)
+		(uuid "24d150bc-a1fa-44fb-a78e-bad1134694b1")
+	)
 	(text "Not necessary \n(no external usb)"
 		(exclude_from_sim no)
 		(at 269.24 254 0)
@@ -8203,32 +8214,6 @@
 			(justify left bottom)
 		)
 		(uuid "2a742c8d-1c39-4349-b185-c9e7cf31793b")
-	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 469.138 95.758 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "2d410fc3-193c-48b7-8b1a-fc22403a8c42")
-	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 421.64 160.02 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "2d510ba2-c581-4c7e-b3c9-3fff256a8942")
 	)
 	(text "Batt(17V to 3.3V) to 3.3V regulator (max 1.5A)"
 		(exclude_from_sim no)
@@ -8285,19 +8270,6 @@
 		)
 		(uuid "44b7f973-01b7-4097-b665-db0bbb767a54")
 	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 423.545 34.925 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "469b3f83-6e3e-409a-9baf-ffe2cf2a2f5c")
-	)
 	(text "31"
 		(exclude_from_sim no)
 		(at 283.21 101.6 0)
@@ -8320,19 +8292,6 @@
 		)
 		(uuid "4c7e9c7e-f931-4bc3-8e63-db183ac9c9b0")
 	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 469.138 35.306 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "4e5a16e2-f2d4-416c-b93f-45ed16d8cc0d")
-	)
 	(text "37"
 		(exclude_from_sim no)
 		(at 281.94 157.48 0)
@@ -8344,19 +8303,6 @@
 		)
 		(uuid "4e9d9cb2-1bdc-4358-bac9-dfecaefa2f85")
 	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 469.646 66.294 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "546a8853-3b48-48f4-a715-5b390c375c95")
-	)
 	(text "TX 29"
 		(exclude_from_sim no)
 		(at 283.21 106.68 0)
@@ -8367,19 +8313,6 @@
 			(justify right bottom)
 		)
 		(uuid "56e98f45-7169-4330-a685-828bbe875d2d")
-	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 423.164 68.072 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "5e4cec7b-0ee2-49bb-8456-556bd86a8e8b")
 	)
 	(text "6"
 		(exclude_from_sim no)
@@ -8568,6 +8501,17 @@
 		)
 		(uuid "a5df7158-fdbb-4ec9-98f5-b64f9045fbd6")
 	)
+	(text "Sense when USB \nconnected"
+		(exclude_from_sim no)
+		(at 271.78 214.884 0)
+		(effects
+			(font
+				(size 0.7 0.7)
+			)
+			(justify left)
+		)
+		(uuid "adc51126-a877-4494-a6fb-67f916cde969")
+	)
 	(text "21"
 		(exclude_from_sim no)
 		(at 272.415 165.1 0)
@@ -8633,19 +8577,6 @@
 			(justify right bottom)
 		)
 		(uuid "c6204430-8e15-4f81-b392-a90395b393a2")
-	)
-	(text "VERIFIED"
-		(exclude_from_sim no)
-		(at 422.402 96.52 0)
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.4)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "c762257e-7e25-4248-8403-3c60c44776bf")
 	)
 	(text "15"
 		(exclude_from_sim no)
@@ -8713,6 +8644,19 @@
 		)
 		(uuid "ea498b37-5b51-451c-b0f2-4913e685248c")
 	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 475.996 203.454 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "ec768d81-ee7d-4bfc-9775-9724dcf8f46a")
+	)
 	(text "Bootloader"
 		(exclude_from_sim no)
 		(at 137.16 309.88 0)
@@ -8745,12 +8689,6 @@
 			(justify right bottom)
 		)
 		(uuid "ff7fd6ff-2fdc-4596-9bdd-9f7fa7a1f420")
-	)
-	(junction
-		(at 328.93 214.63)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "028fd7bf-1363-4c6f-ad1a-d13652834daa")
 	)
 	(junction
 		(at 212.09 257.81)
@@ -8915,6 +8853,12 @@
 		(uuid "6ccf3982-aa33-42ad-bec5-b53cb0f69410")
 	)
 	(junction
+		(at 245.11 36.83)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "71bf7a09-a179-4bc6-8851-8a16b85dc680")
+	)
+	(junction
 		(at 336.55 214.63)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -8961,12 +8905,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "90e21e04-fc95-4f8f-8cbf-32453fe8b455")
-	)
-	(junction
-		(at 245.11 36.83)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "918d3834-c49b-42a6-8865-23fdbd3d7a35")
 	)
 	(junction
 		(at 39.37 363.22)
@@ -9628,7 +9566,7 @@
 	)
 	(wire
 		(pts
-			(xy 328.93 214.63) (xy 336.55 214.63)
+			(xy 322.58 214.63) (xy 336.55 214.63)
 		)
 		(stroke
 			(width 0)
@@ -9915,16 +9853,6 @@
 			(type default)
 		)
 		(uuid "27eb7c74-b501-4e90-afa1-514d991e527f")
-	)
-	(wire
-		(pts
-			(xy 322.58 214.63) (xy 328.93 214.63)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "285d8c6f-bf6a-4222-a67a-988b7347d2f2")
 	)
 	(wire
 		(pts
@@ -11438,16 +11366,6 @@
 	)
 	(wire
 		(pts
-			(xy 328.93 210.82) (xy 328.93 214.63)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a2c968f7-1ae7-4662-9e71-94a680330fa8")
-	)
-	(wire
-		(pts
 			(xy 246.38 135.89) (xy 250.19 135.89)
 		)
 		(stroke
@@ -12028,7 +11946,7 @@
 	)
 	(wire
 		(pts
-			(xy 238.76 36.83) (xy 245.11 36.83)
+			(xy 234.95 36.83) (xy 245.11 36.83)
 		)
 		(stroke
 			(width 0)
@@ -12636,7 +12554,7 @@
 		)
 		(uuid "3c1bd551-7714-4cd7-bf3e-512166fd0252")
 	)
-	(label "M1M2"
+	(label "SOC"
 		(at 226.06 166.37 180)
 		(effects
 			(font
@@ -12666,18 +12584,8 @@
 		)
 		(uuid "3fbdbeea-857c-4bb6-8812-b4db4da913eb")
 	)
-	(label "M1M2"
-		(at 328.93 210.82 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "40c2506b-e2c9-4685-8cac-8d5df3d60e20")
-	)
 	(label "SOC"
-		(at 238.76 36.83 0)
+		(at 234.95 36.83 0)
 		(effects
 			(font
 				(size 1.27 1.27)
