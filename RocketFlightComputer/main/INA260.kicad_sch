@@ -1152,7 +1152,7 @@
 	)
 	(text_box "0x40 adress"
 		(exclude_from_sim no)
-		(at 63.5 71.755 0)
+		(at 92.075 72.39 0)
 		(size 10.795 6.35)
 		(margins 1.125 1.125 1.125 1.125)
 		(stroke
@@ -1171,28 +1171,6 @@
 			(justify left top)
 		)
 		(uuid "005c8390-1c6f-4110-ba7a-7bc019e3c756")
-	)
-	(text_box "Alert pin to trigger cut off switch if possible"
-		(exclude_from_sim no)
-		(at 60.96 81.915 0)
-		(size 20.955 12.065)
-		(margins 1.125 1.125 1.125 1.125)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(fill
-			(type none)
-		)
-		(effects
-			(font
-				(size 1.5 1.5)
-				(thickness 0.254)
-				(bold yes)
-			)
-			(justify left top)
-		)
-		(uuid "01333bcc-505c-46de-9185-a26b27fe9b4e")
 	)
 	(junction
 		(at 97.79 53.975)

@@ -1572,6 +1572,18 @@
 		)
 		(uuid "5d0b03cc-6bd9-4764-a53b-62fec0ff5052")
 	)
+	(text "CEVA recommends using a crystal \nwith tolerance50ppm with \n12.5pF capacitor loading."
+		(exclude_from_sim no)
+		(at 130.048 74.422 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.125)
+			)
+			(justify left bottom)
+		)
+		(uuid "70a1bd30-b1ae-404d-8e16-2cad9e2661ce")
+	)
 	(text "Slave I2C keep \nunconnected"
 		(exclude_from_sim no)
 		(at 110.744 52.324 0)
@@ -1589,6 +1601,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "05a8403f-e314-43e3-876c-984392ee25c3")
+	)
+	(junction
+		(at 63.5 74.93)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "07771fd8-2a66-4245-9d37-eb2891938a57")
 	)
 	(junction
 		(at 49.53 36.83)
@@ -1609,12 +1627,6 @@
 		(uuid "74197e5d-46f8-4f28-8c1e-398c6d5f471d")
 	)
 	(junction
-		(at 63.5 76.2)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "8e82ec9b-08fc-4bb8-9350-a3ecd9327c49")
-	)
-	(junction
 		(at 29.21 39.37)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1625,6 +1637,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "c698d62a-7483-4c05-a739-0d64da01c24d")
+	)
+	(junction
+		(at 63.5 67.31)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "cc6c7171-21fe-40f2-8d8c-40a7eaf8b638")
 	)
 	(junction
 		(at 148.59 52.07)
@@ -1672,7 +1690,7 @@
 	)
 	(wire
 		(pts
-			(xy 63.5 77.47) (xy 63.5 76.2)
+			(xy 63.5 74.93) (xy 63.5 77.47)
 		)
 		(stroke
 			(width 0)
@@ -1802,16 +1820,6 @@
 	)
 	(wire
 		(pts
-			(xy 63.5 67.31) (xy 63.5 64.77)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "81686989-c027-481f-b2d7-de181216dad8")
-	)
-	(wire
-		(pts
 			(xy 132.08 52.07) (xy 132.08 57.15)
 		)
 		(stroke
@@ -1832,13 +1840,13 @@
 	)
 	(wire
 		(pts
-			(xy 63.5 74.93) (xy 63.5 76.2)
+			(xy 63.5 67.31) (xy 63.5 64.77)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "9072ec78-d5d5-42f4-9bd3-ac7ff2dfea89")
+		(uuid "8d17d76d-4f38-408d-9e26-2d4acce5cd90")
 	)
 	(wire
 		(pts
@@ -1922,7 +1930,17 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 52.07) (xy 35.56 52.07)
+			(xy 63.5 67.31) (xy 63.5 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c7f7e327-6036-4dc0-bff7-b64715a3f7bc")
+	)
+	(wire
+		(pts
+			(xy 34.29 52.07) (xy 68.58 52.07)
 		)
 		(stroke
 			(width 0)
@@ -1972,16 +1990,6 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 52.07) (xy 68.58 52.07)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "e5f6ca18-0245-4639-af11-c9f19d50caae")
-	)
-	(wire
-		(pts
 			(xy 132.08 52.07) (xy 132.08 54.61)
 		)
 		(stroke
@@ -2020,6 +2028,16 @@
 		)
 		(uuid "f78a0b7d-8847-446c-8889-a1e1d28fef2e")
 	)
+	(wire
+		(pts
+			(xy 109.22 59.69) (xy 115.57 59.69)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f95f7f9c-90a6-432c-9a02-c447241a56af")
+	)
 	(label "CAP"
 		(at 109.855 36.83 0)
 		(effects
@@ -2040,6 +2058,17 @@
 			(justify right)
 		)
 		(uuid "1f40d208-e35e-4578-af3f-05a8f7ee547f")
+	)
+	(hierarchical_label "BNO085_RST"
+		(shape bidirectional)
+		(at 115.57 59.69 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "61e8cf2d-589f-4c41-936d-d358f9c7503a")
 	)
 	(hierarchical_label "BNO085_SDA"
 		(shape bidirectional)
@@ -2380,86 +2409,6 @@
 	)
 	(symbol
 		(lib_id "power:GNDREF")
-		(at 63.5 76.2 270)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "1645f262-3274-48d0-81fc-7920d2fa4610")
-		(property "Reference" "#PWR087"
-			(at 57.15 76.2 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GNDREF"
-			(at 59.69 75.565 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" ""
-			(at 63.5 76.2 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 63.5 76.2 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 63.5 76.2 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "3cf566f3-cf59-4991-a1ba-ee2de717ce7f")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/f1ce41f5-ec33-4382-82d9-21de8266ebc9"
-					(reference "#PWR087")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GNDREF")
 		(at 148.59 64.77 0)
 		(unit 1)
 		(body_style 1)
@@ -2533,98 +2482,6 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/f1ce41f5-ec33-4382-82d9-21de8266ebc9"
 					(reference "#PWR091")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 113.03 59.69 90)
-		(mirror x)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "20a94596-a865-4c05-a31b-2535f1fce6b7")
-		(property "Reference" "R18"
-			(at 113.03 62.23 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k"
-			(at 110.744 59.69 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
-			(at 113.03 57.912 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 113.03 59.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 113.03 59.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25804 "
-			(at 113.03 59.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "eb4ff7f3-a967-4568-9bd8-4fe4d0e6c444")
-		)
-		(pin "2"
-			(uuid "ec4e003b-fa98-46e9-827a-7424a1ffb226")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/f1ce41f5-ec33-4382-82d9-21de8266ebc9"
-					(reference "R18")
 					(unit 1)
 				)
 			)
@@ -2882,84 +2739,6 @@
 			(project "Adafruit_BNO08x"
 				(path "/f4179d80-0429-4739-b162-4db0d08d7b34"
 					(reference "C?")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3.3V")
-		(at 116.84 59.69 270)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "43349142-a531-4af8-88d6-1c8cd3794b9b")
-		(property "Reference" "#PWR088"
-			(at 113.03 59.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+3.3V"
-			(at 118.11 58.42 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 116.84 59.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 116.84 59.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 116.84 59.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "7b405077-f18a-448c-991a-2720fdb15158")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/f1ce41f5-ec33-4382-82d9-21de8266ebc9"
-					(reference "#PWR088")
 					(unit 1)
 				)
 			)
@@ -3688,7 +3467,7 @@
 	)
 	(symbol
 		(lib_id "power:GNDREF")
-		(at 63.5 64.77 270)
+		(at 63.5 67.31 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -3699,7 +3478,7 @@
 		(fields_autoplaced yes)
 		(uuid "938eea51-567e-4030-ac95-316b6ee6bb38")
 		(property "Reference" "#PWR086"
-			(at 57.15 64.77 0)
+			(at 57.15 67.31 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3710,7 +3489,7 @@
 			)
 		)
 		(property "Value" "GNDREF"
-			(at 59.69 64.135 90)
+			(at 59.69 66.675 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3722,7 +3501,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 63.5 64.77 0)
+			(at 63.5 67.31 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3733,7 +3512,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 63.5 64.77 0)
+			(at 63.5 67.31 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3744,7 +3523,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 63.5 64.77 0)
+			(at 63.5 67.31 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)

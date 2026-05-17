@@ -7695,6 +7695,18 @@
 		(uuid "3750a7fd-e794-4726-9c81-9cf7b620ecf7")
 	)
 	(circle
+		(center 271.145 85.09)
+		(radius 0.635)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "39e8357f-fffe-41dd-a9f9-cdbe3c44aae3")
+	)
+	(circle
 		(center 285.496 151.384)
 		(radius 0.635)
 		(stroke
@@ -7827,6 +7839,18 @@
 		(uuid "716d8b28-3d71-4cee-8b9c-f0b0b778c52f")
 	)
 	(circle
+		(center 271.145 118.11)
+		(radius 0.635)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "736ee39f-0a48-4f27-a2cb-4a06d1918c09")
+	)
+	(circle
 		(center 285.242 148.844)
 		(radius 0.635)
 		(stroke
@@ -7957,6 +7981,18 @@
 			(type none)
 		)
 		(uuid "ab2b4350-f692-45a6-a165-607df820e4a7")
+	)
+	(circle
+		(center 271.145 120.65)
+		(radius 0.635)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "b066ce41-b2a8-4375-95bd-40509c250cb1")
 	)
 	(circle
 		(center 284.226 174.244)
@@ -8138,6 +8174,19 @@
 		)
 		(uuid "fe080ce0-acb5-45b9-a50a-239901102d19")
 	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 422.148 129.286 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "00dda509-1b07-406f-ba48-fb4474b57ebe")
+	)
 	(text "24"
 		(exclude_from_sim no)
 		(at 272.415 129.54 0)
@@ -8171,6 +8220,19 @@
 		)
 		(uuid "0986d18a-ae27-4615-a3ba-980ba8601579")
 	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 469.9 66.294 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "0b64f3be-d558-48ab-a3e9-4b3ba34856a2")
+	)
 	(text "23"
 		(exclude_from_sim no)
 		(at 272.415 198.12 0)
@@ -8193,6 +8255,19 @@
 		)
 		(uuid "11248707-8713-44c0-9729-fc61cc92f191")
 	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 469.138 95.758 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "1d3ae94c-d867-4faa-961e-e0571a9089ee")
+	)
 	(text "2.55ma to LED"
 		(exclude_from_sim no)
 		(at 230.378 32.258 0)
@@ -8204,6 +8279,17 @@
 		)
 		(uuid "24d150bc-a1fa-44fb-a78e-bad1134694b1")
 	)
+	(text "18"
+		(exclude_from_sim no)
+		(at 272.288 121.666 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "25bbbaa8-b81d-49d5-8640-6db2382f8004")
+	)
 	(text "Not necessary \n(no external usb)"
 		(exclude_from_sim no)
 		(at 269.24 254 0)
@@ -8214,6 +8300,19 @@
 			(justify left bottom)
 		)
 		(uuid "2a742c8d-1c39-4349-b185-c9e7cf31793b")
+	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 421.894 160.274 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "2e40236b-a63a-4261-9bc8-325e55af6b0d")
 	)
 	(text "Batt(17V to 3.3V) to 3.3V regulator (max 1.5A)"
 		(exclude_from_sim no)
@@ -8236,6 +8335,19 @@
 			(justify right bottom)
 		)
 		(uuid "31c33e18-6f27-4c83-8a59-ffb5b3ddf621")
+	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 423.164 68.58 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "347481fd-7143-4805-8d28-df74cd5b3bec")
 	)
 	(text "41"
 		(exclude_from_sim no)
@@ -8302,6 +8414,19 @@
 			(justify left bottom)
 		)
 		(uuid "4e9d9cb2-1bdc-4358-bac9-dfecaefa2f85")
+	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 466.852 130.302 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "54915e04-b9cb-4db4-bbb3-d434f73ed02a")
 	)
 	(text "TX 29"
 		(exclude_from_sim no)
@@ -8380,6 +8505,19 @@
 		)
 		(uuid "6a263214-9c37-4f2b-a2d1-26f514314577")
 	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 13.97 214.884 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "6e71bb1f-79e9-477a-b2ba-f10679d55f06")
+	)
 	(text "36"
 		(exclude_from_sim no)
 		(at 281.94 121.92 0)
@@ -8390,6 +8528,19 @@
 			(justify left bottom)
 		)
 		(uuid "70c4c551-1729-4d4d-bcc7-bd763123e868")
+	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 422.656 34.544 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "772bbc6e-2d1e-49fc-963f-3a736874302a")
 	)
 	(text "40"
 		(exclude_from_sim no)
@@ -8435,6 +8586,19 @@
 		)
 		(uuid "8596cee0-9d2c-42d0-ac3d-c75eaeeed73c")
 	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 423.672 96.774 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "86baa44e-9c46-4f5f-962b-60e41266b90a")
+	)
 	(text "16"
 		(exclude_from_sim no)
 		(at 271.78 118.745 0)
@@ -8457,6 +8621,17 @@
 		)
 		(uuid "8c95471f-6b48-4df7-adbb-6cac7e5237b4")
 	)
+	(text "Permanent pull up high\nPull down for rst"
+		(exclude_from_sim no)
+		(at 317.754 100.33 0)
+		(effects
+			(font
+				(size 0.7 0.7)
+			)
+			(justify left bottom)
+		)
+		(uuid "96b7d2c6-28e8-4351-8f8a-8782f69c923f")
+	)
 	(text "RX 34"
 		(exclude_from_sim no)
 		(at 278.638 165.1 0)
@@ -8478,6 +8653,19 @@
 			(justify right bottom)
 		)
 		(uuid "9a3eb93c-5aba-41ea-a6b3-0a1a5fcd51b5")
+	)
+	(text "VERIFIED"
+		(exclude_from_sim no)
+		(at 468.884 35.814 0)
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.4)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "9ea7d3c7-3d58-4d57-ad99-f0cd7bd93f64")
 	)
 	(text "38"
 		(exclude_from_sim no)
@@ -8512,7 +8700,7 @@
 		)
 		(uuid "adc51126-a877-4494-a6fb-67f916cde969")
 	)
-	(text "21"
+	(text "25"
 		(exclude_from_sim no)
 		(at 272.415 165.1 0)
 		(effects
@@ -8566,6 +8754,17 @@
 			(justify left bottom)
 		)
 		(uuid "c2b26da5-01f7-4689-be30-9a176eb501f6")
+	)
+	(text "19"
+		(exclude_from_sim no)
+		(at 272.542 85.852 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c530964f-d1f0-4eb8-9853-d287bc939d6c")
 	)
 	(text "9"
 		(exclude_from_sim no)
@@ -9315,10 +9514,6 @@
 	(no_connect
 		(at 303.53 118.11)
 		(uuid "a2763c98-d084-415c-a69d-911ca6b77ff2")
-	)
-	(no_connect
-		(at 303.53 100.33)
-		(uuid "ac7c3ea3-26bc-4059-a7e9-1edc69a17ecc")
 	)
 	(no_connect
 		(at 303.53 54.61)
@@ -11156,6 +11351,16 @@
 	)
 	(wire
 		(pts
+			(xy 392.43 106.68) (xy 406.4 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "92b11f59-4531-4f3e-8f7f-65614cc46768")
+	)
+	(wire
+		(pts
 			(xy 63.5 387.35) (xy 63.5 384.81)
 		)
 		(stroke
@@ -12196,6 +12401,16 @@
 	)
 	(wire
 		(pts
+			(xy 316.23 100.33) (xy 303.53 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fbacc269-1a99-483e-90e5-6144df4ac47d")
+	)
+	(wire
+		(pts
 			(xy 499.11 212.09) (xy 483.87 212.09)
 		)
 		(stroke
@@ -12273,6 +12488,16 @@
 			(justify right bottom)
 		)
 		(uuid "0b952aa3-758c-485c-ac27-74c681ccb2f7")
+	)
+	(label "BNO085_RST"
+		(at 316.23 100.33 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "0be7a262-564a-497d-a135-3d267b72186e")
 	)
 	(label "Reserve_TX"
 		(at 392.43 165.1 0)
@@ -12683,6 +12908,16 @@
 			(justify left bottom)
 		)
 		(uuid "53fe684e-cd59-4fba-8d20-b57755e53ea1")
+	)
+	(label "BNO085_RST"
+		(at 392.43 106.68 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "57d0da8e-f89c-4cd6-80ae-d6ca7e6d1096")
 	)
 	(label "PyroCH3_4"
 		(at 499.11 229.87 180)
@@ -27814,6 +28049,16 @@
 		(pin "BNO085_SDA" bidirectional
 			(at 406.4 101.6 180)
 			(uuid "ed061131-1752-4526-8de1-480be526f5f2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "BNO085_RST" bidirectional
+			(at 406.4 106.68 180)
+			(uuid "702092b2-a2c9-4e79-a049-3ccd9d684bf7")
 			(effects
 				(font
 					(size 1.27 1.27)
