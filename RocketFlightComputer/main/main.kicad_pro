@@ -142,7 +142,7 @@
       "rules": {
         "max_error": 0.005,
         "min_clearance": 0.15,
-        "min_connection": 0.0,
+        "min_connection": 0.1,
         "min_copper_edge_clearance": 0.1,
         "min_groove_width": 0.0,
         "min_hole_clearance": 0.1,
@@ -150,7 +150,7 @@
         "min_microvia_diameter": 0.43,
         "min_microvia_drill": 0.2,
         "min_resolved_spokes": 2,
-        "min_silk_clearance": 0.0,
+        "min_silk_clearance": 0.1,
         "min_text_height": 0.8,
         "min_text_thickness": 0.15,
         "min_through_hole_diameter": 0.2,
@@ -660,7 +660,6 @@
         "bus_width": 12,
         "clearance": 0.1,
         "diff_pair_gap": 0.217,
-        "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.155,
         "line_style": 0,
         "microvia_diameter": 0.3,
@@ -679,7 +678,6 @@
         "bus_width": 12,
         "clearance": 0.1524,
         "diff_pair_gap": 0.1524,
-        "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.1524,
         "line_style": 0,
         "microvia_diameter": 0.4572,
@@ -698,7 +696,6 @@
         "bus_width": 12,
         "clearance": 0.1524,
         "diff_pair_gap": 0.1524,
-        "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.1524,
         "line_style": 0,
         "microvia_diameter": 0.4572,
@@ -973,7 +970,7 @@
         "uuid": "27195d1d-92b2-40df-ada5-3b20841577e7"
       }
     ],
-    "used_designators": "IC1,#FLG1-4,R18,R22-23,R26-27,R30-31,U1-2,Q4,D7,#PWR9,#PWR13,#PWR26,#PWR88,#PWR147",
+    "used_designators": "",
     "variants": []
   },
   "sheets": [
