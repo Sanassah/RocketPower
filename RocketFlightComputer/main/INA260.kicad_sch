@@ -2089,7 +2089,7 @@
 				)
 			)
 		)
-		(property "LCSC" ""
+		(property "LCSC" "C1590"
 			(at 106.68 53.975 0)
 			(hide yes)
 			(show_name no)

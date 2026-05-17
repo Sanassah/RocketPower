@@ -385,7 +385,24 @@
     "equivalence_files": []
   },
   "erc": {
-    "erc_exclusions": [],
+    "erc_exclusions": [
+      [
+        "power_pin_not_driven|266700|3606800|d4cb608a-9781-48ae-bf24-82e799370e98|00000000-0000-0000-0000-000000000000|/27195d1d-92b2-40df-ada5-3b20841577e7|/27195d1d-92b2-40df-ada5-3b20841577e7|",
+        ""
+      ],
+      [
+        "power_pin_not_driven|609600|558800|4ce5508a-0245-41eb-a115-84660bf979c5|00000000-0000-0000-0000-000000000000|/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a|/27195d1d-92b2-40df-ada5-3b20841577e7/cea4c1d7-5261-445d-b36e-014b1552505a|",
+        ""
+      ],
+      [
+        "power_pin_not_driven|685800|749300|2d04f2dc-79d7-4edb-952d-f09ad55f54e7|00000000-0000-0000-0000-000000000000|/27195d1d-92b2-40df-ada5-3b20841577e7/f1ce41f5-ec33-4382-82d9-21de8266ebc9|/27195d1d-92b2-40df-ada5-3b20841577e7/f1ce41f5-ec33-4382-82d9-21de8266ebc9|",
+        ""
+      ],
+      [
+        "power_pin_not_driven|952500|558800|31958fe5-e48d-4065-a4f7-13033f8acd11|00000000-0000-0000-0000-000000000000|/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf|/27195d1d-92b2-40df-ada5-3b20841577e7/125f95e9-6bcc-4b33-8d0b-519410cf48bf|",
+        ""
+      ]
+    ],
     "meta": {
       "version": 0
     },
@@ -856,7 +873,7 @@
           "group_by": false,
           "label": "Mouser Part Number",
           "name": "Mouser Part Number",
-          "show": true
+          "show": false
         },
         {
           "group_by": false,
@@ -956,7 +973,7 @@
         "uuid": "27195d1d-92b2-40df-ada5-3b20841577e7"
       }
     ],
-    "used_designators": "R18,R22-23,R26-27,R30-31,U1,Q4,D7,#PWR88,#PWR147",
+    "used_designators": "IC1,#FLG1-4,R18,R22-23,R26-27,R30-31,U1-2,Q4,D7,#PWR9,#PWR13,#PWR26,#PWR88,#PWR147",
     "variants": []
   },
   "sheets": [
