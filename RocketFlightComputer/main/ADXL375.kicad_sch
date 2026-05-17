@@ -1076,6 +1076,17 @@
 			(embedded_fonts no)
 		)
 	)
+	(text "Tantalum capacitor"
+		(exclude_from_sim no)
+		(at 36.576 46.99 0)
+		(effects
+			(font
+				(size 0.7 0.7)
+			)
+			(justify left bottom)
+		)
+		(uuid "6e36e7ad-199b-4a3d-8baa-a11048de300d")
+	)
 	(text "Max current: 145 uA\n"
 		(exclude_from_sim no)
 		(at 112.268 104.648 0)
@@ -1086,6 +1097,17 @@
 			(justify left bottom)
 		)
 		(uuid "ce0914db-cbef-412c-ab58-56d6cbf5a640")
+	)
+	(text "Ceramic capacitor"
+		(exclude_from_sim no)
+		(at 36.83 58.42 0)
+		(effects
+			(font
+				(size 0.7 0.7)
+			)
+			(justify left bottom)
+		)
+		(uuid "e425cbb4-c5eb-43bd-b8f9-2b4a801b568a")
 	)
 	(text_box "Clear BIT D6 in DATA_FORMAT register (0x31)"
 		(exclude_from_sim no)
