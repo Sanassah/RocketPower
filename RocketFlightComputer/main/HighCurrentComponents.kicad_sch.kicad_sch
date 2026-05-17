@@ -1966,121 +1966,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "power:PWR_FLAG"
-			(power global)
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "#FLG"
-				(at 0 1.905 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "PWR_FLAG"
-				(at 0 3.81 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Special symbol for telling ERC where power comes from"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "flag power"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "PWR_FLAG_0_0"
-				(pin power_out line
-					(at 0 0 90)
-					(length 0)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(symbol "PWR_FLAG_0_1"
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 1.27) (xy -1.016 1.905) (xy 0 2.54) (xy 1.016 1.905) (xy 0 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 	)
 	(rectangle
 		(start 189.23 71.755)
@@ -2311,12 +2196,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "55ee4277-52c2-48fb-8365-1d2c70eac9b9")
-	)
-	(junction
-		(at 54.61 35.56)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "86eac6ee-eb66-4303-82f5-c96099072861")
 	)
 	(junction
 		(at 179.07 147.32)
@@ -2664,7 +2543,7 @@
 	)
 	(wire
 		(pts
-			(xy 49.53 35.56) (xy 54.61 35.56)
+			(xy 49.53 35.56) (xy 53.34 35.56)
 		)
 		(stroke
 			(width 0)
@@ -3632,7 +3511,7 @@
 		(fields_autoplaced yes)
 		(uuid "1939a4f7-3004-455e-b8f2-ae0d329374c3")
 		(property "Reference" "Q1"
-			(at 59.69 146.685 0)
+			(at 59.69 146.0499 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3643,7 +3522,7 @@
 			)
 		)
 		(property "Value" "DMG3406L"
-			(at 59.69 149.225 0)
+			(at 59.69 148.5899 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3985,7 +3864,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25804 "
+		(property "LCSC" "C23101 "
 			(at 148.59 127 0)
 			(hide yes)
 			(show_name no)
@@ -4006,83 +3885,6 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/03966d30-d016-427a-9db2-b49a5b43d133"
 					(reference "R27")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:PWR_FLAG")
-		(at 54.61 35.56 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "2be65731-9ae9-4f82-99c3-e181d3f8abbf")
-		(property "Reference" "#FLG05"
-			(at 54.61 33.655 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "PWR_FLAG"
-			(at 54.61 31.242 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 54.61 35.56 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 54.61 35.56 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 54.61 35.56 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "6d1d5517-c834-48eb-84f2-0d98cc9cfee6")
-		)
-		(instances
-			(project "main"
-				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/03966d30-d016-427a-9db2-b49a5b43d133"
-					(reference "#FLG05")
 					(unit 1)
 				)
 			)
@@ -5023,7 +4825,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C23101 "
+		(property "LCSC" "C25804 "
 			(at 64.77 128.27 0)
 			(hide yes)
 			(show_name no)
@@ -5658,7 +5460,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25804 "
+		(property "LCSC" "C23101 "
 			(at 217.17 127 0)
 			(hide yes)
 			(show_name no)
@@ -6258,7 +6060,7 @@
 		(fields_autoplaced yes)
 		(uuid "a77b9716-fb35-4568-a3a7-6df508ab11ed")
 		(property "Reference" "Q3"
-			(at 199.39 146.685 0)
+			(at 199.39 146.0499 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6268,8 +6070,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "SI2302"
-			(at 199.39 149.225 0)
+		(property "Value" "DMG3406L"
+			(at 199.39 148.5899 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6573,7 +6375,7 @@
 		(fields_autoplaced yes)
 		(uuid "aaeaf064-5a84-4f59-8e26-58a53a9d15ed")
 		(property "Reference" "Q2"
-			(at 131.445 146.685 0)
+			(at 130.81 146.0499 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6583,8 +6385,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "SI2302"
-			(at 131.445 149.225 0)
+		(property "Value" "DMG3406L"
+			(at 130.81 148.5899 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6672,7 +6474,7 @@
 	)
 	(symbol
 		(lib_id "power:+BATT")
-		(at 54.61 35.56 180)
+		(at 53.34 35.56 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -6682,7 +6484,7 @@
 		(dnp no)
 		(uuid "acb78fa4-5efb-43f7-a80e-23172004143b")
 		(property "Reference" "#PWR0120"
-			(at 54.61 31.75 0)
+			(at 49.53 35.56 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6693,7 +6495,7 @@
 			)
 		)
 		(property "Value" "+BATT"
-			(at 52.07 39.624 0)
+			(at 57.404 38.1 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6704,7 +6506,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 54.61 35.56 0)
+			(at 53.34 35.56 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6715,7 +6517,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 54.61 35.56 0)
+			(at 53.34 35.56 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6726,7 +6528,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 54.61 35.56 0)
+			(at 53.34 35.56 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7049,7 +6851,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C23101 "
+		(property "LCSC" "C25804 "
 			(at 137.16 127 0)
 			(hide yes)
 			(show_name no)
@@ -7306,7 +7108,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25804 "
+		(property "LCSC" "C23101 "
 			(at 77.47 128.27 0)
 			(hide yes)
 			(show_name no)

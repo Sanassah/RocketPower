@@ -11,7 +11,7 @@
 			(on_board yes)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "IC?"
+			(property "Reference" "BMP1"
 				(at -10.16 13.97 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -23,7 +23,7 @@
 					(justify left bottom)
 				)
 			)
-			(property "Value" "BMP388"
+			(property "Value" "ALTIMETER"
 				(at -10.16 -15.24 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -45,7 +45,7 @@
 					)
 				)
 			)
-			(property "Datasheet" ""
+			(property "Datasheet" "https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp390-ds002.pdf"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -57,6 +57,28 @@
 				)
 			)
 			(property "Description" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "LCSC" "C2684802 "
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Mouser Part Number" "262-BMP390"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -278,7 +300,7 @@
 						)
 					)
 				)
-				(pin power_in line
+				(pin passive line
 					(at -12.7 -5.08 0)
 					(length 2.54)
 					(name "GND"
@@ -368,7 +390,7 @@
 						)
 					)
 				)
-				(pin power_in line
+				(pin passive line
 					(at -12.7 -5.08 0)
 					(length 2.54)
 					(name "GND"
@@ -386,7 +408,7 @@
 						)
 					)
 				)
-				(pin power_in line
+				(pin passive line
 					(at -12.7 -5.08 0)
 					(length 2.54)
 					(name "GND"
@@ -931,36 +953,20 @@
 		(uuid "964f046f-145e-41be-8b1c-abd42805babe")
 	)
 	(junction
-		(at 59.69 53.34)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "abd2557e-be8e-42be-b9e7-df9f6fedda46")
-	)
-	(junction
-		(at 59.055 53.34)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b344a51f-7abf-4141-812f-f364ca60a57f")
-	)
-	(junction
 		(at 88.265 53.34)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d5f51bc5-373b-48fb-958b-78201e146f12")
 	)
+	(junction
+		(at 59.69 53.34)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "ff4a7cfd-c19d-490e-93bd-d2fc892b9cc6")
+	)
 	(no_connect
 		(at 86.36 58.42)
 		(uuid "fdcff065-d10e-4e7f-b0c0-cd1a47815f5b")
-	)
-	(wire
-		(pts
-			(xy 59.055 43.18) (xy 88.265 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "053cff29-47d5-4c8c-b842-4d75cb5670a1")
 	)
 	(wire
 		(pts
@@ -974,13 +980,13 @@
 	)
 	(wire
 		(pts
-			(xy 59.69 53.34) (xy 59.055 53.34)
+			(xy 59.69 53.34) (xy 60.96 53.34)
 		)
 		(stroke
 			(width 0.1524)
 			(type solid)
 		)
-		(uuid "4a706070-370c-4c98-8cd9-773e4ac3aa5e")
+		(uuid "4b33dc85-9052-4cc6-ba26-e8db0d5e105a")
 	)
 	(wire
 		(pts
@@ -1004,7 +1010,7 @@
 	)
 	(wire
 		(pts
-			(xy 52.07 53.34) (xy 59.055 53.34)
+			(xy 52.07 53.34) (xy 59.69 53.34)
 		)
 		(stroke
 			(width 0.1524)
@@ -1024,7 +1030,17 @@
 	)
 	(wire
 		(pts
-			(xy 60.96 63.5) (xy 61.595 63.5)
+			(xy 59.69 43.18) (xy 88.265 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8c1b674c-781f-4430-8f10-c06a9da62021")
+	)
+	(wire
+		(pts
+			(xy 60.96 63.5) (xy 59.055 63.5)
 		)
 		(stroke
 			(width 0)
@@ -1064,33 +1080,23 @@
 	)
 	(wire
 		(pts
-			(xy 59.055 43.18) (xy 59.055 53.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c9241a31-089d-4700-bb40-c8fd25a2f2c0")
-	)
-	(wire
-		(pts
-			(xy 60.96 53.34) (xy 59.69 53.34)
+			(xy 59.69 53.34) (xy 59.69 55.88)
 		)
 		(stroke
 			(width 0.1524)
 			(type solid)
 		)
-		(uuid "ced0cb70-db43-48c1-9a12-0999206f29dd")
+		(uuid "bff0907d-4924-43dd-8787-006227feadec")
 	)
 	(wire
 		(pts
-			(xy 59.69 55.88) (xy 59.69 53.34)
+			(xy 59.69 43.18) (xy 59.69 53.34)
 		)
 		(stroke
-			(width 0)
-			(type default)
+			(width 0.1524)
+			(type solid)
 		)
-		(uuid "f0ddb6d5-d201-4a24-b76c-ca58d0342cff")
+		(uuid "fafb21f5-4db8-4e9d-8345-e137411582cb")
 	)
 	(hierarchical_label "BMP390_SCL1"
 		(shape input)
@@ -1313,7 +1319,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C48579250"
+		(property "LCSC" "C1590"
 			(at 52.07 58.42 0)
 			(hide yes)
 			(show_name no)
@@ -1505,7 +1511,7 @@
 	)
 	(symbol
 		(lib_id "power:GNDREF")
-		(at 61.595 63.5 270)
+		(at 59.055 63.5 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -1516,7 +1522,7 @@
 		(fields_autoplaced yes)
 		(uuid "ad53c45b-3fb7-491c-9a89-9061193693b9")
 		(property "Reference" "#PWR095"
-			(at 55.245 63.5 0)
+			(at 52.705 63.5 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1527,7 +1533,7 @@
 			)
 		)
 		(property "Value" "GNDREF"
-			(at 57.785 62.865 90)
+			(at 55.245 62.865 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1539,7 +1545,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 61.595 63.5 0)
+			(at 59.055 63.5 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1550,7 +1556,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 61.595 63.5 0)
+			(at 59.055 63.5 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1561,7 +1567,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 61.595 63.5 0)
+			(at 59.055 63.5 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1728,7 +1734,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C48579250"
+		(property "LCSC" "C1590"
 			(at 42.545 58.42 0)
 			(hide yes)
 			(show_name no)
