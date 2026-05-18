@@ -1111,7 +1111,7 @@
 	)
 	(text_box "Clear BIT D6 in DATA_FORMAT register (0x31)"
 		(exclude_from_sim no)
-		(at 97.79 54.61 0)
+		(at 101.6 38.1 0)
 		(size 31.115 5.08)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
@@ -1176,6 +1176,12 @@
 		(uuid "616bb430-7f82-43d1-a549-b87ec7de3679")
 	)
 	(junction
+		(at 99.06 66.04)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6bd6110e-e69c-49de-8e46-cd20d1ef79e5")
+	)
+	(junction
 		(at 49.53 50.8)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1192,6 +1198,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "875caeaa-9358-4b10-8134-8d48feae54e3")
+	)
+	(junction
+		(at 99.06 63.5)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d1b890a4-1f8f-42b1-9897-5a8203dd2394")
 	)
 	(junction
 		(at 91.44 53.34)
@@ -1231,7 +1243,7 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 63.5) (xy 88.265 63.5)
+			(xy 101.6 63.5) (xy 99.06 63.5)
 		)
 		(stroke
 			(width 0)
@@ -1341,6 +1353,26 @@
 	)
 	(wire
 		(pts
+			(xy 99.06 63.5) (xy 88.265 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "818af375-2c88-4998-a478-7045e70b9e47")
+	)
+	(wire
+		(pts
+			(xy 99.06 66.04) (xy 88.265 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a735f425-2d2e-4a75-aea2-ee70651a02bf")
+	)
+	(wire
+		(pts
 			(xy 49.53 50.8) (xy 54.61 50.8)
 		)
 		(stroke
@@ -1351,7 +1383,7 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 66.04) (xy 88.265 66.04)
+			(xy 101.6 66.04) (xy 99.06 66.04)
 		)
 		(stroke
 			(width 0)
@@ -1391,7 +1423,7 @@
 	)
 	(hierarchical_label "ADXL375_SCL2"
 		(shape input)
-		(at 90.17 66.04 0)
+		(at 101.6 66.04 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1402,7 +1434,7 @@
 	)
 	(hierarchical_label "ADXL375_SDA2"
 		(shape input)
-		(at 90.17 63.5 0)
+		(at 101.6 63.5 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1410,6 +1442,84 @@
 			(justify left)
 		)
 		(uuid "92bd31a8-2223-4487-b8af-c65acb247d8b")
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 99.06 55.88 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "222fb9d2-a0f5-4638-964c-e360f3774ee7")
+		(property "Reference" "#PWR088"
+			(at 99.06 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 101.346 54.356 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 99.06 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 99.06 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 99.06 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "976f7edb-a7bc-459c-9180-20197e8fcb49")
+		)
+		(instances
+			(project "main"
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
+					(reference "#PWR088")
+					(unit 1)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id "Adafruit_BNO08x-eagle-import:CAP_CERAMIC0603_NO")
@@ -1520,6 +1630,97 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 99.06 59.69 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "3fcfa265-a8e7-4a08-8950-922563ffb4e1")
+		(property "Reference" "R18"
+			(at 101.6 59.69 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "4.7k"
+			(at 99.06 57.404 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
+			(at 97.282 59.69 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 99.06 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 99.06 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C23162 "
+			(at 99.06 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "213f6215-410e-4cd4-b8da-01637c5c02e5")
+		)
+		(pin "2"
+			(uuid "f8aa649b-4f03-48d3-9c80-109e9087aaa1")
+		)
+		(instances
+			(project "main"
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
+					(reference "R18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GNDREF")
 		(at 52.705 78.74 0)
 		(unit 1)
@@ -1594,6 +1795,97 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
 					(reference "#PWR0100")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 99.06 69.85 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "9b9661d3-bf96-49f2-a252-6ec3d4504872")
+		(property "Reference" "R32"
+			(at 96.52 69.85 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "4.7k"
+			(at 99.06 72.136 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
+			(at 100.838 69.85 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 99.06 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 99.06 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C23162 "
+			(at 99.06 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "396a4eac-8669-488a-967f-1f95814ee59d")
+		)
+		(pin "2"
+			(uuid "cf1c2991-a848-473b-bdd0-5bd197ce5af9")
+		)
+		(instances
+			(project "main"
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
+					(reference "R32")
 					(unit 1)
 				)
 			)
@@ -2333,6 +2625,84 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
 					(reference "#PWR096")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 99.06 73.66 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "e869e53c-cc0f-42f3-acd5-37aae0091e96")
+		(property "Reference" "#PWR0105"
+			(at 99.06 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 106.68 74.422 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 99.06 73.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 99.06 73.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 99.06 73.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "28804b80-901d-4136-9b40-f7930b8c4163")
+		)
+		(instances
+			(project "main"
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/ab53b5aa-f87c-4c4c-94f1-6ed73299a675"
+					(reference "#PWR0105")
 					(unit 1)
 				)
 			)

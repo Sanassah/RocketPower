@@ -9447,10 +9447,6 @@
 		(uuid "9080846d-298b-416a-9ebb-b3f763785a3a")
 	)
 	(no_connect
-		(at 250.19 115.57)
-		(uuid "92f84340-2bc1-4ce2-91dd-e43595c5c824")
-	)
-	(no_connect
 		(at 250.19 46.99)
 		(uuid "95b5d843-c18b-4d1a-bb10-a6d9ce9b1bfd")
 	)
@@ -24690,6 +24686,87 @@
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7"
 					(reference "#PWR03")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GNDREF")
+		(at 250.19 115.57 270)
+		(mirror x)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "cad36b5b-852d-438b-a7ee-b7b8fd377ab7")
+		(property "Reference" "#PWR087"
+			(at 243.84 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GNDREF"
+			(at 246.38 116.205 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 250.19 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 250.19 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 250.19 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "0c37c9f4-14dc-444f-ab58-03cf11339f50")
+		)
+		(instances
+			(project "main"
+				(path "/27195d1d-92b2-40df-ada5-3b20841577e7"
+					(reference "#PWR087")
 					(unit 1)
 				)
 			)
