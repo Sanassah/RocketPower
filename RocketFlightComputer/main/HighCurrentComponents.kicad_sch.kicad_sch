@@ -3821,7 +3821,7 @@
 				)
 			)
 		)
-		(property "Value" "7k"
+		(property "Value" "7.32k"
 			(at 148.59 127 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4692,7 +4692,7 @@
 				)
 			)
 		)
-		(property "Value" "7k"
+		(property "Value" "10k"
 			(at 206.883 127.254 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4735,7 +4735,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C23101 "
+		(property "LCSC" "C25804 "
 			(at 207.01 127 0)
 			(hide yes)
 			(show_name no)
@@ -5417,7 +5417,7 @@
 				)
 			)
 		)
-		(property "Value" "7k"
+		(property "Value" "7.32k"
 			(at 217.17 127 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7065,7 +7065,7 @@
 				)
 			)
 		)
-		(property "Value" "7k"
+		(property "Value" "7.32k"
 			(at 77.597 128.397 90)
 			(show_name no)
 			(do_not_autoplace no)

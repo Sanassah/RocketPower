@@ -1942,6 +1942,17 @@
 		)
 		(uuid "c12226e7-2789-49dc-bc30-be198119e429")
 	)
+	(text "Leave Open for DDC I2C"
+		(exclude_from_sim no)
+		(at 171.958 82.042 0)
+		(effects
+			(font
+				(size 0.7 0.7)
+			)
+			(justify left bottom)
+		)
+		(uuid "fc7e0f79-0253-4493-835b-fc07d3b922b4")
+	)
 	(junction
 		(at 134.62 73.66)
 		(diameter 0)
