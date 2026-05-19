@@ -655,7 +655,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "b29cb636-55f1-415e-b2cf-98d87b10b1dc")
-		(property "Reference" "S4B-PH-K-S_LF__SN_2"
+		(property "Reference" "JST-GH-2"
 			(at 130.048 85.852 0)
 			(hide yes)
 			(show_name no)
@@ -799,7 +799,7 @@
 		(instances
 			(project "main"
 				(path "/27195d1d-92b2-40df-ada5-3b20841577e7/e516ca7f-4a7c-4d6f-878d-eb9fde5d9c52"
-					(reference "S4B-PH-K-S_LF__SN_2")
+					(reference "JST-GH-2")
 					(unit 1)
 				)
 			)

@@ -6214,7 +6214,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "JST-GH"
 			(at 212.09 80.01 0)
 			(hide yes)
 			(show_name no)

@@ -22271,7 +22271,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "a05f4fb7-281c-46c4-a0ee-1987ad03da5d")
 		(property "Reference" "MKL02Z32VFG1"
 			(at 187.96 322.58 0)
