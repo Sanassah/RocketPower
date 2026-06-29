@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 160" width="60" height="160">
+  <!-- Fins -->
+  <polygon points="20,115 5,148 20,135" fill="#6688aa"/>
+  <polygon points="40,115 55,148 40,135" fill="#6688aa"/>
+  <!-- Body tube -->
+  <rect x="20" y="58" width="20" height="90" rx="3" ry="3" fill="#b0bec8"/>
+  <!-- Nose cone -->
+  <polygon points="30,4 20,58 40,58" fill="#8fa8bc"/>
+  <!-- Nozzle -->
+  <polygon points="22,138 38,138 35,150 25,150" fill="#445566"/>
+  <!-- Porthole -->
+  <circle cx="30" cy="80" r="7" fill="#001a2e" stroke="#00ccff" stroke-width="1.5"/>
+  <circle cx="30" cy="80" r="4" fill="#003344" opacity="0.6"/>
+  <!-- Stripe -->
+  <rect x="20" y="100" width="20" height="5" fill="#cc2200" opacity="0.7"/>
+</svg>
