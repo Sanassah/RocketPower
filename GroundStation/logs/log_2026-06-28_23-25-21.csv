@@ -1,0 +1,1 @@
+rx_time,seq,timestamp_ms,state,lat,lon,gps_alt_m,gps_sats,gps_fix,baro_alt_m,vert_vel_ms,accel_x_g,accel_y_g,accel_z_g,accel_mag_g,quat_w,quat_x,quat_y,quat_z,voltage_v,current_ma,rssi
