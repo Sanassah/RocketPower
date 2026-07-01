@@ -21,7 +21,7 @@ private:
     Adafruit_BMP3XX _bmp;
     BarometerData   _data{};
 
-    float    _groundAlt_m  = 0.0f;
-    float    _prevAlt_m    = 0.0f;
-    uint32_t _prevTime_ms  = 0;
+    float    _groundPressure_hpa = 1013.25f;  // pressure at launch site, set by calibrate()
+    float    _prevAlt_m          = 0.0f;
+    uint32_t _prevTime_ms        = 0;
 };

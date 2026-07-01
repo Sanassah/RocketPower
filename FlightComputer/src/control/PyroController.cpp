@@ -4,9 +4,9 @@
 
 // From schematic: PyroCHx_N labels give MCU pin N for each channel
 const uint8_t PyroController::_firePins[3] = {
-    PYRO_CH1_FIRE_PIN,   // pin 2  — drogue
-    PYRO_CH2_FIRE_PIN,   // pin 3  — main
-    PYRO_CH3_FIRE_PIN,   // pin 4  — aux
+    PYRO_CH1_FIRE_PIN,   // pin 2  — ignition
+    PYRO_CH2_FIRE_PIN,   // pin 3  — parachute
+    PYRO_CH3_FIRE_PIN,   // pin 4  — backup
 };
 const uint8_t PyroController::_contPins[3] = {
     PYRO_CH1_CONT_PIN,   // pin 40

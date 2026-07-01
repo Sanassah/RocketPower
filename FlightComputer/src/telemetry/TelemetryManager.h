@@ -17,11 +17,16 @@ public:
     // checks for incoming commands and dispatches them.
     void update(const FlightData& d);
 
+    // Returns true (once) when a CALIBRATE_BARO command arrived.
+    // main.cpp polls this and calls sensors.calibrateBaro().
+    bool calibrateRequested() { bool r = _calibrateRequested; _calibrateRequested = false; return r; }
+
 private:
     LoRaRadio&      _lora;
     StateMachine&   _sm;
     PyroController& _pyro;
-    uint32_t        _lastTxMs = 0;
+    uint32_t        _lastTxMs          = 0;
+    bool            _calibrateRequested = false;
 
     void _sendTelemetry(const FlightData& d);
     void _handleCommand(const CommandPacket& cmd);

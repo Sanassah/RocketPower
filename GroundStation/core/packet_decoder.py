@@ -1,7 +1,7 @@
 """
 Decodes binary TelemetryPacket from the flight computer.
 
-Packet layout (packed, little-endian, 78 bytes total):
+Packet layout (packed, little-endian, 81 bytes total):
   Offset  Size  Type      Field
   0       1     uint8     magic[0]      = 0xAA
   1       1     uint8     magic[1]      = 0x55
@@ -25,7 +25,10 @@ Packet layout (packed, little-endian, 78 bytes total):
   67      4     float     voltage_v
   71      4     float     current_ma
   75      1     int8      rssi
-  76      2     uint16    checksum     (sum of bytes 0..75)
+  76      1     uint8     pyro_cont[0]  (CH1 ignition:  1=OK, 0=open)
+  77      1     uint8     pyro_cont[1]  (CH2 parachute: 1=OK, 0=open)
+  78      1     uint8     pyro_cont[2]  (CH3 backup:    1=OK, 0=open)
+  79      2     uint16    checksum      (sum of bytes 0..78)
 """
 
 import struct
@@ -37,9 +40,9 @@ from typing import Optional
 TELEM_MAGIC_0 = 0xAA
 TELEM_MAGIC_1 = 0x55
 
-# 23 fields, 78 bytes total
-TELEM_FORMAT = '<BBHIBddfBBfffffffffffbH'
-TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 78
+# 26 fields, 81 bytes total (added pyro_cont[3] before checksum)
+TELEM_FORMAT = '<BBHIBddfBBfffffffffffb3BH'
+TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 81
 
 STATE_NAMES = {
     0: 'IDLE',
@@ -86,10 +89,18 @@ class TelemetryData:
     voltage_v:    float
     current_ma:   float
     rssi:         int
+    pyro_cont_0:  int          # CH1 continuity (1=OK, 0=open)
+    pyro_cont_1:  int          # CH2 continuity
+    pyro_cont_2:  int          # CH3 continuity
     checksum:     int
     # Derived — populated by decode_packet()
     accel_mag_g:  float = 0.0
     rx_time:      float = field(default_factory=time.time)
+
+    @property
+    def pyro_continuity(self) -> tuple[bool, bool, bool]:
+        """True per channel if the ematch (igniter wire) is connected."""
+        return (bool(self.pyro_cont_0), bool(self.pyro_cont_1), bool(self.pyro_cont_2))
 
     @property
     def state_name(self) -> str:
@@ -101,7 +112,9 @@ class TelemetryData:
 
     @property
     def has_gps_fix(self) -> bool:
-        return bool(self.gps_fix) and self.gps_sats >= 3
+        # gps_fix comes from TinyGPSPlus location.isValid(); satellite count
+        # arrives in a separate NMEA sentence so don't gate on it here.
+        return bool(self.gps_fix)
 
 
 def decode_packet(raw: bytes) -> Optional[TelemetryData]:
@@ -117,7 +130,7 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
     if raw[0] != TELEM_MAGIC_0 or raw[1] != TELEM_MAGIC_1:
         return None
 
-    # Checksum = 16-bit sum of bytes 0..75
+    # Checksum = 16-bit sum of all bytes except the last 2 (the checksum itself)
     expected = sum(raw[:-2]) & 0xFFFF
     stored   = struct.unpack_from('<H', raw, TELEM_SIZE - 2)[0]
     if expected != stored:

@@ -75,9 +75,9 @@ void StateMachine::update(const FlightData& d) {
             break;
         }
 
-        // ---- APOGEE: fire drogue, immediately transition to DESCENT ----
+        // ---- APOGEE: deploy parachute, immediately transition to DESCENT ----
         case FlightState::APOGEE:
-            _pyro.fire(PYRO_DROGUE);
+            _pyro.fire(PYRO_PARACHUTE);
             _enterState(FlightState::DESCENT, now);
             break;
 

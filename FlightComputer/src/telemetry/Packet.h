@@ -47,16 +47,19 @@ struct TelemetryPacket {
     // Link quality
     int8_t   rssi;
 
+    uint8_t  pyro_cont[3];   // continuity per channel: 1=OK 0=open (index 0=CH1, 1=CH2, 2=CH3)
+
     uint16_t checksum;       // simple sum of all preceding bytes
 };
 #pragma pack(pop)
 
 // ===== Ground → Rocket commands =====
 enum class CommandType : uint8_t {
-    ARM        = 0x01,
-    DISARM     = 0x02,
-    FIRE_PYRO  = 0x03,   // param = channel (1-3)
-    PING       = 0x04,
+    ARM            = 0x01,
+    DISARM         = 0x02,
+    FIRE_PYRO      = 0x03,   // param = channel (1-3)
+    PING           = 0x04,
+    CALIBRATE_BARO = 0x05,   // re-zero barometer altitude at current ground level
 };
 
 #pragma pack(push, 1)

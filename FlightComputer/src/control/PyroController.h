@@ -3,9 +3,9 @@
 
 // Controls the 3 pyro channels on the custom MIMXRT1062 board.
 // From schematic (HighCurrentComponents.kicad_sch):
-//   CH1 (drogue): fire=pin2, continuity=pin40
-//   CH2 (main):   fire=pin3, continuity=pin41
-//   CH3 (aux):    fire=pin4, continuity=pin39
+//   CH1 (ignition):  fire=pin2, continuity=pin40
+//   CH2 (parachute): fire=pin3, continuity=pin41
+//   CH3 (backup):    fire=pin4, continuity=pin39
 class PyroController {
 public:
     bool begin();    // configure GPIO directions

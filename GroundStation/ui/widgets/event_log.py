@@ -1,73 +1,81 @@
-"""
-Scrolling event log — clean white background, monospace timestamps,
-iOS-palette level colours, subtle alternating row tints.
-"""
+"""Scrolling event log -- dark terminal style."""
 
 from datetime import datetime
 
-from PyQt6.QtWidgets import QGroupBox, QVBoxLayout, QTextEdit
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit
 from PyQt6.QtCore    import Qt
 from PyQt6.QtGui     import QFont
 
 from core.packet_decoder import TelemetryData
 
+_BG     = '#1A1A1B'
+_BORDER = '#2E2E30'
+_TEXT   = '#F1F5F9'
+_MUTED  = '#94A3B8'
+
 _MAX_LINES = 500
 
-# iOS / Apple HIG event colours
 _COLORS = {
-    'info':    '#6E6E73',   # grey
-    'ok':      '#34C759',   # green
-    'warn':    '#FF9F0A',   # orange
-    'error':   '#FF3B30',   # red
-    'command': '#0071E3',   # blue
-    'state':   '#BF5AF2',   # purple
+    'info':    '#64748B',
+    'ok':      '#22C55E',
+    'warn':    '#F59E0B',
+    'error':   '#EF4444',
+    'command': '#3B82F6',
+    'state':   '#A78BFA',
 }
 
-# Alternating row tints (very subtle)
-_ROW_A = '#FFFFFF'
-_ROW_B = '#FAFAFA'
 
-
-class EventLog(QGroupBox):
+class EventLog(QWidget):
     def __init__(self, parent=None):
-        super().__init__('EVENT LOG', parent)
+        super().__init__(parent)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setStyleSheet(
+            f'background-color:{_BG};border:1px solid {_BORDER};border-radius:8px;'
+        )
         self._last_state: int | None = None
         self._line_count = 0
 
+        root = QVBoxLayout(self)
+        root.setContentsMargins(16, 12, 16, 12)
+        root.setSpacing(8)
+
+        hdr = QHBoxLayout(); hdr.setSpacing(8)
+        sym = QLabel('--')
+        sym.setStyleSheet(f'color:{_TEXT};font-size:12px;background:transparent;border:none;')
+        ttl = QLabel('EVENT LOG')
+        ttl.setStyleSheet(
+            f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
+            f'background:transparent;border:none;'
+        )
+        hdr.addWidget(sym); hdr.addWidget(ttl); hdr.addStretch()
+        root.addLayout(hdr)
+
         self._text = QTextEdit()
         self._text.setReadOnly(True)
-        self._text.setFont(QFont('JetBrains Mono', 10))
-        self._text.setStyleSheet("""
-            QTextEdit {
-                background-color: #FFFFFF;
-                color: #1D1D1F;
-                border: none;
-                padding: 4px 8px;
-                font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
-                font-size: 10px;
-            }
+        self._text.setFont(QFont('JetBrains Mono', 11))
+        self._text.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: #0F0F10;
+                color: #F1F5F9;
+                border: 1px solid {_BORDER};
+                border-radius: 6px;
+                padding: 6px 10px;
+                font-size: 11px;
+            }}
         """)
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 4, 0, 0)
-        layout.addWidget(self._text)
+        root.addWidget(self._text)
 
     def log(self, message: str, level: str = 'info') -> None:
-        color  = _COLORS.get(level, _COLORS['info'])
-        ts     = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-        row_bg = _ROW_B if self._line_count % 2 else _ROW_A
-
-        line = (
-            f'<div style="background-color:{row_bg}; padding:2px 8px;">'
-            f'<span style="color:#C7C7CC; font-family:monospace;">{ts}</span>'
+        color = _COLORS.get(level, _COLORS['info'])
+        ts    = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+        line  = (
+            f'<span style="color:#64748B;font-family:monospace;">{ts}</span>'
             f'&nbsp;&nbsp;'
             f'<span style="color:{color};">{message}</span>'
-            f'</div>'
         )
         self._text.append(line)
         self._line_count += 1
 
-        # Trim oldest entry when over limit
         if self._line_count > _MAX_LINES:
             cursor = self._text.textCursor()
             cursor.movePosition(cursor.MoveOperation.Start)
@@ -82,4 +90,4 @@ class EventLog(QGroupBox):
     def update_data(self, data: TelemetryData) -> None:
         if data.state != self._last_state:
             self._last_state = data.state
-            self.log(f'State → {data.state_name}  (seq {data.seq})', level='state')
+            self.log(f'State -> {data.state_name}  (seq {data.seq})', level='state')
