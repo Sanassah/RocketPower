@@ -1,5 +1,5 @@
 """
-Rocket GCS — Ground Control Station
+RocketPower GCS -- Ground Control Station
 Entry point. Run from the ground_station/ directory:
     python main.py
 """
@@ -12,197 +12,102 @@ sys.path.insert(0, os.path.dirname(__file__))
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui     import QFont
 
-# pyqtgraph global config — must be set before any PlotWidget is created
 import pyqtgraph as pg
-pg.setConfigOption('background', '#FFFFFF')
-pg.setConfigOption('foreground', '#6E6E73')
+pg.setConfigOption('background', '#0F0F10')
+pg.setConfigOption('foreground', '#64748B')
 pg.setConfigOptions(antialias=True)
 
-# ── Design System ──────────────────────────────────────────────────────────────
-#
-#   BG_APP   = #F5F5F7   off-white app background
-#   BG_CARD  = #FFFFFF   card / panel
-#   BLUE     = #0071E3   primary action (Apple blue)
-#   GREEN    = #34C759   success / landed
-#   ORANGE   = #FF9F0A   warning / powered ascent
-#   RED      = #FF3B30   danger / fire
-#   TEXT_PRI = #1D1D1F   near-black body text
-#   TEXT_SEC = #6E6E73   grey secondary label
-#   TEXT_TER = #8E8E93   tertiary / placeholder
-#   BORDER   = #D2D2D7   card border
-#   DIVIDER  = #E5E5EA   subtle divider
-#
-# ──────────────────────────────────────────────────────────────────────────────
-
 STYLESHEET = """
-/* ── Base ─────────────────────────────────────────────────── */
 QMainWindow, QWidget {
-    background-color: #F5F5F7;
-    color: #1D1D1F;
-    font-family: 'Segoe UI', 'SF Pro Display', Arial, sans-serif;
+    background-color: #0F0F10;
+    color: #F1F5F9;
+    font-family: 'Segoe UI', Arial, sans-serif;
     font-size: 11px;
 }
 
-/* ── Cards (Group Boxes) ───────────────────────────────────── */
-QGroupBox {
-    background-color: #FFFFFF;
-    border: 1px solid #D2D2D7;
-    border-radius: 12px;
-    margin-top: 22px;
-    padding: 10px 12px 12px 12px;
-    color: #8E8E93;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-}
-QGroupBox::title {
-    subcontrol-origin: margin;
-    subcontrol-position: top left;
-    left: 14px;
-    padding: 2px 6px;
-    background-color: #F5F5F7;
-    color: #8E8E93;
-    border-radius: 3px;
-}
-
-/* ── Default Button ────────────────────────────────────────── */
-QPushButton {
-    background-color: #FFFFFF;
-    color: #0071E3;
-    border: 1px solid #D2D2D7;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 12px;
-    font-weight: 600;
-}
-QPushButton:hover  { background-color: #F2F2F7; border-color: #0071E3; }
-QPushButton:pressed { background-color: #E8E8EC; }
-QPushButton:disabled {
-    background-color: #F2F2F7;
-    color: #C7C7CC;
-    border-color: #E5E5EA;
-}
-
-/* ARM — solid blue fill */
-QPushButton#armButton {
-    background-color: #0071E3;
-    color: #FFFFFF;
+QScrollBar:vertical {
+    background: transparent;
+    width: 5px;
     border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 8px 16px;
 }
-QPushButton#armButton:hover   { background-color: #0077ED; }
-QPushButton#armButton:pressed { background-color: #005BBB; }
-
-/* DISARM — outlined blue */
-QPushButton#disarmButton {
-    background-color: transparent;
-    color: #0071E3;
-    border: 1.5px solid #0071E3;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 8px 16px;
+QScrollBar::handle:vertical {
+    background: #2A2A2C;
+    border-radius: 2px;
+    min-height: 28px;
 }
-QPushButton#disarmButton:hover   { background-color: #E1F0FD; }
-QPushButton#disarmButton:pressed { background-color: #C8E0F9; }
+QScrollBar::handle:vertical:hover { background: #64748B; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
 
-/* FIRE — solid red fill */
-QPushButton#fireButton {
-    background-color: #FF3B30;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
+QSplitter::handle { background-color: #1E1E20; }
+QSplitter::handle:horizontal { width: 1px; }
+QSplitter::handle:vertical   { height: 1px; }
+
+QStatusBar {
+    background-color: #1A1A1B;
+    color: #94A3B8;
+    border-top: 1px solid #2E2E30;
     font-size: 11px;
-    padding: 7px 14px;
-}
-QPushButton#fireButton:hover   { background-color: #FF453A; }
-QPushButton#fireButton:pressed { background-color: #D70015; }
-QPushButton#fireButton:disabled {
-    background-color: #F2F2F7;
-    color: #C7C7CC;
-    border: 1px solid #E5E5EA;
 }
 
-/* ── Combo Boxes ───────────────────────────────────────────── */
 QComboBox {
-    background-color: #FFFFFF;
-    color: #1D1D1F;
-    border: 1px solid #D2D2D7;
-    border-radius: 8px;
-    padding: 5px 10px;
-    font-size: 12px;
+    background-color: #222224;
+    color: #F1F5F9;
+    border: 1px solid #2A2A2C;
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: 11px;
 }
-QComboBox:hover   { border-color: #0071E3; }
+QComboBox:hover { border-color: #3B82F6; }
 QComboBox::drop-down { border: none; }
 QComboBox QAbstractItemView {
-    background-color: #FFFFFF;
-    color: #1D1D1F;
-    border: 1px solid #D2D2D7;
-    border-radius: 8px;
-    selection-background-color: #E1F0FD;
-    selection-color: #0071E3;
-    padding: 4px;
+    background-color: #1A1A1B;
+    color: #F1F5F9;
+    border: 1px solid #2A2A2C;
+    selection-background-color: #222224;
+    selection-color: #3B82F6;
     outline: none;
 }
 
-/* ── Text Edit ─────────────────────────────────────────────── */
+QPushButton {
+    background-color: #222224;
+    color: #F1F5F9;
+    border: 1px solid #2A2A2C;
+    border-radius: 5px;
+    padding: 6px 14px;
+    font-size: 11px;
+}
+QPushButton:hover   { background-color: #2A2A2C; border-color: #64748B; }
+QPushButton:pressed { background-color: #1A1A1B; }
+QPushButton:disabled { color: #2A2A2C; border-color: #1E1E20; }
+
 QTextEdit {
-    background-color: #FFFFFF;
-    color: #1D1D1F;
+    background-color: #0F0F10;
+    color: #F1F5F9;
     border: none;
     font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
     font-size: 10px;
     padding: 4px;
-    selection-background-color: #E1F0FD;
-    selection-color: #0071E3;
+    selection-background-color: #222224;
+    selection-color: #3B82F6;
 }
 
-/* ── Scroll Bars ───────────────────────────────────────────── */
-QScrollBar:vertical {
-    background: transparent;
-    width: 6px;
-    border: none;
-    margin: 2px 0;
+QLabel { color: #F1F5F9; }
+
+QMessageBox {
+    background-color: #1A1A1B;
+    color: #F1F5F9;
 }
-QScrollBar::handle:vertical {
-    background: #C7C7CC;
-    border-radius: 3px;
-    min-height: 28px;
+QMessageBox QPushButton {
+    min-width: 80px;
+    padding: 7px 18px;
+    border-radius: 5px;
 }
-QScrollBar::handle:vertical:hover { background: #8E8E93; }
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
-QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
-
-/* ── Splitters ─────────────────────────────────────────────── */
-QSplitter::handle { background-color: #E5E5EA; }
-QSplitter::handle:horizontal { width: 1px; }
-QSplitter::handle:vertical   { height: 1px; }
-QSplitter::handle:hover { background-color: #0071E3; }
-
-/* ── Status Bar ────────────────────────────────────────────── */
-QStatusBar {
-    background-color: #FFFFFF;
-    color: #8E8E93;
-    border-top: 1px solid #E5E5EA;
-    font-size: 10px;
-}
-
-/* ── Labels ────────────────────────────────────────────────── */
-QLabel { color: #1D1D1F; }
-
-/* ── Message Boxes ─────────────────────────────────────────── */
-QMessageBox { background-color: #FFFFFF; color: #1D1D1F; }
-QMessageBox QPushButton { min-width: 88px; padding: 8px 22px; border-radius: 8px; }
 """
 
 
 def main() -> None:
     app = QApplication(sys.argv)
-    app.setApplicationName('Rocket GCS')
+    app.setApplicationName('RocketPower GCS')
     app.setStyle('Fusion')
     app.setStyleSheet(STYLESHEET)
     app.setFont(QFont('Segoe UI', 11))

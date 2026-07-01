@@ -50,9 +50,9 @@
 // From HighCurrentComponents.kicad_sch hierarchical labels
 // PyroCHx_N  → low-side MOSFET gate, MCU pin N (active HIGH to fire)
 // Pyrox_Test_N → continuity sense (analog input), MCU pin N
-#define PYRO_CH1_FIRE_PIN   2     // PyroCH1_2  — drogue
-#define PYRO_CH2_FIRE_PIN   3     // PyroCH2_3  — main
-#define PYRO_CH3_FIRE_PIN   4     // PyroCH3_4  — aux / backup
+#define PYRO_CH1_FIRE_PIN   2     // PyroCH1_2  — ignition
+#define PYRO_CH2_FIRE_PIN   3     // PyroCH2_3  — parachute
+#define PYRO_CH3_FIRE_PIN   4     // PyroCH3_4  — backup
 
 #define PYRO_CH1_CONT_PIN   40    // Pyro1_Test_40
 #define PYRO_CH2_CONT_PIN   41    // Pyro2_Test_41
@@ -63,9 +63,9 @@
 #define PYRO_CONT_THRESHOLD    512     // ADC counts — above = continuity OK
 
 // ===== Pyro channel aliases =====
-#define PYRO_DROGUE  1
-#define PYRO_MAIN    2
-#define PYRO_AUX     3
+#define PYRO_IGNITION   1   // CH1 — motor igniter, fired by ground command
+#define PYRO_PARACHUTE  2   // CH2 — recovery parachute, fired at apogee
+#define PYRO_BACKUP     3   // CH3 — backup charge, fired manually if CH2 fails
 
 // ===== Camera =====
 // JST-GH 4-pin, Serial7 at 115200 baud (RunCam Split 4-25 compatible)
@@ -80,6 +80,10 @@
 
 #define TELEMETRY_INTERVAL_MS      200    // 5 Hz downlink
 #define LOG_INTERVAL_MS            10     // 100 Hz SD logging
+
+// Complementary filter weight for fused vertical velocity (SensorManager).
+// 0.98 = IMU integration dominates above ~0.5 Hz, baro corrects drift below that.
+#define VERT_VEL_ALPHA  0.98f
 
 // ===== Sea-level pressure for altitude reference =====
 #define SEA_LEVEL_HPA 1013.25f

@@ -118,7 +118,14 @@ void loop() {
         logger.flush();   // force flush on state change to minimise data loss
 
         // Arm pyro on ARM, disarm on IDLE or LANDED
-        if (newState == FlightState::ARMED)  pyro.arm();
+        if (newState == FlightState::ARMED) {
+            pyro.arm();
+            // Re-calibrate baro at the actual launch site, not wherever the FCC booted.
+            // The rocket should be stationary on the pad when ARM is sent.
+            Serial.println("[CALIB] Re-calibrating baro at launch site...");
+            sensors.calibrateBaro();
+            Serial.println("[CALIB] Done.");
+        }
         if (newState == FlightState::IDLE || newState == FlightState::LANDED) pyro.disarm();
 
         // Close log after landing
@@ -132,6 +139,13 @@ void loop() {
 
     // ---- 6. Telemetry (send + receive commands) ----
     telem.update(d);
+
+    // ---- 6b. Execute calibration if requested by ground station ----
+    if (telem.calibrateRequested()) {
+        Serial.println("[CALIB] Calibrating barometer...");
+        sensors.calibrateBaro();
+        Serial.println("[CALIB] Done.");
+    }
 
     // ---- 7. Loop timing diagnostics ----
     uint32_t elapsed = micros() - loopStart;

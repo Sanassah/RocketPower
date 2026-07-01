@@ -16,9 +16,12 @@ void TelemetryManager::update(const FlightData& d) {
         _sendTelemetry(d);
     }
 
-    // Check for incoming commands
+    // Check for incoming commands — USB has priority when a PC is connected
     CommandPacket cmd;
-    if (_lora.receiveCommand(cmd)) {
+    if ((bool)Serial && _lora.receiveCommandFrom(Serial, cmd)) {
+        Serial.println("[TELEM] CMD source: USB");
+        _handleCommand(cmd);
+    } else if (_lora.receiveCommand(cmd)) {
         _handleCommand(cmd);
     }
 }
@@ -47,6 +50,11 @@ void TelemetryManager::_sendTelemetry(const FlightData& d) {
     pkt.current_ma    = d.current_ma;
     pkt.rssi          = (int8_t)_lora.getRSSI();
 
+    // Read continuity for each pyro channel so the ground station shows green/red
+    pkt.pyro_cont[0]  = _pyro.continuityOk(1) ? 1 : 0;
+    pkt.pyro_cont[1]  = _pyro.continuityOk(2) ? 1 : 0;
+    pkt.pyro_cont[2]  = _pyro.continuityOk(3) ? 1 : 0;
+
     _lora.send(pkt);
 }
 
@@ -65,6 +73,11 @@ void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
         case CommandType::FIRE_PYRO:
             Serial.print("[TELEM] CMD: FIRE_PYRO ch="); Serial.println(cmd.param);
             _pyro.fire(cmd.param);   // PyroController enforces armed + continuity checks
+            break;
+
+        case CommandType::CALIBRATE_BARO:
+            Serial.println("[TELEM] CMD: CALIBRATE_BARO");
+            _calibrateRequested = true;
             break;
 
         case CommandType::PING:

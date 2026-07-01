@@ -20,10 +20,11 @@ CMD_SIZE   = struct.calcsize(CMD_FORMAT)  # 6
 
 
 class CommandType(IntEnum):
-    ARM       = 0x01
-    DISARM    = 0x02
-    FIRE_PYRO = 0x03
-    PING      = 0x04
+    ARM            = 0x01
+    DISARM         = 0x02
+    FIRE_PYRO      = 0x03
+    PING           = 0x04
+    CALIBRATE_BARO = 0x05   # re-zero barometer at current ground level
 
 
 def encode_command(cmd_type: CommandType, param: int = 0) -> bytes:
@@ -37,3 +38,4 @@ def encode_arm()                -> bytes: return encode_command(CommandType.ARM)
 def encode_disarm()             -> bytes: return encode_command(CommandType.DISARM)
 def encode_fire_pyro(ch: int)   -> bytes: return encode_command(CommandType.FIRE_PYRO, ch)
 def encode_ping()               -> bytes: return encode_command(CommandType.PING)
+def encode_calibrate()          -> bytes: return encode_command(CommandType.CALIBRATE_BARO)

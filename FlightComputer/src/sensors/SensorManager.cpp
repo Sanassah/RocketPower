@@ -1,4 +1,5 @@
 #include "SensorManager.h"
+#include "../config.h"
 #include <Wire.h>
 
 bool SensorManager::begin() {
@@ -68,8 +69,33 @@ void SensorManager::update() {
     _data.voltage_v  = pwr.voltage_v;
     _data.current_ma = pwr.current_ma;
     _data.power_mw   = pwr.power_mw;
+
+    // Fused vertical velocity: complementary filter combining IMU and barometer.
+    // The IMU gives fast, low-noise dynamics; the baro corrects long-term drift.
+    // Falls back to barometer-only (already in _data.vert_vel_ms) if IMU is absent.
+    if (_data.imu_ok && _prevFuseTime_ms > 0) {
+        float dt = (_data.timestamp_ms - _prevFuseTime_ms) * 0.001f;
+        if (dt > 0.0f && dt < 0.1f) {
+            // Rotate body-frame linear acceleration to world-frame vertical (Z-up)
+            // using the BNO085 quaternion. Row 3 of the rotation matrix:
+            float qw = _data.quat_w, qx = _data.quat_x;
+            float qy = _data.quat_y, qz = _data.quat_z;
+            float accel_vert = 2.0f*(qx*qz - qw*qy) * _data.lin_accel_x
+                             + 2.0f*(qy*qz + qw*qx) * _data.lin_accel_y
+                             + (1.0f - 2.0f*(qx*qx + qy*qy)) * _data.lin_accel_z;
+
+            float baro_vel = (_data.baro_alt_m - _prevBaroAlt_m) / dt;
+            _fusedVel_ms   = VERT_VEL_ALPHA * (_fusedVel_ms + accel_vert * dt)
+                           + (1.0f - VERT_VEL_ALPHA) * baro_vel;
+            _data.vert_vel_ms = _fusedVel_ms;
+        }
+    }
+    _prevBaroAlt_m   = _data.baro_alt_m;
+    _prevFuseTime_ms = _data.timestamp_ms;
 }
 
 void SensorManager::calibrateBaro() {
     _baro.calibrate();
+    _fusedVel_ms     = 0.0f;
+    _prevFuseTime_ms = 0;     // forces a one-cycle skip so no spurious velocity spike
 }

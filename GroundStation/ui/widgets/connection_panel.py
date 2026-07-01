@@ -11,8 +11,8 @@ from PyQt6.QtGui  import QFont
 
 from core.serial_worker import list_serial_ports
 
-_BAUD_RATES   = ['9600', '19200', '38400', '57600', '115200']
-_DEFAULT_BAUD = '9600'
+_BAUD_RATES   = ['115200', '9600', '57600', '38400', '19200']
+_DEFAULT_BAUD = '115200'
 
 _BTN_CONNECT = """
     QPushButton {
@@ -94,7 +94,7 @@ class ConnectionPanel(QWidget):
         layout.setSpacing(12)
 
         # ── App title ──────────────────────────────────────────────
-        title = QLabel('Rocket GCS')
+        title = QLabel('RocketPower GCS')
         title.setFont(QFont('Segoe UI', 15, QFont.Weight.Bold))
         title.setStyleSheet('color: #1D1D1F; letter-spacing: -0.3px; background: transparent;')
         layout.addWidget(title)
