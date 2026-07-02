@@ -49,6 +49,7 @@ class EventLog(QWidget):
         )
         hdr.addWidget(sym); hdr.addWidget(ttl); hdr.addStretch()
         root.addLayout(hdr)
+        self.hdr_layout = hdr   # allows main_window to inject action buttons
 
         self._text = QTextEdit()
         self._text.setReadOnly(True)
