@@ -196,7 +196,7 @@ class MainWindow(QMainWindow):
         self._sys_dot.setStyleSheet(f'color:{_RED};background:transparent;border:none;')
         self._sys_lbl = QLabel('OFFLINE')
         self._sys_lbl.setStyleSheet(
-            f'color:{_MUTED};font-size:8px;font-weight:700;letter-spacing:0.5px;'
+            f'color:{_MUTED};font-size:10px;font-weight:700;letter-spacing:0.5px;'
             f'background:transparent;border:none;'
         )
         status_row.addWidget(self._sys_dot)
@@ -212,7 +212,7 @@ class MainWindow(QMainWindow):
         def _small_label(text):
             l = QLabel(text)
             l.setStyleSheet(
-                f'color:{_MUTED};font-size:8px;font-weight:700;letter-spacing:0.5px;'
+                f'color:{_MUTED};font-size:10px;font-weight:700;letter-spacing:0.5px;'
                 f'background:transparent;border:none;padding:4px 10px 1px 10px;'
             )
             return l
@@ -298,13 +298,14 @@ class MainWindow(QMainWindow):
         page.setStyleSheet(f'background-color:{_BG};')
 
         root = QVBoxLayout(page)
-        root.setContentsMargins(12, 12, 12, 12)
-        root.setSpacing(10)
+        root.setContentsMargins(14, 14, 14, 14)
+        root.setSpacing(14)
 
         # Top: GPS | Trajectory | 3D
         top = QSplitter(Qt.Orientation.Horizontal)
         top.setChildrenCollapsible(False)
-        top.setStyleSheet(f'QSplitter::handle{{background:{_BORDER};width:1px;}}')
+        top.setHandleWidth(14)
+        top.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
 
         self._gps_map    = GPSMap()
         self._traj_plot  = TrajectoryPlot()
@@ -318,7 +319,8 @@ class MainWindow(QMainWindow):
         # Bottom: Pyro | Continuity | Arm
         bot = QSplitter(Qt.Orientation.Horizontal)
         bot.setChildrenCollapsible(False)
-        bot.setStyleSheet(f'QSplitter::handle{{background:{_BORDER};width:1px;}}')
+        bot.setHandleWidth(14)
+        bot.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
 
         self._pyro_panel = PyroPanel()
         self._cont_panel = ContinuityPanel()
@@ -331,7 +333,8 @@ class MainWindow(QMainWindow):
 
         vsplit = QSplitter(Qt.Orientation.Vertical)
         vsplit.setChildrenCollapsible(False)
-        vsplit.setStyleSheet(f'QSplitter::handle{{background:{_BORDER};height:1px;}}')
+        vsplit.setHandleWidth(14)
+        vsplit.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
         vsplit.addWidget(top)
         vsplit.addWidget(bot)
         vsplit.setSizes([570, 285])
@@ -412,22 +415,67 @@ class MainWindow(QMainWindow):
         page.setStyleSheet(f'background-color:{_BG};')
 
         root = QHBoxLayout(page)
-        root.setContentsMargins(12, 12, 12, 12)
-        root.setSpacing(10)
+        root.setContentsMargins(14, 14, 14, 14)
+        root.setSpacing(0)
 
+        # Left column: sensor data (top-left) + commands/utilities (bottom-left)
         self._sensor_panel  = SensorPanel()
         self._command_panel = CommandPanel()
-        self._event_log     = EventLog()
 
-        self._sensor_panel.setMinimumWidth(240)
-        self._sensor_panel.setMaximumWidth(320)
-        self._command_panel.setMinimumWidth(260)
-        self._command_panel.setMaximumWidth(360)
+        left = QSplitter(Qt.Orientation.Vertical)
+        left.setChildrenCollapsible(False)
+        left.setHandleWidth(14)
+        left.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
+        left.addWidget(self._sensor_panel)
+        left.addWidget(self._command_panel)
+        left.setSizes([520, 380])
 
-        root.addWidget(self._sensor_panel)
-        root.addWidget(self._command_panel)
-        root.addWidget(self._event_log, stretch=1)
+        # Right column: event log (full height) + REC button in its header
+        self._event_log = EventLog()
+
+        self._rec_btn = QPushButton('⏺  REC')
+        self._rec_btn.setFixedHeight(24)
+        self._rec_btn.setFont(QFont('Segoe UI', 9, QFont.Weight.Bold))
+        self._rec_btn.setCheckable(True)
+        self._rec_btn.setEnabled(False)
+        self._rec_btn.clicked.connect(self._toggle_recording)
+        self._rec_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color:#222224;color:#64748B;
+                border:1px solid #2E2E30;border-radius:5px;
+                padding:0 10px;font-weight:700;letter-spacing:0.5px;
+            }}
+            QPushButton:checked {{
+                background-color:#200A0A;color:{_RED};border:1px solid {_RED};
+            }}
+            QPushButton:enabled:hover {{ background-color:#2A2A2C; }}
+            QPushButton:disabled {{
+                background-color:#1A1A1B;color:#3A3A3E;border:1px solid #2E2E30;
+            }}
+        """)
+        self._event_log.hdr_layout.addWidget(self._rec_btn)
+
+        # Main horizontal split
+        hsplit = QSplitter(Qt.Orientation.Horizontal)
+        hsplit.setChildrenCollapsible(False)
+        hsplit.setHandleWidth(14)
+        hsplit.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
+        hsplit.addWidget(left)
+        hsplit.addWidget(self._event_log)
+        hsplit.setSizes([340, 1000])
+
+        root.addWidget(hsplit)
         return page
+
+    def _toggle_recording(self) -> None:
+        if self._rec_btn.isChecked():
+            path = self._logger.open()
+            self._event_log.log(f'Recording -> {path}', level='ok')
+            self._status_bar.showMessage(f'Logging -> {os.path.abspath(path)}')
+        else:
+            self._logger.close()
+            self._event_log.log('Recording stopped.', level='warn')
+            self._status_bar.showMessage('Recording stopped.')
 
     # ── Signals ───────────────────────────────────────────────────────────────
     def _connect_signals(self) -> None:
@@ -515,6 +563,8 @@ class MainWindow(QMainWindow):
             self._conn_btn.setStyleSheet(self._conn_btn_style(True))
             self._port_combo.setEnabled(False)
             self._baud_combo.setEnabled(False)
+            self._rec_btn.setEnabled(True)
+            self._rec_btn.setChecked(True)
         else:
             self._logger.close()
             self._status_bar.showMessage('Disconnected')
@@ -526,6 +576,8 @@ class MainWindow(QMainWindow):
             self._conn_btn.setStyleSheet(self._conn_btn_style(False))
             self._port_combo.setEnabled(True)
             self._baud_combo.setEnabled(True)
+            self._rec_btn.setEnabled(False)
+            self._rec_btn.setChecked(False)
 
     # ── Commands ──────────────────────────────────────────────────────────────
     def _send_arm(self) -> None:
