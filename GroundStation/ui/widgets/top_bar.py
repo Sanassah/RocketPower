@@ -320,14 +320,15 @@ class TopBar(QWidget):
         bc  = _GREEN if pct > 40 else _ORANGE if pct > 20 else _RED
         self._s_batt.set_pct(pct, bc)
 
-        rssi = data.rssi
-        if rssi > -70:
-            lt, lc = 'LINK GOOD', _GREEN
-        elif rssi > -90:
-            lt, lc = 'LINK FAIR', _ORANGE
+    def update_stats(self, packets_per_sec: float) -> None:
+        # Nominal downlink rate is 5 Hz (TELEMETRY_INTERVAL_MS=200 on the flight computer).
+        if packets_per_sec >= 4.0:
+            color = _GREEN
+        elif packets_per_sec >= 1.0:
+            color = _ORANGE
         else:
-            lt, lc = 'LINK WEAK', _RED
-        self._s_telem.set(lt, lc)
+            color = _RED
+        self._s_telem.set(f'{packets_per_sec:.1f} Hz', color)
 
     def set_connected(self, connected: bool) -> None:
         if not connected:

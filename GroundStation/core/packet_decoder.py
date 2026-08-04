@@ -1,34 +1,39 @@
 """
 Decodes binary TelemetryPacket from the flight computer.
 
-Packet layout (packed, little-endian, 81 bytes total):
-  Offset  Size  Type      Field
+Packet layout (packed, little-endian, 49 bytes total). Deliberately compact --
+the LoRa link is stuck at a slow factory-default air data rate and packet size
+is the only remaining lever to reduce airtime per packet, so most fields are
+scaled fixed-point (int16) instead of float. Values are unscaled back to
+normal engineering units in decode_packet() below; every other module only
+ever sees the same TelemetryData fields/units as before this change.
+  Offset  Size  Type      Field                 Scale
   0       1     uint8     magic[0]      = 0xAA
   1       1     uint8     magic[1]      = 0x55
   2       2     uint16    seq
   4       4     uint32    timestamp_ms
   8       1     uint8     state
-  9       8     double    lat
-  17      8     double    lon
-  25      4     float     gps_alt_m
-  29      1     uint8     gps_sats
-  30      1     uint8     gps_fix
-  31      4     float     baro_alt_m
-  35      4     float     vert_vel_ms
-  39      4     float     accel_x_g
-  43      4     float     accel_y_g
-  47      4     float     accel_z_g
-  51      4     float     quat_w
-  55      4     float     quat_x
-  59      4     float     quat_y
-  63      4     float     quat_z
-  67      4     float     voltage_v
-  71      4     float     current_ma
-  75      1     int8      rssi
-  76      1     uint8     pyro_cont[0]  (CH1 ignition:  1=OK, 0=open)
-  77      1     uint8     pyro_cont[1]  (CH2 parachute: 1=OK, 0=open)
-  78      1     uint8     pyro_cont[2]  (CH3 backup:    1=OK, 0=open)
-  79      2     uint16    checksum      (sum of bytes 0..78)
+  9       4     float     lat
+  13      4     float     lon
+  17      2     int16     gps_alt_dm            /10  -> meters
+  19      1     uint8     gps_sats
+  20      1     uint8     gps_fix
+  21      2     int16     baro_alt_dm           /10  -> meters
+  23      2     int16     vert_vel_cms          /100 -> m/s
+  25      2     int16     accel_x_cg            /100 -> g
+  27      2     int16     accel_y_cg            /100 -> g
+  29      2     int16     accel_z_cg            /100 -> g
+  31      2     int16     quat_w_i16            /32767
+  33      2     int16     quat_x_i16            /32767
+  35      2     int16     quat_y_i16            /32767
+  37      2     int16     quat_z_i16            /32767
+  39      2     int16     voltage_cv            /100 -> V
+  41      2     int16     current_ma
+  43      1     int8      rssi
+  44      1     uint8     pyro_cont[0]  (CH1 ignition:  1=OK, 0=open)
+  45      1     uint8     pyro_cont[1]  (CH2 parachute: 1=OK, 0=open)
+  46      1     uint8     pyro_cont[2]  (CH3 backup:    1=OK, 0=open)
+  47      2     uint16    checksum      (sum of bytes 0..46)
 """
 
 import struct
@@ -40,9 +45,9 @@ from typing import Optional
 TELEM_MAGIC_0 = 0xAA
 TELEM_MAGIC_1 = 0x55
 
-# 26 fields, 81 bytes total (added pyro_cont[3] before checksum)
-TELEM_FORMAT = '<BBHIBddfBBfffffffffffb3BH'
-TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 81
+# 26 fields, 49 bytes total
+TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBH'
+TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 49
 
 STATE_NAMES = {
     0: 'IDLE',
@@ -119,7 +124,7 @@ class TelemetryData:
 
 def decode_packet(raw: bytes) -> Optional[TelemetryData]:
     """
-    Decode a raw 78-byte telemetry packet.
+    Decode a raw telemetry packet.
     Returns None if magic bytes are wrong or checksum fails.
     """
     if len(raw) < TELEM_SIZE:
@@ -141,7 +146,36 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
     except struct.error:
         return None
 
-    data = TelemetryData(*vals)
+    (magic0, magic1, seq, timestamp_ms, state,
+     lat, lon, gps_alt_dm, gps_sats, gps_fix,
+     baro_alt_dm, vert_vel_cms,
+     accel_x_cg, accel_y_cg, accel_z_cg,
+     quat_w_i16, quat_x_i16, quat_y_i16, quat_z_i16,
+     voltage_cv, current_ma,
+     rssi, pyro_cont_0, pyro_cont_1, pyro_cont_2, checksum) = vals
+
+    # Unscale wire fixed-point values back to normal engineering units --
+    # everything downstream of this function sees the same units as before.
+    data = TelemetryData(
+        magic0=magic0, magic1=magic1, seq=seq, timestamp_ms=timestamp_ms, state=state,
+        lat=lat, lon=lon,
+        gps_alt_m=gps_alt_dm / 10.0,
+        gps_sats=gps_sats, gps_fix=gps_fix,
+        baro_alt_m=baro_alt_dm / 10.0,
+        vert_vel_ms=vert_vel_cms / 100.0,
+        accel_x_g=accel_x_cg / 100.0,
+        accel_y_g=accel_y_cg / 100.0,
+        accel_z_g=accel_z_cg / 100.0,
+        quat_w=quat_w_i16 / 32767.0,
+        quat_x=quat_x_i16 / 32767.0,
+        quat_y=quat_y_i16 / 32767.0,
+        quat_z=quat_z_i16 / 32767.0,
+        voltage_v=voltage_cv / 100.0,
+        current_ma=float(current_ma),
+        rssi=rssi,
+        pyro_cont_0=pyro_cont_0, pyro_cont_1=pyro_cont_1, pyro_cont_2=pyro_cont_2,
+        checksum=checksum,
+    )
     data.accel_mag_g = math.sqrt(data.accel_x_g**2 + data.accel_y_g**2 + data.accel_z_g**2)
     data.rx_time     = time.time()
     return data

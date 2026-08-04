@@ -10,6 +10,13 @@
 #define CMD_MAGIC_1    0x44
 
 // ===== Rocket → Ground telemetry =====
+// Deliberately compact (49 bytes, was 81) -- the LoRa link is stuck at a slow
+// factory-default air data rate (2.4kbps) and reconfiguring the radios is off
+// the table for now, so packet size is the only remaining lever to reduce
+// airtime per packet. Most fields are scaled fixed-point instead of float:
+// GPS accuracy is only ~2-5m, so lat/lon as float (not double) already loses
+// no real accuracy; the rest use a resolution well beyond what's physically
+// meaningful for this vehicle (see comments per field).
 #pragma pack(push, 1)
 struct TelemetryPacket {
     uint8_t  magic[2];       // TELEM_MAGIC_0, TELEM_MAGIC_1
@@ -19,30 +26,30 @@ struct TelemetryPacket {
     uint8_t  state;          // FlightState
 
     // GPS
-    double   lat;
-    double   lon;
-    float    gps_alt_m;
+    float    lat;
+    float    lon;
+    int16_t  gps_alt_dm;     // decimeters (0.1m resolution), +-3276m range
     uint8_t  gps_sats;
     uint8_t  gps_fix;
 
     // Barometer
-    float    baro_alt_m;     // relative to launch site
-    float    vert_vel_ms;    // m/s, positive = up
+    int16_t  baro_alt_dm;    // decimeters (0.1m resolution), relative to launch site
+    int16_t  vert_vel_cms;   // cm/s (0.01 m/s resolution), positive = up
 
-    // High-g accelerometer
-    float    accel_x_g;
-    float    accel_y_g;
-    float    accel_z_g;
+    // High-g accelerometer (ADXL375 is +-200g rated -- centi-g gives +-327g range)
+    int16_t  accel_x_cg;
+    int16_t  accel_y_cg;
+    int16_t  accel_z_cg;
 
-    // IMU quaternion
-    float    quat_w;
-    float    quat_x;
-    float    quat_y;
-    float    quat_z;
+    // IMU quaternion -- components are always in [-1,1], scaled to int16
+    int16_t  quat_w_i16;
+    int16_t  quat_x_i16;
+    int16_t  quat_y_i16;
+    int16_t  quat_z_i16;
 
     // Power
-    float    voltage_v;
-    float    current_ma;
+    int16_t  voltage_cv;     // centi-volts (0.01V resolution)
+    int16_t  current_ma;     // milliamps, integer precision is plenty
 
     // Link quality
     int8_t   rssi;
@@ -60,6 +67,14 @@ enum class CommandType : uint8_t {
     FIRE_PYRO      = 0x03,   // param = channel (1-3)
     PING           = 0x04,
     CALIBRATE_BARO = 0x05,   // re-zero barometer altitude at current ground level
+    SERVO_TEST     = 0x06,   // param = fin channel (1-4); sweeps center->min->max->center
+    CAM_START      = 0x07,   // manually start camera recording (bench test)
+    CAM_STOP       = 0x08,   // manually stop camera recording (bench test)
+    SERVO_NUDGE_POS = 0x09,  // param = fin channel (1-4); +SERVO_TRIM_STEP_US, not persisted
+    SERVO_NUDGE_NEG = 0x0A,  // param = fin channel (1-4); -SERVO_TRIM_STEP_US, not persisted
+    SERVO_SAVE_CAL  = 0x0B,  // param unused; persists all 4 channels' live position as new trim
+    SERVO_CENTER_ALL = 0x0C, // param unused; drives all 4 to raw center, ignoring trim, not persisted
+    SERVO_PREFLIGHT  = 0x0D, // param unused; blocking ~6s all-4 choreography, see FinController
 };
 
 #pragma pack(push, 1)

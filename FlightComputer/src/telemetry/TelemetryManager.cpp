@@ -2,6 +2,9 @@
 #include "../config.h"
 #include "../states/StateMachine.h"
 #include "../control/PyroController.h"
+#include "../control/FinController.h"
+#include "../control/CameraController.h"
+#include <math.h>
 
 bool TelemetryManager::begin() {
     return _lora.begin();
@@ -32,22 +35,22 @@ void TelemetryManager::_sendTelemetry(const FlightData& d) {
     pkt.magic[1]      = TELEM_MAGIC_1;
     pkt.timestamp_ms  = d.timestamp_ms;
     pkt.state         = static_cast<uint8_t>(d.state);
-    pkt.lat           = d.lat;
-    pkt.lon           = d.lon;
-    pkt.gps_alt_m     = d.gps_alt_m;
+    pkt.lat           = (float)d.lat;
+    pkt.lon           = (float)d.lon;
+    pkt.gps_alt_dm    = (int16_t)lroundf(d.gps_alt_m * 10.0f);
     pkt.gps_sats      = d.gps_sats;
     pkt.gps_fix       = d.gps_fix ? 1 : 0;
-    pkt.baro_alt_m    = d.baro_alt_m;
-    pkt.vert_vel_ms   = d.vert_vel_ms;
-    pkt.accel_x_g     = d.highg_x_g;
-    pkt.accel_y_g     = d.highg_y_g;
-    pkt.accel_z_g     = d.highg_z_g;
-    pkt.quat_w        = d.quat_w;
-    pkt.quat_x        = d.quat_x;
-    pkt.quat_y        = d.quat_y;
-    pkt.quat_z        = d.quat_z;
-    pkt.voltage_v     = d.voltage_v;
-    pkt.current_ma    = d.current_ma;
+    pkt.baro_alt_dm   = (int16_t)lroundf(d.baro_alt_m * 10.0f);
+    pkt.vert_vel_cms  = (int16_t)lroundf(d.vert_vel_ms * 100.0f);
+    pkt.accel_x_cg    = (int16_t)lroundf(d.highg_x_g * 100.0f);
+    pkt.accel_y_cg    = (int16_t)lroundf(d.highg_y_g * 100.0f);
+    pkt.accel_z_cg    = (int16_t)lroundf(d.highg_z_g * 100.0f);
+    pkt.quat_w_i16    = (int16_t)lroundf(d.quat_w * 32767.0f);
+    pkt.quat_x_i16    = (int16_t)lroundf(d.quat_x * 32767.0f);
+    pkt.quat_y_i16    = (int16_t)lroundf(d.quat_y * 32767.0f);
+    pkt.quat_z_i16    = (int16_t)lroundf(d.quat_z * 32767.0f);
+    pkt.voltage_cv    = (int16_t)lroundf(d.voltage_v * 100.0f);
+    pkt.current_ma    = (int16_t)lroundf(d.current_ma);
     pkt.rssi          = (int8_t)_lora.getRSSI();
 
     // Read continuity for each pyro channel so the ground station shows green/red
@@ -78,6 +81,44 @@ void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
         case CommandType::CALIBRATE_BARO:
             Serial.println("[TELEM] CMD: CALIBRATE_BARO");
             _calibrateRequested = true;
+            break;
+
+        case CommandType::SERVO_TEST:
+            Serial.print("[TELEM] CMD: SERVO_TEST ch="); Serial.println(cmd.param);
+            _fins.testSweep(cmd.param);
+            break;
+
+        case CommandType::CAM_START:
+            Serial.println("[TELEM] CMD: CAM_START");
+            _camera.startRecording();
+            break;
+
+        case CommandType::CAM_STOP:
+            Serial.println("[TELEM] CMD: CAM_STOP");
+            _camera.stopRecording();
+            break;
+
+        case CommandType::SERVO_NUDGE_POS:
+            _fins.nudge(cmd.param, true);
+            break;
+
+        case CommandType::SERVO_NUDGE_NEG:
+            _fins.nudge(cmd.param, false);
+            break;
+
+        case CommandType::SERVO_SAVE_CAL:
+            Serial.println("[TELEM] CMD: SERVO_SAVE_CAL");
+            _fins.saveCalibration();
+            break;
+
+        case CommandType::SERVO_CENTER_ALL:
+            Serial.println("[TELEM] CMD: SERVO_CENTER_ALL");
+            _fins.centerAll();
+            break;
+
+        case CommandType::SERVO_PREFLIGHT:
+            Serial.println("[TELEM] CMD: SERVO_PREFLIGHT");
+            _fins.preflightSequence();
             break;
 
         case CommandType::PING:

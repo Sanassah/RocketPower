@@ -15,4 +15,19 @@ public:
 private:
     uint16_t _txSeq = 0;
     bool _validateCommand(const CommandPacket& pkt) const;
+
+    // Resyncing receive buffers, one per stream so USB and LoRa command
+    // reception never interleave. LoRa is a noisier link than a wired USB
+    // connection -- a single stray/corrupted byte can permanently misalign a
+    // naive fixed-size read that never re-searches for the magic bytes
+    // within already-buffered data, so this scans for the magic pair and
+    // only discards one byte at a time on a bad frame instead of the whole
+    // window.
+    static const uint8_t _CMD_BUF_CAP = 32;
+    uint8_t _usbBuf[_CMD_BUF_CAP];
+    uint8_t _usbBufLen = 0;
+    uint8_t _loraBuf[_CMD_BUF_CAP];
+    uint8_t _loraBufLen = 0;
+
+    bool _drainCommand(Stream& src, uint8_t* buf, uint8_t& len, CommandPacket& pkt);
 };
