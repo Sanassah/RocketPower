@@ -114,7 +114,7 @@ def main() -> None:
 
     from ui.main_window import MainWindow
     window = MainWindow()
-    window.show()
+    window.showMaximized()
 
     sys.exit(app.exec())
 

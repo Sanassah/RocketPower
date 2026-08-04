@@ -1,5 +1,6 @@
 #include "LoRa.h"
 #include "../config.h"
+#include <string.h>
 
 bool LoRaRadio::begin() {
     LORA_SERIAL.begin(LORA_BAUD);
@@ -19,11 +20,12 @@ bool LoRaRadio::send(const TelemetryPacket& pkt) {
     Serial.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));
 
     // Human-readable summary for terminal debugging (pure ASCII, won't confuse the binary parser)
+    // Wire fields are scaled fixed-point (see Packet.h) -- unscale for display.
     Serial.print("[TELEM] seq="); Serial.print(out.seq);
-    Serial.print(" alt=");        Serial.print(out.baro_alt_m, 1); Serial.print("m");
-    Serial.print(" vel=");        Serial.print(out.vert_vel_ms, 1); Serial.print("m/s");
-    Serial.print(" accel=");      Serial.print(out.accel_x_g, 2); Serial.print("g");
-    Serial.print(" v=");          Serial.print(out.voltage_v, 2); Serial.print("V");
+    Serial.print(" alt=");        Serial.print(out.baro_alt_dm / 10.0f, 1); Serial.print("m");
+    Serial.print(" vel=");        Serial.print(out.vert_vel_cms / 100.0f, 1); Serial.print("m/s");
+    Serial.print(" accel=");      Serial.print(out.accel_x_cg / 100.0f, 2); Serial.print("g");
+    Serial.print(" v=");          Serial.print(out.voltage_cv / 100.0f, 2); Serial.print("V");
     Serial.print(" sats=");       Serial.print(out.gps_sats);
     Serial.println();
 
@@ -31,16 +33,50 @@ bool LoRaRadio::send(const TelemetryPacket& pkt) {
 }
 
 bool LoRaRadio::receiveCommandFrom(Stream& src, CommandPacket& pkt) {
-    if (src.available() < (int)sizeof(CommandPacket)) return false;
-    uint8_t* buf = reinterpret_cast<uint8_t*>(&pkt);
-    size_t n = src.readBytes(buf, sizeof(CommandPacket));
-    if (n != sizeof(CommandPacket)) return false;
-    if (!_validateCommand(pkt)) return false;
-    return true;
+    return _drainCommand(src, _usbBuf, _usbBufLen, pkt);
 }
 
 bool LoRaRadio::receiveCommand(CommandPacket& pkt) {
-    return receiveCommandFrom(LORA_SERIAL, pkt);
+    return _drainCommand(LORA_SERIAL, _loraBuf, _loraBufLen, pkt);
+}
+
+bool LoRaRadio::_drainCommand(Stream& src, uint8_t* buf, uint8_t& len, CommandPacket& pkt) {
+    // Top up the buffer with whatever's newly arrived, bounded so it can't overflow.
+    while (src.available() && len < _CMD_BUF_CAP) {
+        buf[len++] = (uint8_t)src.read();
+    }
+
+    while (true) {
+        // Search buffered bytes for the magic pair.
+        int magicIdx = -1;
+        for (uint8_t i = 0; (int)i + 1 < (int)len; i++) {
+            if (buf[i] == CMD_MAGIC_0 && buf[i + 1] == CMD_MAGIC_1) {
+                magicIdx = i;
+                break;
+            }
+        }
+        if (magicIdx < 0) {
+            // No magic in the buffer; keep the last byte in case it's the
+            // first half of a magic pair split across reads.
+            if (len > 0) buf[0] = buf[len - 1];
+            len = (len > 0) ? 1 : 0;
+            return false;
+        }
+        if (magicIdx > 0) {
+            // Discard bytes before the magic.
+            memmove(buf, buf + magicIdx, len - magicIdx);
+            len -= magicIdx;
+        }
+        if (len < sizeof(CommandPacket)) return false;  // wait for more bytes
+
+        memcpy(&pkt, buf, sizeof(CommandPacket));
+        memmove(buf, buf + sizeof(CommandPacket), len - sizeof(CommandPacket));
+        len -= sizeof(CommandPacket);
+
+        if (_validateCommand(pkt)) return true;
+        // Bad checksum at this offset -- loop and search the remaining
+        // buffered bytes for another magic occurrence instead of giving up.
+    }
 }
 
 bool LoRaRadio::_validateCommand(const CommandPacket& pkt) const {

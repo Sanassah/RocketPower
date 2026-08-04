@@ -9,14 +9,15 @@ public:
     bool begin();
     void onStateChange(FlightState prev, FlightState next);
 
+    // Manual triggers for bench testing / ground-station override.
+    // Both are no-ops if already in the requested state.
+    void startRecording();
+    void stopRecording();
+
     bool isRecording() const { return _recording; }
 
 private:
     bool _recording = false;
 
-    void _startRecording();
-    void _stopRecording();
-
-    // RunCam protocol: 5-byte frame
-    void _sendCommand(uint8_t action);
+    void _sendCameraControl(uint8_t op);
 };

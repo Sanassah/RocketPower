@@ -11,15 +11,17 @@
 #include "storage/DataLogger.h"
 #include "control/PyroController.h"
 #include "control/CameraController.h"
+#include "control/FinController.h"
 
 // ===== Global objects =====
-SensorManager   sensors;
-PyroController  pyro;
-StateMachine    fsm(pyro);
-LoRaRadio       radio;
-TelemetryManager telem(radio, fsm, pyro);
-DataLogger      logger;
+SensorManager    sensors;
+PyroController   pyro;
+StateMachine     fsm(pyro);
+LoRaRadio        radio;
+FinController    fins;
 CameraController camera;
+TelemetryManager telem(radio, fsm, pyro, fins, camera);
+DataLogger       logger;
 
 // ===== Timing =====
 elapsedMillis loopTimer;     // tracks time since last loop start
@@ -89,6 +91,10 @@ void setup() {
 
     // ---- Camera ----
     camera.begin();
+
+    // ---- Fin servos ----
+    Serial.println("[INIT] Fin servos...");
+    fins.begin();
 
     Serial.println("\n[INIT] Boot complete. State: IDLE\n");
     loopTimer = 0;
@@ -162,6 +168,8 @@ void loop() {
         Serial.print("state="); Serial.println(flightStateName(fsm.state()));
         loopCount  = 0;
         loopMaxUs  = 0;
+
+        sensors.gps().printDebug();
     }
 
     // Enforce 100 Hz minimum: if this loop ran faster than 10ms, yield the remainder.

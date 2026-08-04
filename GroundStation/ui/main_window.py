@@ -14,6 +14,9 @@ from core.packet_decoder  import TelemetryData
 from core.packet_encoder  import (
     encode_arm, encode_disarm, encode_fire_pyro,
     encode_ping, encode_calibrate,
+    encode_servo_test, encode_cam_start, encode_cam_stop,
+    encode_servo_nudge, encode_servo_save_cal, encode_servo_center_all,
+    encode_servo_preflight,
 )
 from core.data_logger import DataLogger
 
@@ -42,6 +45,17 @@ _BLUE    = '#3B82F6'
 
 _BAUD_RATES   = ['115200', '9600', '57600', '38400', '19200']
 _DEFAULT_BAUD = '115200'
+
+# The LoRa link is half-duplex: the flight computer's radio can't hear a
+# command while it's mid-transmit sending telemetry. A single one-shot command
+# can land in that dead window and just be lost -- silently, no ack either
+# way. Rather than guessing at timing with a blind retry schedule, resends are
+# synchronized to telemetry actually arriving: every decoded telemetry packet
+# is concrete proof the rocket's radio just finished transmitting and should
+# now be listening, so that's the best moment to retry.
+# NEVER use this for FIRE_PYRO (dangerous, must stay one-shot) or servo nudge
+# (each send is a relative increment -- resending would multiply it).
+_CMD_RETRY_ON_PACKETS = 3   # resend on this many subsequent telemetry receptions
 
 
 # ── Nav button ────────────────────────────────────────────────────────────────
@@ -107,6 +121,10 @@ class MainWindow(QMainWindow):
         self._thread: QThread | None      = None
         self._logger = DataLogger(log_dir=_LOG_DIR)
         self._connected = False
+
+        # Command retry state -- see _CMD_RETRY_ON_PACKETS.
+        self._pending_cmd_payload: bytes | None = None
+        self._pending_cmd_retries = 0
 
         self._build_ui()
         self._connect_signals()
@@ -428,7 +446,7 @@ class MainWindow(QMainWindow):
         left.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
         left.addWidget(self._sensor_panel)
         left.addWidget(self._command_panel)
-        left.setSizes([520, 380])
+        left.setSizes([560, 390])
 
         # Right column: event log (full height) + REC button in its header
         self._event_log = EventLog()
@@ -462,7 +480,7 @@ class MainWindow(QMainWindow):
         hsplit.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
         hsplit.addWidget(left)
         hsplit.addWidget(self._event_log)
-        hsplit.setSizes([340, 1000])
+        hsplit.setSizes([600, 740])
 
         root.addWidget(hsplit)
         return page
@@ -486,6 +504,13 @@ class MainWindow(QMainWindow):
         self._command_panel.fire_pyro_requested.connect(self._send_fire)
         self._command_panel.ping_requested.connect(self._send_ping)
         self._command_panel.calibrate_requested.connect(self._send_calibrate)
+        self._command_panel.servo_test_requested.connect(self._send_servo_test)
+        self._command_panel.cam_start_requested.connect(self._send_cam_start)
+        self._command_panel.cam_stop_requested.connect(self._send_cam_stop)
+        self._command_panel.servo_nudge_requested.connect(self._send_servo_nudge)
+        self._command_panel.servo_save_cal_requested.connect(self._send_servo_save_cal)
+        self._command_panel.servo_center_requested.connect(self._send_servo_center)
+        self._command_panel.servo_preflight_requested.connect(self._send_servo_preflight)
 
     def _switch_page(self, idx: int) -> None:
         self._pages.setCurrentIndex(idx)
@@ -519,6 +544,7 @@ class MainWindow(QMainWindow):
         self._thread.started.connect(self._worker.run)
         self._worker.packet_received.connect(self._on_packet)
         self._worker.connection_changed.connect(self._on_connection_changed)
+        self._worker.stats_updated.connect(self._on_stats)
         self._thread.start()
 
     def _stop_serial(self) -> None:
@@ -547,6 +573,19 @@ class MainWindow(QMainWindow):
         self._command_panel.update_data(data)
         self._event_log.update_data(data)
 
+        # Piggyback any pending command retry on this packet -- receiving
+        # telemetry is concrete proof the rocket's radio just finished
+        # transmitting and should now be listening, the best moment to retry.
+        if self._pending_cmd_payload and self._worker:
+            self._worker.send_bytes(self._pending_cmd_payload)
+            self._pending_cmd_retries -= 1
+            if self._pending_cmd_retries <= 0:
+                self._pending_cmd_payload = None
+
+    @pyqtSlot(int, float)
+    def _on_stats(self, total_packets: int, packets_per_sec: float) -> None:
+        self._top_bar.update_stats(packets_per_sec)
+
     @pyqtSlot(bool, str)
     def _on_connection_changed(self, connected: bool, message: str) -> None:
         self._connected = connected
@@ -570,6 +609,8 @@ class MainWindow(QMainWindow):
             self._status_bar.showMessage('Disconnected')
             self._event_log.log(message, level='error')
             self._top_bar.set_connected(False)
+            self._pending_cmd_payload = None
+            self._pending_cmd_retries = 0
             self._sys_dot.setStyleSheet(f'color:{_RED};background:transparent;border:none;')
             self._sys_lbl.setText('OFFLINE')
             self._conn_btn.setText('CONNECT')
@@ -580,17 +621,30 @@ class MainWindow(QMainWindow):
             self._rec_btn.setChecked(False)
 
     # ── Commands ──────────────────────────────────────────────────────────────
+    def _send_with_retry(self, payload: bytes) -> None:
+        """Send now, then resend on the next few telemetry packets actually
+        received (proof the link is alive and the radio just finished
+        transmitting). Only for commands where re-running them has no extra
+        effect -- see _CMD_RETRY_ON_PACKETS. A new call replaces whatever
+        retry was still pending, since the user has moved on to a new command."""
+        if not self._worker:
+            return
+        self._worker.send_bytes(payload)
+        self._pending_cmd_payload = payload
+        self._pending_cmd_retries = _CMD_RETRY_ON_PACKETS
+
     def _send_arm(self) -> None:
         if self._worker:
-            self._worker.send_bytes(encode_arm())
+            self._send_with_retry(encode_arm())
             self._event_log.log('^ ARM sent', level='command')
 
     def _send_disarm(self) -> None:
         if self._worker:
-            self._worker.send_bytes(encode_disarm())
+            self._send_with_retry(encode_disarm())
             self._event_log.log('^ DISARM sent', level='command')
 
     def _send_fire(self, channel: int) -> None:
+        # One-shot, never retried -- see _CMD_RETRY_ON_PACKETS.
         if self._worker:
             names = {1: 'Ignition', 2: 'Parachute', 3: 'Backup'}
             self._worker.send_bytes(encode_fire_pyro(channel))
@@ -601,13 +655,51 @@ class MainWindow(QMainWindow):
 
     def _send_ping(self) -> None:
         if self._worker:
-            self._worker.send_bytes(encode_ping())
+            self._send_with_retry(encode_ping())
             self._event_log.log('^ PING sent', level='info')
 
     def _send_calibrate(self) -> None:
         if self._worker:
-            self._worker.send_bytes(encode_calibrate())
+            self._send_with_retry(encode_calibrate())
             self._event_log.log('^ CALIBRATE BARO sent', level='command')
+
+    def _send_servo_test(self, channel: int) -> None:
+        if self._worker:
+            self._send_with_retry(encode_servo_test(channel))
+            self._event_log.log(f'^ SERVO TEST CH{channel} sent', level='command')
+
+    def _send_cam_start(self) -> None:
+        if self._worker:
+            self._send_with_retry(encode_cam_start())
+            self._event_log.log('^ CAM START sent', level='command')
+
+    def _send_cam_stop(self) -> None:
+        if self._worker:
+            self._send_with_retry(encode_cam_stop())
+            self._event_log.log('^ CAM STOP sent', level='command')
+
+    def _send_servo_nudge(self, channel: int, positive: bool) -> None:
+        # One-shot, never retried -- each send is a relative increment, so
+        # resending would multiply the nudge. See _CMD_RETRY_ON_PACKETS.
+        if self._worker:
+            self._worker.send_bytes(encode_servo_nudge(channel, positive))
+            sign = '+' if positive else '-'
+            self._event_log.log(f'^ SERVO CH{channel} nudge {sign}', level='info')
+
+    def _send_servo_save_cal(self) -> None:
+        if self._worker:
+            self._send_with_retry(encode_servo_save_cal())
+            self._event_log.log('^ SERVO CALIBRATION SAVED', level='ok')
+
+    def _send_servo_center(self) -> None:
+        if self._worker:
+            self._send_with_retry(encode_servo_center_all())
+            self._event_log.log('^ SERVO CENTER ALL sent', level='command')
+
+    def _send_servo_preflight(self) -> None:
+        if self._worker:
+            self._send_with_retry(encode_servo_preflight())
+            self._event_log.log('^ SERVO PREFLIGHT sent', level='command')
 
     def closeEvent(self, event) -> None:
         self._stop_serial()
