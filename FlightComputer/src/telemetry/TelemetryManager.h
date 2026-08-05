@@ -33,6 +33,14 @@ private:
     uint32_t        _lastTxMs          = 0;
     bool            _calibrateRequested = false;
 
+    // -1 = no command processed yet (cmd.seq is uint8_t, 0-255, so this
+    // sentinel is never reachable by a real command and the first one
+    // always executes). Set to the seq of the last command actually
+    // executed; a resend with the same seq (because its ack got lost, not
+    // because the command itself was lost) is re-acked but not re-run.
+    int16_t _lastProcessedSeq = -1;
+
     void _sendTelemetry(const FlightData& d);
     void _handleCommand(const CommandPacket& cmd);
+    void _sendAck(const CommandPacket& cmd);
 };

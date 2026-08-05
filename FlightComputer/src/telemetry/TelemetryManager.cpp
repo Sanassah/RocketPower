@@ -21,12 +21,41 @@ void TelemetryManager::update(const FlightData& d) {
 
     // Check for incoming commands — USB has priority when a PC is connected
     CommandPacket cmd;
+    bool gotCmd = false;
     if ((bool)Serial && _lora.receiveCommandFrom(Serial, cmd)) {
         Serial.println("[TELEM] CMD source: USB");
-        _handleCommand(cmd);
+        gotCmd = true;
     } else if (_lora.receiveCommand(cmd)) {
-        _handleCommand(cmd);
+        gotCmd = true;
     }
+
+    if (gotCmd) {
+        // Ack first, before executing -- so even a slow/blocking command
+        // (e.g. SERVO_PREFLIGHT) is confirmed promptly and the ground stops
+        // retrying right away instead of retrying into an in-progress command.
+        _sendAck(cmd);
+
+        if ((int16_t)cmd.seq == _lastProcessedSeq) {
+            // Same seq as the last command we actually ran -- this is a
+            // resend because our earlier ack got lost, not because the
+            // command itself was lost. Already acked above; don't run it
+            // again.
+            Serial.print("[TELEM] CMD seq="); Serial.print(cmd.seq);
+            Serial.println(" duplicate (already processed) -- re-acked only");
+        } else {
+            _lastProcessedSeq = cmd.seq;
+            _handleCommand(cmd);
+        }
+    }
+}
+
+void TelemetryManager::_sendAck(const CommandPacket& cmd) {
+    AckPacket ack{};
+    ack.magic[0] = ACK_MAGIC_0;
+    ack.magic[1] = ACK_MAGIC_1;
+    ack.cmdSeq   = cmd.seq;
+    ack.cmdType  = cmd.type;
+    _lora.sendAck(ack);
 }
 
 void TelemetryManager::_sendTelemetry(const FlightData& d) {

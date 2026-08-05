@@ -46,16 +46,16 @@ _BLUE    = '#3B82F6'
 _BAUD_RATES   = ['115200', '9600', '57600', '38400', '19200']
 _DEFAULT_BAUD = '115200'
 
-# The LoRa link is half-duplex: the flight computer's radio can't hear a
-# command while it's mid-transmit sending telemetry. A single one-shot command
-# can land in that dead window and just be lost -- silently, no ack either
-# way. Rather than guessing at timing with a blind retry schedule, resends are
-# synchronized to telemetry actually arriving: every decoded telemetry packet
-# is concrete proof the rocket's radio just finished transmitting and should
-# now be listening, so that's the best moment to retry.
-# NEVER use this for FIRE_PYRO (dangerous, must stay one-shot) or servo nudge
-# (each send is a relative increment -- resending would multiply it).
-_CMD_RETRY_ON_PACKETS = 3   # resend on this many subsequent telemetry receptions
+# Commands are now ack-confirmed: every send carries a sequence number, the
+# flight computer echoes it back in an AckPacket the instant it validates the
+# command (before executing anything slow), and it deduplicates by that same
+# seq so a resend -- because an earlier ack got lost, not because the command
+# itself was lost -- is re-acked but never re-executed. That dedup is what
+# makes it safe to retry every command, including FIRE_PYRO: a duplicate
+# resend can never fire the pyro channel twice. Retries stop the moment the
+# matching ack arrives; if none arrives after _CMD_MAX_RETRIES, we give up
+# and tell the user explicitly instead of retrying forever or staying silent.
+_CMD_MAX_RETRIES = 5   # retries piggybacked on telemetry receptions before giving up
 
 
 # ── Nav button ────────────────────────────────────────────────────────────────
@@ -122,9 +122,9 @@ class MainWindow(QMainWindow):
         self._logger = DataLogger(log_dir=_LOG_DIR)
         self._connected = False
 
-        # Command retry state -- see _CMD_RETRY_ON_PACKETS.
-        self._pending_cmd_payload: bytes | None = None
-        self._pending_cmd_retries = 0
+        # Ack-tracked command state -- see _CMD_MAX_RETRIES.
+        self._cmd_seq_counter = 0
+        self._pending_acks: dict[int, dict] = {}   # seq -> {payload, retries_left, label}
 
         self._build_ui()
         self._connect_signals()
@@ -543,6 +543,7 @@ class MainWindow(QMainWindow):
         self._worker.moveToThread(self._thread)
         self._thread.started.connect(self._worker.run)
         self._worker.packet_received.connect(self._on_packet)
+        self._worker.ack_received.connect(self._on_ack)
         self._worker.connection_changed.connect(self._on_connection_changed)
         self._worker.stats_updated.connect(self._on_stats)
         self._thread.start()
@@ -573,14 +574,29 @@ class MainWindow(QMainWindow):
         self._command_panel.update_data(data)
         self._event_log.update_data(data)
 
-        # Piggyback any pending command retry on this packet -- receiving
-        # telemetry is concrete proof the rocket's radio just finished
-        # transmitting and should now be listening, the best moment to retry.
-        if self._pending_cmd_payload and self._worker:
-            self._worker.send_bytes(self._pending_cmd_payload)
-            self._pending_cmd_retries -= 1
-            if self._pending_cmd_retries <= 0:
-                self._pending_cmd_payload = None
+        # Retry any still-unacked commands, piggybacked on this packet --
+        # receiving telemetry is concrete proof the rocket's radio just
+        # finished transmitting and should now be listening, the best
+        # moment to retry. Safe to resend blindly: the firmware dedupes by
+        # seq, so a resend of an already-executed command is re-acked but
+        # never re-run.
+        for seq in list(self._pending_acks.keys()):
+            pending = self._pending_acks.get(seq)
+            if pending is None:
+                continue
+            if pending['retries_left'] <= 0:
+                self._event_log.log(f'✗ {pending["label"]} -- no confirmation, giving up', level='error')
+                del self._pending_acks[seq]
+                continue
+            if self._worker:
+                self._worker.send_bytes(pending['payload'])
+            pending['retries_left'] -= 1
+
+    @pyqtSlot(int, int)
+    def _on_ack(self, cmd_seq: int, cmd_type: int) -> None:
+        pending = self._pending_acks.pop(cmd_seq, None)
+        if pending:
+            self._event_log.log(f'✓ {pending["label"]} confirmed', level='ok')
 
     @pyqtSlot(int, float)
     def _on_stats(self, total_packets: int, packets_per_sec: float) -> None:
@@ -609,8 +625,7 @@ class MainWindow(QMainWindow):
             self._status_bar.showMessage('Disconnected')
             self._event_log.log(message, level='error')
             self._top_bar.set_connected(False)
-            self._pending_cmd_payload = None
-            self._pending_cmd_retries = 0
+            self._pending_acks.clear()
             self._sys_dot.setStyleSheet(f'color:{_RED};background:transparent;border:none;')
             self._sys_lbl.setText('OFFLINE')
             self._conn_btn.setText('CONNECT')
@@ -621,85 +636,71 @@ class MainWindow(QMainWindow):
             self._rec_btn.setChecked(False)
 
     # ── Commands ──────────────────────────────────────────────────────────────
-    def _send_with_retry(self, payload: bytes) -> None:
-        """Send now, then resend on the next few telemetry packets actually
-        received (proof the link is alive and the radio just finished
-        transmitting). Only for commands where re-running them has no extra
-        effect -- see _CMD_RETRY_ON_PACKETS. A new call replaces whatever
-        retry was still pending, since the user has moved on to a new command."""
+    def _next_seq(self) -> int:
+        self._cmd_seq_counter = (self._cmd_seq_counter + 1) % 256
+        return self._cmd_seq_counter
+
+    def _send_tracked(self, encode_fn, *args, label: str, level: str = 'command') -> None:
+        """Send a command tagged with a fresh sequence number, log it, and
+        track it for ack-confirmed retry (see _CMD_MAX_RETRIES and _on_ack).
+        Safe for every command type, including FIRE_PYRO: the firmware
+        dedupes by seq, so a resend can only ever re-confirm, never re-run."""
         if not self._worker:
             return
+        seq = self._next_seq()
+        payload = encode_fn(*args, seq=seq)
         self._worker.send_bytes(payload)
-        self._pending_cmd_payload = payload
-        self._pending_cmd_retries = _CMD_RETRY_ON_PACKETS
+        self._pending_acks[seq] = {
+            'payload': payload,
+            'retries_left': _CMD_MAX_RETRIES,
+            'label': label,
+        }
+        self._event_log.log(f'^ {label} sent', level=level)
 
     def _send_arm(self) -> None:
-        if self._worker:
-            self._send_with_retry(encode_arm())
-            self._event_log.log('^ ARM sent', level='command')
+        self._send_tracked(encode_arm, label='ARM')
 
     def _send_disarm(self) -> None:
-        if self._worker:
-            self._send_with_retry(encode_disarm())
-            self._event_log.log('^ DISARM sent', level='command')
+        self._send_tracked(encode_disarm, label='DISARM')
 
     def _send_fire(self, channel: int) -> None:
-        # One-shot, never retried -- see _CMD_RETRY_ON_PACKETS.
-        if self._worker:
-            names = {1: 'Ignition', 2: 'Parachute', 3: 'Backup'}
-            self._worker.send_bytes(encode_fire_pyro(channel))
-            self._event_log.log(
-                f'^ FIRE CH{channel} ({names.get(channel,"")}) sent', level='warn'
-            )
-            self._pyro_panel.mark_fired(channel)
+        names = {1: 'Ignition', 2: 'Parachute', 3: 'Backup'}
+        self._send_tracked(
+            encode_fire_pyro, channel,
+            label=f'FIRE CH{channel} ({names.get(channel, "")})', level='warn',
+        )
+        self._pyro_panel.mark_fired(channel)
 
     def _send_ping(self) -> None:
-        if self._worker:
-            self._send_with_retry(encode_ping())
-            self._event_log.log('^ PING sent', level='info')
+        self._send_tracked(encode_ping, label='PING', level='info')
 
     def _send_calibrate(self) -> None:
-        if self._worker:
-            self._send_with_retry(encode_calibrate())
-            self._event_log.log('^ CALIBRATE BARO sent', level='command')
+        self._send_tracked(encode_calibrate, label='CALIBRATE BARO')
 
     def _send_servo_test(self, channel: int) -> None:
-        if self._worker:
-            self._send_with_retry(encode_servo_test(channel))
-            self._event_log.log(f'^ SERVO TEST CH{channel} sent', level='command')
+        self._send_tracked(encode_servo_test, channel, label=f'SERVO TEST CH{channel}')
 
     def _send_cam_start(self) -> None:
-        if self._worker:
-            self._send_with_retry(encode_cam_start())
-            self._event_log.log('^ CAM START sent', level='command')
+        self._send_tracked(encode_cam_start, label='CAM START')
 
     def _send_cam_stop(self) -> None:
-        if self._worker:
-            self._send_with_retry(encode_cam_stop())
-            self._event_log.log('^ CAM STOP sent', level='command')
+        self._send_tracked(encode_cam_stop, label='CAM STOP')
 
     def _send_servo_nudge(self, channel: int, positive: bool) -> None:
-        # One-shot, never retried -- each send is a relative increment, so
-        # resending would multiply the nudge. See _CMD_RETRY_ON_PACKETS.
-        if self._worker:
-            self._worker.send_bytes(encode_servo_nudge(channel, positive))
-            sign = '+' if positive else '-'
-            self._event_log.log(f'^ SERVO CH{channel} nudge {sign}', level='info')
+        sign = '+' if positive else '-'
+        self._send_tracked(
+            encode_servo_nudge, channel, positive,
+            label=f'SERVO CH{channel} nudge {sign}', level='info',
+        )
 
     def _send_servo_save_cal(self) -> None:
-        if self._worker:
-            self._send_with_retry(encode_servo_save_cal())
-            self._event_log.log('^ SERVO CALIBRATION SAVED', level='ok')
+        self._send_tracked(encode_servo_save_cal, label='SERVO CALIBRATION', level='ok')
 
     def _send_servo_center(self) -> None:
-        if self._worker:
-            self._send_with_retry(encode_servo_center_all())
-            self._event_log.log('^ SERVO CENTER ALL sent', level='command')
+        self._send_tracked(encode_servo_center_all, label='SERVO CENTER ALL')
 
     def _send_servo_preflight(self) -> None:
-        if self._worker:
-            self._send_with_retry(encode_servo_preflight())
-            self._event_log.log('^ SERVO PREFLIGHT sent', level='command')
+        self._send_tracked(encode_servo_preflight, label='SERVO PREFLIGHT')
 
     def closeEvent(self, event) -> None:
         self._stop_serial()

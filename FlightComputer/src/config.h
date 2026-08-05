@@ -126,8 +126,12 @@
 // the air, leaving the radio almost continuously transmitting -- observed
 // real throughput was 0.8-2.3Hz, and since the link is half-duplex, a nearly
 // always-busy radio also had little time free to receive inbound commands.
-// 400ms gives the link real idle/listening time between packets.
-#define TELEMETRY_INTERVAL_MS      400    // 2.5 Hz downlink (was 200ms/5Hz)
+// 400ms still wasn't enough idle/listening time for reliable command
+// reception. Confirmed empirically with the isolated TelemetryTest rig
+// (dual-comms build): 1000ms (1Hz) gave a clean, reliable command hit rate
+// alongside continuous telemetry. Slower downlink, but a link that actually
+// works both ways beats a faster one that doesn't.
+#define TELEMETRY_INTERVAL_MS      1000   // 1 Hz downlink (was 400ms/2.5Hz)
 #define LOG_INTERVAL_MS            10     // 100 Hz SD logging
 
 // Complementary filter weight for fused vertical velocity (SensorManager).

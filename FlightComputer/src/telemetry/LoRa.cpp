@@ -32,6 +32,15 @@ bool LoRaRadio::send(const TelemetryPacket& pkt) {
     return (written == sizeof(out));
 }
 
+bool LoRaRadio::sendAck(const AckPacket& pkt) {
+    AckPacket out = pkt;
+    size_t checksumLen = sizeof(AckPacket) - sizeof(out.checksum);
+    out.checksum = packetChecksum(reinterpret_cast<const uint8_t*>(&out), checksumLen);
+    size_t written = LORA_SERIAL.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));
+    Serial.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));   // USB mirror, same as telemetry
+    return (written == sizeof(out));
+}
+
 bool LoRaRadio::receiveCommandFrom(Stream& src, CommandPacket& pkt) {
     return _drainCommand(src, _usbBuf, _usbBufLen, pkt);
 }

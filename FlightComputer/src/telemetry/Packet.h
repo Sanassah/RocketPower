@@ -8,6 +8,8 @@
 #define TELEM_MAGIC_1  0x55
 #define CMD_MAGIC_0    0xBB
 #define CMD_MAGIC_1    0x44
+#define ACK_MAGIC_0    0xAC
+#define ACK_MAGIC_1    0x4B
 
 // ===== Rocket → Ground telemetry =====
 // Deliberately compact (49 bytes, was 81) -- the LoRa link is stuck at a slow
@@ -82,6 +84,25 @@ struct CommandPacket {
     uint8_t     magic[2];    // CMD_MAGIC_0, CMD_MAGIC_1
     CommandType type;
     uint8_t     param;       // FIRE_PYRO: channel number; others: 0
+    uint8_t     seq;         // ground-assigned, echoed back in AckPacket so
+                              // the ground knows exactly which send this was
+                              // -- also used on this end to deduplicate a
+                              // resent command (lost ack, not lost command)
+                              // from a genuinely new one.
+    uint16_t    checksum;    // simple sum of preceding bytes
+};
+#pragma pack(pop)
+
+// ===== Rocket -> Ground: acknowledges a received command =====
+// Sent immediately on receipt/validation, before the command is actually
+// executed -- so even a slow, blocking command (e.g. SERVO_PREFLIGHT) still
+// gets acked promptly and the ground stops retrying right away instead of
+// retrying into an already-executing sequence.
+#pragma pack(push, 1)
+struct AckPacket {
+    uint8_t     magic[2];    // ACK_MAGIC_0, ACK_MAGIC_1
+    uint8_t     cmdSeq;      // echoes CommandPacket.seq being acknowledged
+    CommandType cmdType;     // echoes CommandPacket.type, handy for logging
     uint16_t    checksum;    // simple sum of preceding bytes
 };
 #pragma pack(pop)

@@ -1,12 +1,13 @@
 """
 Encodes CommandPackets to send to the flight computer.
 
-CommandPacket layout (packed, little-endian, 6 bytes):
+CommandPacket layout (packed, little-endian, 7 bytes):
   0  uint8   magic[0]  = 0xBB
   1  uint8   magic[1]  = 0x44
   2  uint8   type      (CommandType enum)
   3  uint8   param     (channel for FIRE_PYRO, else 0)
-  4  uint16  checksum  (sum of bytes 0..3)
+  4  uint8   seq       (ground-assigned, echoed back in AckPacket)
+  5  uint16  checksum  (sum of bytes 0..4)
 """
 
 import struct
@@ -15,8 +16,8 @@ from enum import IntEnum
 CMD_MAGIC_0 = 0xBB
 CMD_MAGIC_1 = 0x44
 
-CMD_FORMAT = '<BBBBH'
-CMD_SIZE   = struct.calcsize(CMD_FORMAT)  # 6
+CMD_FORMAT = '<BBBBBH'
+CMD_SIZE   = struct.calcsize(CMD_FORMAT)  # 7
 
 
 class CommandType(IntEnum):
@@ -35,25 +36,25 @@ class CommandType(IntEnum):
     SERVO_PREFLIGHT  = 0x0D  # param unused; blocking ~6s all-4 choreography
 
 
-def encode_command(cmd_type: CommandType, param: int = 0) -> bytes:
+def encode_command(cmd_type: CommandType, param: int = 0, seq: int = 0) -> bytes:
     """Build a validated CommandPacket as bytes ready to send over serial."""
-    payload  = struct.pack('<BBBB', CMD_MAGIC_0, CMD_MAGIC_1, int(cmd_type), param & 0xFF)
+    payload  = struct.pack('<BBBBB', CMD_MAGIC_0, CMD_MAGIC_1, int(cmd_type), param & 0xFF, seq & 0xFF)
     checksum = sum(payload) & 0xFFFF
     return payload + struct.pack('<H', checksum)
 
 
-def encode_arm()                -> bytes: return encode_command(CommandType.ARM)
-def encode_disarm()             -> bytes: return encode_command(CommandType.DISARM)
-def encode_fire_pyro(ch: int)   -> bytes: return encode_command(CommandType.FIRE_PYRO, ch)
-def encode_ping()               -> bytes: return encode_command(CommandType.PING)
-def encode_calibrate()          -> bytes: return encode_command(CommandType.CALIBRATE_BARO)
-def encode_servo_test(ch: int)  -> bytes: return encode_command(CommandType.SERVO_TEST, ch)
-def encode_cam_start()          -> bytes: return encode_command(CommandType.CAM_START)
-def encode_cam_stop()           -> bytes: return encode_command(CommandType.CAM_STOP)
+def encode_arm(seq: int = 0)                  -> bytes: return encode_command(CommandType.ARM, 0, seq)
+def encode_disarm(seq: int = 0)               -> bytes: return encode_command(CommandType.DISARM, 0, seq)
+def encode_fire_pyro(ch: int, seq: int = 0)   -> bytes: return encode_command(CommandType.FIRE_PYRO, ch, seq)
+def encode_ping(seq: int = 0)                 -> bytes: return encode_command(CommandType.PING, 0, seq)
+def encode_calibrate(seq: int = 0)            -> bytes: return encode_command(CommandType.CALIBRATE_BARO, 0, seq)
+def encode_servo_test(ch: int, seq: int = 0)  -> bytes: return encode_command(CommandType.SERVO_TEST, ch, seq)
+def encode_cam_start(seq: int = 0)            -> bytes: return encode_command(CommandType.CAM_START, 0, seq)
+def encode_cam_stop(seq: int = 0)             -> bytes: return encode_command(CommandType.CAM_STOP, 0, seq)
 
-def encode_servo_nudge(ch: int, positive: bool) -> bytes:
-    return encode_command(CommandType.SERVO_NUDGE_POS if positive else CommandType.SERVO_NUDGE_NEG, ch)
+def encode_servo_nudge(ch: int, positive: bool, seq: int = 0) -> bytes:
+    return encode_command(CommandType.SERVO_NUDGE_POS if positive else CommandType.SERVO_NUDGE_NEG, ch, seq)
 
-def encode_servo_save_cal()     -> bytes: return encode_command(CommandType.SERVO_SAVE_CAL)
-def encode_servo_center_all()   -> bytes: return encode_command(CommandType.SERVO_CENTER_ALL)
-def encode_servo_preflight()    -> bytes: return encode_command(CommandType.SERVO_PREFLIGHT)
+def encode_servo_save_cal(seq: int = 0)     -> bytes: return encode_command(CommandType.SERVO_SAVE_CAL, 0, seq)
+def encode_servo_center_all(seq: int = 0)   -> bytes: return encode_command(CommandType.SERVO_CENTER_ALL, 0, seq)
+def encode_servo_preflight(seq: int = 0)    -> bytes: return encode_command(CommandType.SERVO_PREFLIGHT, 0, seq)
