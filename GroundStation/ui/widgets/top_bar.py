@@ -7,6 +7,12 @@ from PyQt6.QtCore    import Qt, QTimer, QRectF
 from PyQt6.QtGui     import QFont, QColor, QPainter, QPen, QBrush
 
 from core.packet_decoder import TelemetryData
+from core.serial_worker  import LinkStats
+
+# The radio is stuck at a fixed factory-default air data rate -- see
+# TELEMETRY_INTERVAL_MS in FlightComputer/src/config.h for the full story.
+# This is what RX+TX bandwidth is actually being measured against.
+_LORA_AIR_RATE_BPS = 2400
 
 _BG     = '#0F0F10'
 _CARD   = '#1A1A1B'
@@ -227,10 +233,36 @@ class _StatTelem(QWidget):
         row.addStretch()
         lay.addLayout(row)
 
+        self._bw_lbl = QLabel('RX -- / TX --')
+        self._bw_lbl.setStyleSheet(_lbl_css(_MUTED, 9, 600))
+        self._bw_lbl.setToolTip('Live throughput vs. the LoRa link\'s fixed air data rate.')
+        lay.addWidget(self._bw_lbl)
+
     def set(self, text: str, color: str) -> None:
         self._val.setText(text)
         self._val.setStyleSheet(_lbl_css(color, 14, 700))
         self._dot.setStyleSheet(f'color:{color};background:transparent;border:none;')
+
+    def set_bandwidth(self, stats: LinkStats) -> None:
+        used_bps = stats.rx_bps + stats.tx_bps
+        pct = used_bps / _LORA_AIR_RATE_BPS * 100.0
+        color = _RED if pct >= 90 else _ORANGE if pct >= 60 else _MUTED
+        self._bw_lbl.setStyleSheet(_lbl_css(color, 9, 600))
+        self._bw_lbl.setText(
+            f'RX {stats.rx_pkt_per_sec:.1f}/s {stats.rx_bps:.0f}bps  '
+            f'TX {stats.tx_pkt_per_sec:.1f}/s {stats.tx_bps:.0f}bps  '
+            f'({pct:.0f}% of {_LORA_AIR_RATE_BPS}bps)'
+        )
+        self._bw_lbl.setToolTip(
+            f'RX total: {stats.rx_packets} packets\n'
+            f'TX total: {stats.tx_packets} packets\n'
+            f'Combined throughput: {used_bps:.0f} bps of the LoRa link\'s '
+            f'{_LORA_AIR_RATE_BPS} bps fixed air rate ({pct:.0f}%).'
+        )
+
+    def clear_bandwidth(self) -> None:
+        self._bw_lbl.setStyleSheet(_lbl_css(_MUTED, 9, 600))
+        self._bw_lbl.setText('RX -- / TX --')
 
 
 # ── Top bar ───────────────────────────────────────────────────────────────────
@@ -320,15 +352,19 @@ class TopBar(QWidget):
         bc  = _GREEN if pct > 40 else _ORANGE if pct > 20 else _RED
         self._s_batt.set_pct(pct, bc)
 
-    def update_stats(self, packets_per_sec: float) -> None:
-        # Nominal downlink rate is 5 Hz (TELEMETRY_INTERVAL_MS=200 on the flight computer).
-        if packets_per_sec >= 4.0:
+    def update_stats(self, stats: LinkStats) -> None:
+        # Nominal downlink rate is 1 Hz -- see TELEMETRY_INTERVAL_MS in
+        # FlightComputer/src/config.h (hard-won: faster rates starved the
+        # half-duplex radio of listening time for inbound commands).
+        rx_hz = stats.rx_pkt_per_sec
+        if rx_hz >= 0.8:
             color = _GREEN
-        elif packets_per_sec >= 1.0:
+        elif rx_hz >= 0.3:
             color = _ORANGE
         else:
             color = _RED
-        self._s_telem.set(f'{packets_per_sec:.1f} Hz', color)
+        self._s_telem.set(f'{rx_hz:.1f} Hz', color)
+        self._s_telem.set_bandwidth(stats)
 
     def set_connected(self, connected: bool) -> None:
         if not connected:
@@ -338,4 +374,5 @@ class TopBar(QWidget):
             self._s_vel.set('-- m/s', _MUTED)
             self._s_batt.set_pct(0, _MUTED)
             self._s_telem.set('NO LINK', _RED)
+            self._s_telem.clear_bandwidth()
             self._s_met.set('00:00:00', _MUTED)

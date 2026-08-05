@@ -12,7 +12,9 @@ class TelemetryManager {
 public:
     TelemetryManager(LoRaRadio& lora, StateMachine& sm, PyroController& pyro,
                       FinController& fins, CameraController& camera)
-        : _lora(lora), _sm(sm), _pyro(pyro), _fins(fins), _camera(camera) {}
+        : _lora(lora), _sm(sm), _pyro(pyro), _fins(fins), _camera(camera) {
+        for (size_t i = 0; i < _CMD_TYPE_SLOTS; i++) _lastProcessedSeqByType[i] = -1;
+    }
 
     bool begin();
 
@@ -33,12 +35,18 @@ private:
     uint32_t        _lastTxMs          = 0;
     bool            _calibrateRequested = false;
 
-    // -1 = no command processed yet (cmd.seq is uint8_t, 0-255, so this
-    // sentinel is never reachable by a real command and the first one
-    // always executes). Set to the seq of the last command actually
-    // executed; a resend with the same seq (because its ack got lost, not
-    // because the command itself was lost) is re-acked but not re-run.
-    int16_t _lastProcessedSeq = -1;
+    // Last-processed seq, tracked PER command type (indexed by the raw
+    // CommandType byte) rather than one global value. A single global last-
+    // seq is wrong: if command A executes and then a *different* command B
+    // executes before A's ack makes it back to the ground, a resend of A
+    // (because its ack got lost, not because A itself was lost) no longer
+    // matches the global "last seq" -- B's seq does -- so it looks new and
+    // gets re-run. Per-type tracking means A's resend is only ever compared
+    // against A's own last seq, regardless of what else ran in between.
+    // -1 = no command of this type processed yet (cmd.seq is uint8_t,
+    // 0-255, so this sentinel is never reachable by a real command).
+    static constexpr size_t _CMD_TYPE_SLOTS = 32;   // headroom above the highest CommandType value
+    int16_t _lastProcessedSeqByType[_CMD_TYPE_SLOTS];
 
     void _sendTelemetry(const FlightData& d);
     void _handleCommand(const CommandPacket& cmd);
