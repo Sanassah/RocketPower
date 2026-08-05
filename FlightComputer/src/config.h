@@ -149,3 +149,20 @@
 
 // ===== Sea-level pressure for altitude reference =====
 #define SEA_LEVEL_HPA 1013.25f
+
+// ===== Status LEDs =====
+// From main.kicad_sch: D3 "GPS LED", D4 "Altimeter LED", D5 "200G ACC LED",
+// D6 "IMU LED" each have their cathode tied to GND and their anode driven
+// through a series resistor by a dedicated MIMXRT1062 GPIO (active HIGH).
+// Pin numbers below were cross-checked against the Teensy 4.1 core's
+// CORE_PINn_CONFIG -> IOMUXC pad table (core_pins.h), since this board wires
+// the bare MIMXRT1062 the same way the real Teensy 4.1 module does.
+// D1 "3.3V LED" is a hardwired power-good indicator (not GPIO-driven).
+// D2 "BOOT LED" is driven by the separate MKL02 USB/bootloader chip, not the
+// flight MCU -- no software control possible from this firmware.
+#define IMU_LED_PIN     26   // D6 "IMU LED"       -- GPIO_AD_B1_14
+#define BARO_LED_PIN    5    // D4 "Altimeter LED" -- GPIO_EMC_08
+#define ACCEL_LED_PIN   13   // D5 "200G ACC LED"  -- GPIO_B0_03 (shares Teensy's LED_BUILTIN pad)
+#define GPS_LED_PIN     27   // D3 "GPS LED"        -- GPIO_AD_B1_15
+
+#define STATUS_LED_FLASH_MS  250   // half-period for fault flashing (~2 Hz)

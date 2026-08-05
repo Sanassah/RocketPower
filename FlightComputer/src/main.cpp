@@ -12,6 +12,7 @@
 #include "control/PyroController.h"
 #include "control/CameraController.h"
 #include "control/FinController.h"
+#include "control/StatusLED.h"
 
 // ===== Global objects =====
 SensorManager    sensors;
@@ -22,6 +23,7 @@ FinController    fins;
 CameraController camera;
 TelemetryManager telem(radio, fsm, pyro, fins, camera);
 DataLogger       logger;
+StatusLED        statusLed;
 
 // ===== Timing =====
 elapsedMillis loopTimer;     // tracks time since last loop start
@@ -52,13 +54,17 @@ void setup() {
     Serial.println(" Custom MIMXRT1062 / Teensy 4.1");
     Serial.println("=================================\n");
 
+    // ---- Status LEDs ----
+    statusLed.begin();
+
     // ---- Sensors ----
     Serial.println("[INIT] Sensors...");
     bool sensorsOk = sensors.begin();
     printSensorReport();
+    statusLed.update(sensors.data());
     if (!sensorsOk) {
         Serial.println("[INIT] CRITICAL: IMU or barometer failed. Halting.");
-        while (true) { delay(1000); }
+        while (true) { statusLed.update(sensors.data()); delay(50); }
     }
 
     // ---- Calibrate barometer at launch site ----
@@ -107,6 +113,7 @@ void loop() {
     // ---- 1. Read all sensors ----
     sensors.update();
     const FlightData& d = sensors.data();
+    statusLed.update(d);
 
     // ---- 2. Inject current state into data (read-modify-write via mutable ref) ----
     // StateMachine owns the state; we inject it into the FlightData snapshot
