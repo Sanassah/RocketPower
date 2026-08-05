@@ -44,10 +44,16 @@ from typing import Optional
 
 TELEM_MAGIC_0 = 0xAA
 TELEM_MAGIC_1 = 0x55
+ACK_MAGIC_0   = 0xAC
+ACK_MAGIC_1   = 0x4B
 
 # 26 fields, 49 bytes total
 TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBH'
 TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 49
+
+# AckPacket: magic0, magic1, cmdSeq, cmdType, checksum
+ACK_FORMAT = '<BBBBH'
+ACK_SIZE   = struct.calcsize(ACK_FORMAT)  # 6
 
 STATE_NAMES = {
     0: 'IDLE',
@@ -181,12 +187,44 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
     return data
 
 
-def find_packet_start(buf: bytes) -> int:
+def find_packet_start(buf: bytes, magic0: int = TELEM_MAGIC_0, magic1: int = TELEM_MAGIC_1) -> int:
     """
-    Scan buf for the telemetry magic bytes 0xAA 0x55.
+    Scan buf for a given magic byte pair (defaults to the telemetry magic).
     Returns the index of the magic or -1 if not found.
     """
     for i in range(len(buf) - 1):
-        if buf[i] == TELEM_MAGIC_0 and buf[i + 1] == TELEM_MAGIC_1:
+        if buf[i] == magic0 and buf[i + 1] == magic1:
             return i
     return -1
+
+
+@dataclass
+class AckData:
+    cmd_seq:  int
+    cmd_type: int
+
+
+def decode_ack(raw: bytes) -> Optional[AckData]:
+    """
+    Decode a raw AckPacket (6 bytes: magic0, magic1, cmdSeq, cmdType, checksum).
+    Returns None if magic bytes are wrong or checksum fails.
+    """
+    if len(raw) < ACK_SIZE:
+        return None
+
+    raw = raw[:ACK_SIZE]
+
+    if raw[0] != ACK_MAGIC_0 or raw[1] != ACK_MAGIC_1:
+        return None
+
+    expected = sum(raw[:-2]) & 0xFFFF
+    stored   = struct.unpack_from('<H', raw, ACK_SIZE - 2)[0]
+    if expected != stored:
+        return None
+
+    try:
+        _, _, cmd_seq, cmd_type, _ = struct.unpack(ACK_FORMAT, raw)
+    except struct.error:
+        return None
+
+    return AckData(cmd_seq=cmd_seq, cmd_type=cmd_type)

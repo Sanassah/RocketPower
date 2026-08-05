@@ -1,7 +1,8 @@
 """
 QThread-based serial worker. Runs on its own thread, reads the COM port,
-finds telemetry packet boundaries, validates checksums, and emits
-packet_received for each valid packet. Auto-reconnects on disconnection.
+finds packet boundaries (telemetry and ack packets share the same wire),
+validates checksums, and emits a signal for each valid packet.
+Auto-reconnects on disconnection.
 """
 
 import serial
@@ -14,6 +15,7 @@ from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
 from core.packet_decoder import (
     TelemetryData, decode_packet, find_packet_start,
     TELEM_MAGIC_0, TELEM_MAGIC_1, TELEM_SIZE,
+    decode_ack, ACK_MAGIC_0, ACK_MAGIC_1, ACK_SIZE,
 )
 
 
@@ -24,6 +26,7 @@ class SerialWorker(QObject):
     """
 
     packet_received    = pyqtSignal(TelemetryData)
+    ack_received        = pyqtSignal(int, int)   # (cmd_seq, cmd_type)
     connection_changed = pyqtSignal(bool, str)   # (connected, message)
     stats_updated      = pyqtSignal(int, float)  # (total_packets, packets_per_sec)
 
@@ -98,42 +101,59 @@ class SerialWorker(QObject):
         if chunk:
             self._buf.extend(chunk)
 
-        # Parse all complete packets from the buffer
+        # Parse all complete packets from the buffer -- telemetry and ack
+        # packets are interleaved on the same wire, distinguished by magic.
         while True:
-            # Find magic header
-            idx = find_packet_start(bytes(self._buf))
-            if idx == -1:
-                # No magic found; keep last byte in case next read completes the magic pair
+            buf_bytes = bytes(self._buf)
+            telem_idx = find_packet_start(buf_bytes, TELEM_MAGIC_0, TELEM_MAGIC_1)
+            ack_idx   = find_packet_start(buf_bytes, ACK_MAGIC_0, ACK_MAGIC_1)
+
+            candidates = [(i, 'telem', TELEM_SIZE) for i in (telem_idx,) if i != -1]
+            candidates += [(i, 'ack', ACK_SIZE) for i in (ack_idx,) if i != -1]
+
+            if not candidates:
+                # No magic found; keep last byte in case next read completes it
                 if len(self._buf) > 1:
                     self._buf = self._buf[-1:]
                 return
+
+            # Whichever magic pair appears earliest in the buffer goes first
+            idx, kind, size = min(candidates, key=lambda c: c[0])
 
             # Discard bytes before magic
             if idx > 0:
                 self._buf = self._buf[idx:]
 
-            if len(self._buf) < TELEM_SIZE:
+            if len(self._buf) < size:
                 return  # Wait for more bytes
 
-            raw = bytes(self._buf[:TELEM_SIZE])
-            data = decode_packet(raw)
+            raw = bytes(self._buf[:size])
 
-            if data is not None:
-                self._buf = self._buf[TELEM_SIZE:]
-                self._total_pkts  += 1
-                self._window_pkts += 1
-                self.packet_received.emit(data)
+            if kind == 'telem':
+                data = decode_packet(raw)
+                if data is not None:
+                    self._buf = self._buf[size:]
+                    self._total_pkts  += 1
+                    self._window_pkts += 1
+                    self.packet_received.emit(data)
 
-                now = time.time()
-                elapsed = now - self._window_start
-                if elapsed >= 1.0:
-                    rate = self._window_pkts / elapsed
-                    self.stats_updated.emit(self._total_pkts, rate)
-                    self._window_pkts  = 0
-                    self._window_start = now
+                    now = time.time()
+                    elapsed = now - self._window_start
+                    if elapsed >= 1.0:
+                        rate = self._window_pkts / elapsed
+                        self.stats_updated.emit(self._total_pkts, rate)
+                        self._window_pkts  = 0
+                        self._window_start = now
+                else:
+                    # Bad packet at this offset; skip one byte and retry sync
+                    self._buf = self._buf[1:]
             else:
-                # Bad packet at this offset; skip one byte and retry sync
-                self._buf = self._buf[1:]
+                ack = decode_ack(raw)
+                if ack is not None:
+                    self._buf = self._buf[size:]
+                    self.ack_received.emit(ack.cmd_seq, ack.cmd_type)
+                else:
+                    self._buf = self._buf[1:]
 
 
 def list_serial_ports() -> list[str]:

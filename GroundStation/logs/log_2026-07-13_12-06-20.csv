@@ -1,2 +1,0 @@
-rx_time,seq,timestamp_ms,state,lat,lon,gps_alt_m,gps_sats,gps_fix,baro_alt_m,vert_vel_ms,accel_x_g,accel_y_g,accel_z_g,accel_mag_g,quat_w,quat_x,quat_y,quat_z,voltage_v,current_ma,rssi
-1783958781.152,716,166307,0,0.00000000,0.00000000,0.00,0,0,-39.72,0.163,1.0780,0.2940,2.0090,2.2988,0.381775,0.100708,-0.079529,0.915283,7.801,77.5,-1
