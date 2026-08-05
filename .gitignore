@@ -38,3 +38,10 @@ codegen/
 # SimBiology backup files
 *.sbproj.backup
 *.sbproj.bak
+
+# Python bytecode cache (GroundStation)
+__pycache__/
+*.pyc
+
+# GroundStation bench-test session logs -- regenerated every run, not source
+GroundStation/logs/*.csv

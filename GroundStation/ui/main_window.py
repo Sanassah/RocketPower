@@ -9,12 +9,12 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QThread, pyqtSlot
 from PyQt6.QtGui  import QFont
 
-from core.serial_worker   import SerialWorker, list_serial_ports
+from core.serial_worker   import SerialWorker, LinkStats, list_serial_ports
 from core.packet_decoder  import TelemetryData
 from core.packet_encoder  import (
     encode_arm, encode_disarm, encode_fire_pyro,
     encode_ping, encode_calibrate,
-    encode_servo_test, encode_cam_start, encode_cam_stop,
+    encode_servo_test, encode_cam_toggle,
     encode_servo_nudge, encode_servo_save_cal, encode_servo_center_all,
     encode_servo_preflight,
 )
@@ -505,8 +505,7 @@ class MainWindow(QMainWindow):
         self._command_panel.ping_requested.connect(self._send_ping)
         self._command_panel.calibrate_requested.connect(self._send_calibrate)
         self._command_panel.servo_test_requested.connect(self._send_servo_test)
-        self._command_panel.cam_start_requested.connect(self._send_cam_start)
-        self._command_panel.cam_stop_requested.connect(self._send_cam_stop)
+        self._command_panel.cam_toggle_requested.connect(self._send_cam_toggle)
         self._command_panel.servo_nudge_requested.connect(self._send_servo_nudge)
         self._command_panel.servo_save_cal_requested.connect(self._send_servo_save_cal)
         self._command_panel.servo_center_requested.connect(self._send_servo_center)
@@ -598,9 +597,9 @@ class MainWindow(QMainWindow):
         if pending:
             self._event_log.log(f'✓ {pending["label"]} confirmed', level='ok')
 
-    @pyqtSlot(int, float)
-    def _on_stats(self, total_packets: int, packets_per_sec: float) -> None:
-        self._top_bar.update_stats(packets_per_sec)
+    @pyqtSlot(object)
+    def _on_stats(self, stats: LinkStats) -> None:
+        self._top_bar.update_stats(stats)
 
     @pyqtSlot(bool, str)
     def _on_connection_changed(self, connected: bool, message: str) -> None:
@@ -680,11 +679,8 @@ class MainWindow(QMainWindow):
     def _send_servo_test(self, channel: int) -> None:
         self._send_tracked(encode_servo_test, channel, label=f'SERVO TEST CH{channel}')
 
-    def _send_cam_start(self) -> None:
-        self._send_tracked(encode_cam_start, label='CAM START')
-
-    def _send_cam_stop(self) -> None:
-        self._send_tracked(encode_cam_stop, label='CAM STOP')
+    def _send_cam_toggle(self) -> None:
+        self._send_tracked(encode_cam_toggle, label='CAM TOGGLE')
 
     def _send_servo_nudge(self, channel: int, positive: bool) -> None:
         sign = '+' if positive else '-'

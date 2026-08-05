@@ -33,7 +33,8 @@ ever sees the same TelemetryData fields/units as before this change.
   44      1     uint8     pyro_cont[0]  (CH1 ignition:  1=OK, 0=open)
   45      1     uint8     pyro_cont[1]  (CH2 parachute: 1=OK, 0=open)
   46      1     uint8     pyro_cont[2]  (CH3 backup:    1=OK, 0=open)
-  47      2     uint16    checksum      (sum of bytes 0..46)
+  47      1     uint8     cam_recording (1=recording, 0=stopped -- FC's belief, no camera ack)
+  48      2     uint16    checksum      (sum of bytes 0..47)
 """
 
 import struct
@@ -47,9 +48,9 @@ TELEM_MAGIC_1 = 0x55
 ACK_MAGIC_0   = 0xAC
 ACK_MAGIC_1   = 0x4B
 
-# 26 fields, 49 bytes total
-TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBH'
-TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 49
+# 27 fields, 50 bytes total
+TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBBH'
+TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 50
 
 # AckPacket: magic0, magic1, cmdSeq, cmdType, checksum
 ACK_FORMAT = '<BBBBH'
@@ -103,6 +104,7 @@ class TelemetryData:
     pyro_cont_0:  int          # CH1 continuity (1=OK, 0=open)
     pyro_cont_1:  int          # CH2 continuity
     pyro_cont_2:  int          # CH3 continuity
+    cam_recording: int         # 1=recording, 0=stopped (FC's belief, no camera ack)
     checksum:     int
     # Derived — populated by decode_packet()
     accel_mag_g:  float = 0.0
@@ -120,6 +122,10 @@ class TelemetryData:
     @property
     def state_color(self) -> str:
         return STATE_COLORS.get(self.state_name, '#555577')
+
+    @property
+    def is_recording(self) -> bool:
+        return bool(self.cam_recording)
 
     @property
     def has_gps_fix(self) -> bool:
@@ -158,7 +164,7 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
      accel_x_cg, accel_y_cg, accel_z_cg,
      quat_w_i16, quat_x_i16, quat_y_i16, quat_z_i16,
      voltage_cv, current_ma,
-     rssi, pyro_cont_0, pyro_cont_1, pyro_cont_2, checksum) = vals
+     rssi, pyro_cont_0, pyro_cont_1, pyro_cont_2, cam_recording, checksum) = vals
 
     # Unscale wire fixed-point values back to normal engineering units --
     # everything downstream of this function sees the same units as before.
@@ -180,6 +186,7 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
         current_ma=float(current_ma),
         rssi=rssi,
         pyro_cont_0=pyro_cont_0, pyro_cont_1=pyro_cont_1, pyro_cont_2=pyro_cont_2,
+        cam_recording=cam_recording,
         checksum=checksum,
     )
     data.accel_mag_g = math.sqrt(data.accel_x_g**2 + data.accel_y_g**2 + data.accel_z_g**2)

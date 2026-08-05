@@ -14,10 +14,12 @@ bool LoRaRadio::send(const TelemetryPacket& pkt) {
     out.checksum = packetChecksum(reinterpret_cast<const uint8_t*>(&out), checksumLen);
     size_t written = LORA_SERIAL.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));
 
+#if USB_SERIAL_BINARY_MIRROR
     // Binary mirror on USB so the ground station GUI can connect directly.
     // 0xAA is not a valid ASCII byte, so text output can't produce the magic pair
     // 0xAA 0x55 — the GUI's scanner ignores all bytes between packets safely.
     Serial.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));
+#endif
 
     // Human-readable summary for terminal debugging (pure ASCII, won't confuse the binary parser)
     // Wire fields are scaled fixed-point (see Packet.h) -- unscale for display.
@@ -37,7 +39,9 @@ bool LoRaRadio::sendAck(const AckPacket& pkt) {
     size_t checksumLen = sizeof(AckPacket) - sizeof(out.checksum);
     out.checksum = packetChecksum(reinterpret_cast<const uint8_t*>(&out), checksumLen);
     size_t written = LORA_SERIAL.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));
+#if USB_SERIAL_BINARY_MIRROR
     Serial.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));   // USB mirror, same as telemetry
+#endif
     return (written == sizeof(out));
 }
 

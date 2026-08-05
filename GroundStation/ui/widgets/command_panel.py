@@ -74,8 +74,7 @@ class CommandPanel(QWidget):
     ping_requested            = pyqtSignal()
     calibrate_requested       = pyqtSignal()
     servo_test_requested      = pyqtSignal(int)
-    cam_start_requested       = pyqtSignal()
-    cam_stop_requested        = pyqtSignal()
+    cam_toggle_requested      = pyqtSignal()
     servo_nudge_requested     = pyqtSignal(int, bool)   # (channel, positive)
     servo_save_cal_requested  = pyqtSignal()
     servo_center_requested    = pyqtSignal()
@@ -270,20 +269,28 @@ class CommandPanel(QWidget):
         col_b.addLayout(cal_row)
         col_b.addWidget(_divider())
 
-        # Camera bench test
+        # Camera -- the camera only exposes a toggle (see CameraController),
+        # so one button is all there is: it sends CAM_TOGGLE and its look is
+        # kept in sync with the FC's reported cam_recording state on every
+        # telemetry packet. That state is the FC's own belief, not a
+        # camera-confirmed one -- there's no ack on that link.
         col_b.addWidget(_section('CAMERA  (BENCH TEST)'))
-        cam_row = QHBoxLayout()
-        cam_row.setSpacing(6)
-
-        cam_start_btn = _flat_btn('⏺  Start Rec', height=26)
-        cam_start_btn.clicked.connect(self.cam_start_requested.emit)
-
-        cam_stop_btn = _flat_btn('⏹  Stop Rec', height=26)
-        cam_stop_btn.clicked.connect(self.cam_stop_requested.emit)
-
-        cam_row.addWidget(cam_start_btn)
-        cam_row.addWidget(cam_stop_btn)
-        col_b.addLayout(cam_row)
+        self._cam_btn = QPushButton('⏺  Toggle Recording')
+        self._cam_btn.setFixedHeight(28)
+        self._cam_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._cam_btn.setCheckable(True)
+        self._cam_btn.clicked.connect(self.cam_toggle_requested.emit)
+        self._cam_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color:{_CARD2};color:{_TEXT};
+                border:1px solid {_BORDER};border-radius:6px;font-weight:700;
+            }}
+            QPushButton:hover {{ background-color:#222436; }}
+            QPushButton:checked {{
+                background-color:#200A0A;color:{_RED};border:1px solid {_RED};
+            }}
+        """)
+        col_b.addWidget(self._cam_btn)
         col_b.addStretch()
 
         self._update_button_states()
@@ -292,6 +299,8 @@ class CommandPanel(QWidget):
         if data.state != self._state:
             self._state = data.state
             self._update_button_states()
+        self._cam_btn.setChecked(data.is_recording)
+        self._cam_btn.setText('⏺  Recording -- Tap to Stop' if data.is_recording else '⏺  Toggle Recording')
 
     def _update_button_states(self) -> None:
         can_fire = self._state in {1, 2, 3, 4, 5}

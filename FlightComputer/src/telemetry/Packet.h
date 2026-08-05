@@ -58,6 +58,12 @@ struct TelemetryPacket {
 
     uint8_t  pyro_cont[3];   // continuity per channel: 1=OK 0=open (index 0=CH1, 1=CH2, 2=CH3)
 
+    // Camera recording state as last commanded by CameraController. The RunCam
+    // UART link has no ack, so this is what the FC believes it told the camera,
+    // not a hardware-confirmed state -- still enough to catch a missed command
+    // (e.g. sent while out of range) from the ground without touching a cable.
+    uint8_t  cam_recording;  // 1=recording, 0=stopped
+
     uint16_t checksum;       // simple sum of all preceding bytes
 };
 #pragma pack(pop)
@@ -70,8 +76,7 @@ enum class CommandType : uint8_t {
     PING           = 0x04,
     CALIBRATE_BARO = 0x05,   // re-zero barometer altitude at current ground level
     SERVO_TEST     = 0x06,   // param = fin channel (1-4); sweeps center->min->max->center
-    CAM_START      = 0x07,   // manually start camera recording (bench test)
-    CAM_STOP       = 0x08,   // manually stop camera recording (bench test)
+    CAM_TOGGLE     = 0x07,   // manually toggle camera recording (the camera only supports a toggle)
     SERVO_NUDGE_POS = 0x09,  // param = fin channel (1-4); +SERVO_TRIM_STEP_US, not persisted
     SERVO_NUDGE_NEG = 0x0A,  // param = fin channel (1-4); -SERVO_TRIM_STEP_US, not persisted
     SERVO_SAVE_CAL  = 0x0B,  // param unused; persists all 4 channels' live position as new trim

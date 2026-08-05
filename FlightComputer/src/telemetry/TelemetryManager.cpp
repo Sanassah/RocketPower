@@ -35,15 +35,19 @@ void TelemetryManager::update(const FlightData& d) {
         // retrying right away instead of retrying into an in-progress command.
         _sendAck(cmd);
 
-        if ((int16_t)cmd.seq == _lastProcessedSeq) {
-            // Same seq as the last command we actually ran -- this is a
-            // resend because our earlier ack got lost, not because the
-            // command itself was lost. Already acked above; don't run it
-            // again.
-            Serial.print("[TELEM] CMD seq="); Serial.print(cmd.seq);
-            Serial.println(" duplicate (already processed) -- re-acked only");
-        } else {
-            _lastProcessedSeq = cmd.seq;
+        uint8_t typeIdx = (uint8_t)cmd.type;
+        bool isDuplicate = (typeIdx < _CMD_TYPE_SLOTS) &&
+                            ((int16_t)cmd.seq == _lastProcessedSeqByType[typeIdx]);
+
+        // Single-line, always-printed record of every command RX -- easy to
+        // scan/grep for exactly what arrived and whether it actually ran.
+        Serial.print("[CMD RX] seq="); Serial.print(cmd.seq);
+        Serial.print(" type=0x"); Serial.print(typeIdx, HEX);
+        Serial.print(" param="); Serial.print(cmd.param);
+        Serial.println(isDuplicate ? "  -> DUPLICATE (re-acked only, not re-run)" : "  -> NEW (executing)");
+
+        if (!isDuplicate) {
+            if (typeIdx < _CMD_TYPE_SLOTS) _lastProcessedSeqByType[typeIdx] = cmd.seq;
             _handleCommand(cmd);
         }
     }
@@ -87,6 +91,8 @@ void TelemetryManager::_sendTelemetry(const FlightData& d) {
     pkt.pyro_cont[1]  = _pyro.continuityOk(2) ? 1 : 0;
     pkt.pyro_cont[2]  = _pyro.continuityOk(3) ? 1 : 0;
 
+    pkt.cam_recording = _camera.isRecording() ? 1 : 0;
+
     _lora.send(pkt);
 }
 
@@ -117,14 +123,9 @@ void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
             _fins.testSweep(cmd.param);
             break;
 
-        case CommandType::CAM_START:
-            Serial.println("[TELEM] CMD: CAM_START");
-            _camera.startRecording();
-            break;
-
-        case CommandType::CAM_STOP:
-            Serial.println("[TELEM] CMD: CAM_STOP");
-            _camera.stopRecording();
+        case CommandType::CAM_TOGGLE:
+            Serial.println("[TELEM] CMD: CAM_TOGGLE");
+            _camera.toggleRecording();
             break;
 
         case CommandType::SERVO_NUDGE_POS:

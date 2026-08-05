@@ -132,6 +132,15 @@
 // alongside continuous telemetry. Slower downlink, but a link that actually
 // works both ways beats a faster one that doesn't.
 #define TELEMETRY_INTERVAL_MS      1000   // 1 Hz downlink (was 400ms/2.5Hz)
+
+// The raw binary packet is also written to USB Serial on every send/ack (see
+// LoRa.cpp) so the ground station can read telemetry over a direct USB link
+// with no radio involved. That's unreadable noise -- garbled control
+// characters -- in a plain text serial monitor. Set to 0 while watching the
+// USB serial monitor for human debugging (e.g. command RX/dedup behavior);
+// set back to 1 only when the ground station actually needs to connect over
+// USB instead of the LoRa link.
+#define USB_SERIAL_BINARY_MIRROR   0
 #define LOG_INTERVAL_MS            10     // 100 Hz SD logging
 
 // Complementary filter weight for fused vertical velocity (SensorManager).
