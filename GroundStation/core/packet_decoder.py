@@ -1,7 +1,7 @@
 """
 Decodes binary TelemetryPacket from the flight computer.
 
-Packet layout (packed, little-endian, 49 bytes total). Deliberately compact --
+Packet layout (packed, little-endian, 51 bytes total). Deliberately compact --
 the LoRa link is stuck at a slow factory-default air data rate and packet size
 is the only remaining lever to reduce airtime per packet, so most fields are
 scaled fixed-point (int16) instead of float. Values are unscaled back to
@@ -34,7 +34,10 @@ ever sees the same TelemetryData fields/units as before this change.
   45      1     uint8     pyro_cont[1]  (CH2 parachute: 1=OK, 0=open)
   46      1     uint8     pyro_cont[2]  (CH3 backup:    1=OK, 0=open)
   47      1     uint8     cam_recording (1=recording, 0=stopped -- FC's belief, no camera ack)
-  48      2     uint16    checksum      (sum of bytes 0..47)
+  48      1     uint8     system_status (bit0 imu, bit1 baro, bit2 accel, bit3 gps, bit4 power ok --
+                                          1=read successfully within the last 500ms, "alive right now";
+                                          bit5 sd_present, bit6 sd_recording -- live, not boot-time)
+  49      2     uint16    checksum      (sum of bytes 0..48)
 """
 
 import struct
@@ -48,9 +51,18 @@ TELEM_MAGIC_1 = 0x55
 ACK_MAGIC_0   = 0xAC
 ACK_MAGIC_1   = 0x4B
 
-# 27 fields, 50 bytes total
-TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBBH'
-TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 50
+# Bits within system_status -- must mirror the #defines in Packet.h
+SENSOR_HEALTH_IMU_OK   = 1 << 0
+SENSOR_HEALTH_BARO_OK  = 1 << 1
+SENSOR_HEALTH_ACCEL_OK = 1 << 2
+SENSOR_HEALTH_GPS_OK   = 1 << 3
+SENSOR_HEALTH_POWER_OK = 1 << 4
+SD_STATUS_PRESENT      = 1 << 5
+SD_STATUS_RECORDING    = 1 << 6
+
+# 28 fields, 51 bytes total
+TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBBBH'
+TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 51
 
 # AckPacket: magic0, magic1, cmdSeq, cmdType, checksum
 ACK_FORMAT = '<BBBBH'
@@ -105,6 +117,7 @@ class TelemetryData:
     pyro_cont_1:  int          # CH2 continuity
     pyro_cont_2:  int          # CH3 continuity
     cam_recording: int         # 1=recording, 0=stopped (FC's belief, no camera ack)
+    system_status: int         # bitfield, see SENSOR_HEALTH_*_OK / SD_STATUS_* above
     checksum:     int
     # Derived — populated by decode_packet()
     accel_mag_g:  float = 0.0
@@ -132,6 +145,40 @@ class TelemetryData:
         # gps_fix comes from TinyGPSPlus location.isValid(); satellite count
         # arrives in a separate NMEA sentence so don't gate on it here.
         return bool(self.gps_fix)
+
+    # Live sensor health -- "read successfully within the last 500ms", not a
+    # one-time boot check. A False here mid-flight means that sensor just
+    # dropped out, not that it never worked.
+    @property
+    def imu_ok(self) -> bool:
+        return bool(self.system_status & SENSOR_HEALTH_IMU_OK)
+
+    @property
+    def baro_ok(self) -> bool:
+        return bool(self.system_status & SENSOR_HEALTH_BARO_OK)
+
+    @property
+    def accel_ok(self) -> bool:
+        return bool(self.system_status & SENSOR_HEALTH_ACCEL_OK)
+
+    @property
+    def gps_ok(self) -> bool:
+        return bool(self.system_status & SENSOR_HEALTH_GPS_OK)
+
+    @property
+    def power_ok(self) -> bool:
+        return bool(self.system_status & SENSOR_HEALTH_POWER_OK)
+
+    # Flight computer's onboard SD card -- live, not a boot-time check. Not to
+    # be confused with the ground station's own local CSV log (see the "REC"
+    # button / core/data_logger.py), which is a separate, unrelated file.
+    @property
+    def sd_present(self) -> bool:
+        return bool(self.system_status & SD_STATUS_PRESENT)
+
+    @property
+    def sd_recording(self) -> bool:
+        return bool(self.system_status & SD_STATUS_RECORDING)
 
 
 def decode_packet(raw: bytes) -> Optional[TelemetryData]:
@@ -164,7 +211,8 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
      accel_x_cg, accel_y_cg, accel_z_cg,
      quat_w_i16, quat_x_i16, quat_y_i16, quat_z_i16,
      voltage_cv, current_ma,
-     rssi, pyro_cont_0, pyro_cont_1, pyro_cont_2, cam_recording, checksum) = vals
+     rssi, pyro_cont_0, pyro_cont_1, pyro_cont_2, cam_recording,
+     system_status, checksum) = vals
 
     # Unscale wire fixed-point values back to normal engineering units --
     # everything downstream of this function sees the same units as before.
@@ -187,6 +235,7 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
         rssi=rssi,
         pyro_cont_0=pyro_cont_0, pyro_cont_1=pyro_cont_1, pyro_cont_2=pyro_cont_2,
         cam_recording=cam_recording,
+        system_status=system_status,
         checksum=checksum,
     )
     data.accel_mag_g = math.sqrt(data.accel_x_g**2 + data.accel_y_g**2 + data.accel_z_g**2)

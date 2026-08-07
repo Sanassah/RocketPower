@@ -7,19 +7,24 @@ class StateMachine;
 class PyroController;
 class FinController;
 class CameraController;
+class DataLogger;
 
 class TelemetryManager {
 public:
     TelemetryManager(LoRaRadio& lora, StateMachine& sm, PyroController& pyro,
-                      FinController& fins, CameraController& camera)
-        : _lora(lora), _sm(sm), _pyro(pyro), _fins(fins), _camera(camera) {
+                      FinController& fins, CameraController& camera, DataLogger& logger)
+        : _lora(lora), _sm(sm), _pyro(pyro), _fins(fins), _camera(camera), _logger(logger) {
         for (size_t i = 0; i < _CMD_TYPE_SLOTS; i++) _lastProcessedSeqByType[i] = -1;
     }
 
     bool begin();
 
-    // Call every loop. Sends telemetry at TELEMETRY_INTERVAL_MS,
-    // checks for incoming commands and dispatches them.
+    // Call every loop. Sends telemetry over LoRa at TELEMETRY_INTERVAL_MS
+    // (that cadence is airtime-limited, see config.h) and, independently,
+    // mirrors it to USB at the much faster USB_TELEMETRY_INTERVAL_MS when
+    // USB_SERIAL_BINARY_MIRROR is on -- a direct USB link has no airtime
+    // constraint, so there's no reason to throttle it to the radio's rate.
+    // Also checks for incoming commands and dispatches them.
     void update(const FlightData& d);
 
     // Returns true (once) when a CALIBRATE_BARO command arrived.
@@ -32,7 +37,9 @@ private:
     PyroController&   _pyro;
     FinController&    _fins;
     CameraController& _camera;
-    uint32_t        _lastTxMs          = 0;
+    DataLogger&       _logger;
+    uint32_t        _lastLoraTxMs      = 0;
+    uint32_t        _lastUsbTxMs       = 0;
     bool            _calibrateRequested = false;
 
     // Last-processed seq, tracked PER command type (indexed by the raw
@@ -48,7 +55,7 @@ private:
     static constexpr size_t _CMD_TYPE_SLOTS = 32;   // headroom above the highest CommandType value
     int16_t _lastProcessedSeqByType[_CMD_TYPE_SLOTS];
 
-    void _sendTelemetry(const FlightData& d);
+    TelemetryPacket _buildPacket(const FlightData& d) const;
     void _handleCommand(const CommandPacket& cmd);
     void _sendAck(const CommandPacket& cmd);
 };

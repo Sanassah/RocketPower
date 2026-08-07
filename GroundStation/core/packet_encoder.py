@@ -33,6 +33,8 @@ class CommandType(IntEnum):
     SERVO_SAVE_CAL   = 0x0B  # param unused; persists all 4 channels' live position as new trim
     SERVO_CENTER_ALL = 0x0C  # param unused; drives all 4 to raw center, ignoring trim, not persisted
     SERVO_PREFLIGHT  = 0x0D  # param unused; blocking ~6s all-4 choreography
+    SD_START_RECORDING = 0x0E  # param unused; opens a new log file (no-op if already recording)
+    SD_STOP_RECORDING  = 0x0F  # param unused; flushes and closes the current log file
 
 
 def encode_command(cmd_type: CommandType, param: int = 0, seq: int = 0) -> bytes:
@@ -56,3 +58,5 @@ def encode_servo_nudge(ch: int, positive: bool, seq: int = 0) -> bytes:
 def encode_servo_save_cal(seq: int = 0)     -> bytes: return encode_command(CommandType.SERVO_SAVE_CAL, 0, seq)
 def encode_servo_center_all(seq: int = 0)   -> bytes: return encode_command(CommandType.SERVO_CENTER_ALL, 0, seq)
 def encode_servo_preflight(seq: int = 0)    -> bytes: return encode_command(CommandType.SERVO_PREFLIGHT, 0, seq)
+def encode_sd_start(seq: int = 0)           -> bytes: return encode_command(CommandType.SD_START_RECORDING, 0, seq)
+def encode_sd_stop(seq: int = 0)            -> bytes: return encode_command(CommandType.SD_STOP_RECORDING, 0, seq)

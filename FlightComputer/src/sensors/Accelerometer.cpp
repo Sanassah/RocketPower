@@ -12,7 +12,7 @@ bool Accelerometer::begin() {
 
 bool Accelerometer::update() {
     sensors_event_t e;
-    _adxl.getEvent(&e);
+    if (!_adxl.getEvent(&e)) return false;   // I2C read failed; leave last-known values in place
     _data.x_g = e.acceleration.x / SENSORS_GRAVITY_STANDARD;
     _data.y_g = e.acceleration.y / SENSORS_GRAVITY_STANDARD;
     _data.z_g = e.acceleration.z / SENSORS_GRAVITY_STANDARD;

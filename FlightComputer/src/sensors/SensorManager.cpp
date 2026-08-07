@@ -15,19 +15,39 @@ bool SensorManager::begin() {
     _data.gps_ok   = _gps.begin();
     _data.power_ok = _power.begin();
 
+    // Seed each sensor's "last known good" clock so update() has a baseline
+    // to measure staleness from. A sensor that failed begin() keeps its
+    // timestamp at 0, which reads as "unhealthy" from the very first update().
+    uint32_t now = millis();
+    if (_data.imu_ok)   _lastImuOkMs   = now;
+    if (_data.baro_ok)  _lastBaroOkMs  = now;
+    if (_data.accel_ok) _lastAccelOkMs = now;
+    if (_data.gps_ok)   _lastGpsOkMs   = now;
+    if (_data.power_ok) _lastPowerOkMs = now;
+
     // IMU and barometer are critical — flight is unsafe without them
     ok = _data.imu_ok && _data.baro_ok;
     return ok;
 }
 
 void SensorManager::update() {
-    _imu.update();
-    _baro.update();
-    _accel.update();
-    _gps.update();
-    _power.update();
+    uint32_t now = millis();
 
-    _data.timestamp_ms = millis();
+    if (_imu.update())   _lastImuOkMs   = now;
+    if (_baro.update())  _lastBaroOkMs  = now;
+    if (_accel.update()) _lastAccelOkMs = now;
+    if (_gps.update())   _lastGpsOkMs   = now;
+    if (_power.update()) _lastPowerOkMs = now;
+
+    // "OK" means a successful read within the last SENSOR_HEALTH_TIMEOUT_MS,
+    // not just that the sensor passed its boot check.
+    _data.imu_ok   = (now - _lastImuOkMs)   < SENSOR_HEALTH_TIMEOUT_MS;
+    _data.baro_ok  = (now - _lastBaroOkMs)  < SENSOR_HEALTH_TIMEOUT_MS;
+    _data.accel_ok = (now - _lastAccelOkMs) < SENSOR_HEALTH_TIMEOUT_MS;
+    _data.gps_ok   = (now - _lastGpsOkMs)   < SENSOR_HEALTH_TIMEOUT_MS;
+    _data.power_ok = (now - _lastPowerOkMs) < SENSOR_HEALTH_TIMEOUT_MS;
+
+    _data.timestamp_ms = now;
 
     // IMU
     const auto& imu = _imu.data();

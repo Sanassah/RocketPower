@@ -3,17 +3,25 @@
 
 // Binary file starts with an ASCII CSV header block so post-processing tools
 // can discover field names and offsets without a separate schema file.
+// NOTE: this lists field NAMES in struct order, not byte offsets -- FlightData
+// is a plain (non-packed) struct, so the compiler inserts alignment padding
+// between some fields (notably after `state` and after `gps_fix`). A decoder
+// needs the real struct layout, not just this name list, to get offsets
+// right -- see GroundStation/tools/log_convert.py, which hardcodes the
+// current layout and must be updated if FlightData's fields ever change.
 static const char CSV_HEADER[] =
     "# RocketFlightComputer binary log\n"
-    "# Record format: raw FlightData struct, little-endian\n"
-    "# Fields (in order): timestamp_ms,state,"
+    "# Record format: raw FlightData struct, little-endian, sizeof == 128 bytes\n"
+    "# Fields (in order, NOT packed -- see GroundStation/tools/log_convert.py for real offsets):\n"
+    "# timestamp_ms,state,"
     "quat_w,quat_x,quat_y,quat_z,"
     "lin_accel_x,lin_accel_y,lin_accel_z,"
     "gyro_x,gyro_y,gyro_z,"
     "pressure_hpa,temperature_c,baro_alt_m,vert_vel_ms,"
     "highg_x_g,highg_y_g,highg_z_g,highg_mag_g,"
     "lat,lon,gps_alt_m,gps_sats,gps_fix,"
-    "voltage_v,current_ma,power_mw\n"
+    "voltage_v,current_ma,power_mw,"
+    "imu_ok,baro_ok,accel_ok,gps_ok,power_ok\n"
     "# END_HEADER\n";
 
 // Header sentinel lets a parser skip past ASCII bytes to binary records
@@ -29,6 +37,17 @@ String DataLogger::_nextFilename() {
 }
 
 bool DataLogger::open() {
+    if (_isOpen) return true;   // already recording -- no-op, not an error
+
+    // Self-contained: re-probes the card itself rather than trusting an
+    // earlier SD.begin() elsewhere is still valid. Matters once this can be
+    // called long after boot from a ground command, not just from setup().
+    if (!SD.begin(SD_CS_PIN)) {
+        _cardPresent = false;
+        return false;
+    }
+    _cardPresent = true;
+
     String name = _nextFilename();
     _file = SD.open(name.c_str(), FILE_WRITE);
     if (!_file) return false;
@@ -36,6 +55,7 @@ bool DataLogger::open() {
     _writeCsvHeader();
     _isOpen      = true;
     _recordCount = 0;
+    _consecutiveWriteFails = 0;
     Serial.print("[LOG] Opened "); Serial.println(name);
     return true;
 }
@@ -47,12 +67,26 @@ void DataLogger::_writeCsvHeader() {
 }
 
 void DataLogger::update(const FlightData& d) {
-    if (!_isOpen) return;
+    if (!_isOpen) return;   // idle: no periodic re-probe -- see cardPresent() doc comment
+
     uint32_t now = millis();
     if (now - _lastLogMs < LOG_INTERVAL_MS) return;
     _lastLogMs = now;
 
-    _file.write(reinterpret_cast<const uint8_t*>(&d), sizeof(FlightData));
+    size_t written = _file.write(reinterpret_cast<const uint8_t*>(&d), sizeof(FlightData));
+    if (written != sizeof(FlightData)) {
+        _consecutiveWriteFails++;
+        if (_consecutiveWriteFails < _MAX_CONSECUTIVE_WRITE_FAILS) return;   // could be a one-off blip
+
+        // Several writes in a row failed -- card pulled, or a genuine fault.
+        // Stop instead of hammering a dead card every loop.
+        Serial.println("[LOG] WARNING: repeated write failures -- card removed? Closing log.");
+        _cardPresent = false;
+        close();
+        return;
+    }
+    _consecutiveWriteFails = 0;
+    _cardPresent = true;
     _recordCount++;
 
     // Flush every 100 records to bound data loss on power failure

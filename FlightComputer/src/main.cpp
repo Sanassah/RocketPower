@@ -21,8 +21,8 @@ StateMachine     fsm(pyro);
 LoRaRadio        radio;
 FinController    fins;
 CameraController camera;
-TelemetryManager telem(radio, fsm, pyro, fins, camera);
 DataLogger       logger;
+TelemetryManager telem(radio, fsm, pyro, fins, camera, logger);
 StatusLED        statusLed;
 
 // ===== Timing =====
@@ -32,7 +32,7 @@ uint32_t      loopMaxUs    = 0;
 FlightState   prevState    = FlightState::IDLE;
 
 // ===== Helpers =====
-static void printSensorReport() {
+static void printSensorReport(bool sdOk) {
     const FlightData& d = sensors.data();
     Serial.println("--- Sensor init report ---");
     Serial.print("  IMU   (BNO085 Wire  0x4A): "); Serial.println(d.imu_ok   ? "OK" : "FAIL");
@@ -40,7 +40,7 @@ static void printSensorReport() {
     Serial.print("  Accel (ADXL375 Wire2 0x1D): "); Serial.println(d.accel_ok ? "OK" : "FAIL");
     Serial.print("  GPS   (ZOEM8  Wire1 0x42): "); Serial.println(d.gps_ok   ? "OK" : "FAIL");
     Serial.print("  Power (INA260 Wire1 0x40): "); Serial.println(d.power_ok  ? "OK" : "FAIL");
-    Serial.print("  SD    (BUILTIN_SDCARD):    "); Serial.println(SD.begin(SD_CS_PIN) ? "OK" : "FAIL");
+    Serial.print("  SD    (BUILTIN_SDCARD):    "); Serial.println(sdOk ? "OK" : "FAIL");
     Serial.println("--------------------------");
 }
 
@@ -60,7 +60,15 @@ void setup() {
     // ---- Sensors ----
     Serial.println("[INIT] Sensors...");
     bool sensorsOk = sensors.begin();
-    printSensorReport();
+
+    // ---- SD card ---- (before the report below, so it reflects the real attempt --
+    // logger.open() is self-contained and probes the card itself)
+    Serial.println("[INIT] SD card...");
+    if (!logger.open()) {
+        Serial.println("[INIT] WARNING: SD card failed. Logging disabled.");
+    }
+
+    printSensorReport(logger.cardPresent());
     statusLed.update(sensors.data());
     if (!sensorsOk) {
         Serial.println("[INIT] CRITICAL: IMU or barometer failed. Halting.");
@@ -79,14 +87,6 @@ void setup() {
         Serial.print("  CH"); Serial.print(ch);
         Serial.print(" continuity: ");
         Serial.println(pyro.continuityOk(ch) ? "OK" : "OPEN (no ematch?)");
-    }
-
-    // ---- SD card ----
-    Serial.println("[INIT] SD card...");
-    if (!SD.begin(SD_CS_PIN)) {
-        Serial.println("[INIT] WARNING: SD card failed. Logging disabled.");
-    } else {
-        logger.open();
     }
 
     // ---- LoRa / Telemetry ----
@@ -112,20 +112,15 @@ void loop() {
 
     // ---- 1. Read all sensors ----
     sensors.update();
+    sensors.setState(fsm.state());   // stamp this loop's state onto the snapshot for logging/telemetry
     const FlightData& d = sensors.data();
     statusLed.update(d);
 
-    // ---- 2. Inject current state into data (read-modify-write via mutable ref) ----
-    // StateMachine owns the state; we inject it into the FlightData snapshot
-    // for logging and telemetry by const_casting the immutable ref.
-    // (In a refactor, SensorManager would hold a state pointer — fine for now.)
-    const_cast<FlightData&>(d).state = fsm.state();
-
-    // ---- 3. Update state machine ----
+    // ---- 2. Update state machine ----
     fsm.update(d);
     FlightState newState = fsm.state();
 
-    // ---- 4. Handle state transitions ----
+    // ---- 3. Handle state transitions ----
     if (newState != prevState) {
         camera.onStateChange(prevState, newState);
         logger.flush();   // force flush on state change to minimise data loss
@@ -147,20 +142,20 @@ void loop() {
         prevState = newState;
     }
 
-    // ---- 5. Log data ----
+    // ---- 4. Log data ----
     logger.update(d);
 
-    // ---- 6. Telemetry (send + receive commands) ----
+    // ---- 5. Telemetry (send + receive commands) ----
     telem.update(d);
 
-    // ---- 6b. Execute calibration if requested by ground station ----
+    // ---- 5b. Execute calibration if requested by ground station ----
     if (telem.calibrateRequested()) {
         Serial.println("[CALIB] Calibrating barometer...");
         sensors.calibrateBaro();
         Serial.println("[CALIB] Done.");
     }
 
-    // ---- 7. Loop timing diagnostics ----
+    // ---- 6. Loop timing diagnostics ----
     uint32_t elapsed = micros() - loopStart;
     if (elapsed > loopMaxUs) loopMaxUs = elapsed;
     loopCount++;

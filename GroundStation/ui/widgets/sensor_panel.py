@@ -82,6 +82,22 @@ class SensorPanel(QWidget):
         root.addLayout(hdr)
         root.addWidget(_divider())
 
+        # Live sensor health -- "responded within the last 500ms", not a
+        # one-time boot check. The only place this ever surfaces once the
+        # airframe is closed up and the status LEDs are out of sight.
+        root.addWidget(_section('STATUS'))
+        status_grid = QGridLayout()
+        status_grid.setColumnStretch(1, 1)
+        status_grid.setVerticalSpacing(4)
+        self._r_imu_ok   = _Row(status_grid, 0, 'IMU')
+        self._r_baro_ok  = _Row(status_grid, 1, 'Barometer')
+        self._r_accel_ok = _Row(status_grid, 2, 'Accelerometer')
+        self._r_gps_ok   = _Row(status_grid, 3, 'GPS Module')
+        self._r_power_ok = _Row(status_grid, 4, 'Power Monitor')
+        self._r_sd       = _Row(status_grid, 5, 'SD Card')
+        root.addLayout(status_grid)
+        root.addWidget(_divider())
+
         root.addWidget(_section('GPS'))
         gps_grid = QGridLayout()
         gps_grid.setColumnStretch(1, 1)
@@ -118,6 +134,26 @@ class SensorPanel(QWidget):
         root.addStretch()
 
     def update_data(self, data: TelemetryData) -> None:
+        self._r_imu_ok.set('OK' if data.imu_ok else 'LOST', warn=not data.imu_ok, ok=data.imu_ok)
+        self._r_baro_ok.set('OK' if data.baro_ok else 'LOST', warn=not data.baro_ok, ok=data.baro_ok)
+        self._r_accel_ok.set('OK' if data.accel_ok else 'LOST', warn=not data.accel_ok, ok=data.accel_ok)
+        self._r_gps_ok.set('OK' if data.gps_ok else 'LOST', warn=not data.gps_ok, ok=data.gps_ok)
+        self._r_power_ok.set('OK' if data.power_ok else 'LOST', warn=not data.power_ok, ok=data.power_ok)
+
+        # Flight computer's onboard SD card (not the ground station's own
+        # local CSV log -- that's the separate "REC" button up top). Unlike
+        # the sensor rows above, this isn't continuously re-checked while
+        # idle -- it reflects the FC's last actual attempt (boot, a Start
+        # Log command, or a write during active recording), not a live
+        # poll. "NO CARD" can mean "definitely no card" or "haven't
+        # rechecked since you inserted one" -- press Start Log to retry.
+        if data.sd_recording:
+            self._r_sd.set('RECORDING', ok=True)
+        elif data.sd_present:
+            self._r_sd.set('IDLE')
+        else:
+            self._r_sd.set('NO CARD', warn=True)
+
         has_fix = data.has_gps_fix
         self._r_lat.set(f'{data.lat:.6f} deg' if has_fix else '--')
         self._r_lon.set(f'{data.lon:.6f} deg' if has_fix else '--')

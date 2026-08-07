@@ -16,7 +16,7 @@ from core.packet_encoder  import (
     encode_ping, encode_calibrate,
     encode_servo_test, encode_cam_toggle,
     encode_servo_nudge, encode_servo_save_cal, encode_servo_center_all,
-    encode_servo_preflight,
+    encode_servo_preflight, encode_sd_start, encode_sd_stop,
 )
 from core.data_logger import DataLogger
 
@@ -30,6 +30,7 @@ from ui.widgets.arm_panel        import ArmPanel
 from ui.widgets.sensor_panel     import SensorPanel
 from ui.widgets.command_panel    import CommandPanel
 from ui.widgets.event_log        import EventLog
+from ui.widgets.log_converter_panel import LogConverterPanel
 
 _LOG_DIR = 'logs'
 
@@ -154,6 +155,7 @@ class MainWindow(QMainWindow):
         self._pages.setStyleSheet(f'background-color:{_BG};')
         self._pages.addWidget(self._build_page_overview())
         self._pages.addWidget(self._build_page_telemetry())
+        self._pages.addWidget(self._build_page_data_tools())
         body.addWidget(self._pages, stretch=1)
 
         self._status_bar = QStatusBar()
@@ -193,7 +195,7 @@ class MainWindow(QMainWindow):
 
         # Nav buttons (icon + label)
         self._nav_btns: list[_NavBtn] = []
-        for i, label in enumerate(['⊞  OVERVIEW', '↗  TELEMETRY']):
+        for i, label in enumerate(['⊞  OVERVIEW', '↗  TELEMETRY', '⇄  DATA TOOLS']):
             btn = _NavBtn(label)
             btn.clicked.connect(lambda _, idx=i: self._switch_page(idx))
             self._nav_btns.append(btn)
@@ -411,7 +413,7 @@ class MainWindow(QMainWindow):
         hl = QHBoxLayout(hdr)
         hl.setContentsMargins(14, 0, 14, 0)
 
-        lbl = QLabel('[]  3D ORIENTATION  (MATLAB STYLE)')
+        lbl = QLabel('[]  3D ORIENTATION')
         lbl.setStyleSheet(
             f'color:{_MUTED};font-size:10px;font-weight:700;letter-spacing:1px;'
             f'background:transparent;border:none;'
@@ -495,6 +497,20 @@ class MainWindow(QMainWindow):
             self._event_log.log('Recording stopped.', level='warn')
             self._status_bar.showMessage('Recording stopped.')
 
+    # ── Page 2: Data Tools ───────────────────────────────────────────────────
+    def _build_page_data_tools(self) -> QWidget:
+        page = QWidget()
+        page.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        page.setStyleSheet(f'background-color:{_BG};')
+
+        root = QVBoxLayout(page)
+        root.setContentsMargins(14, 14, 14, 14)
+        root.setSpacing(0)
+
+        self._log_converter = LogConverterPanel()
+        root.addWidget(self._log_converter)
+        return page
+
     # ── Signals ───────────────────────────────────────────────────────────────
     def _connect_signals(self) -> None:
         self._arm_panel.arm_requested.connect(self._send_arm)
@@ -510,6 +526,8 @@ class MainWindow(QMainWindow):
         self._command_panel.servo_save_cal_requested.connect(self._send_servo_save_cal)
         self._command_panel.servo_center_requested.connect(self._send_servo_center)
         self._command_panel.servo_preflight_requested.connect(self._send_servo_preflight)
+        self._command_panel.sd_start_requested.connect(self._send_sd_start)
+        self._command_panel.sd_stop_requested.connect(self._send_sd_stop)
 
     def _switch_page(self, idx: int) -> None:
         self._pages.setCurrentIndex(idx)
@@ -697,6 +715,12 @@ class MainWindow(QMainWindow):
 
     def _send_servo_preflight(self) -> None:
         self._send_tracked(encode_servo_preflight, label='SERVO PREFLIGHT')
+
+    def _send_sd_start(self) -> None:
+        self._send_tracked(encode_sd_start, label='SD START RECORDING', level='ok')
+
+    def _send_sd_stop(self) -> None:
+        self._send_tracked(encode_sd_stop, label='SD STOP RECORDING', level='warn')
 
     def closeEvent(self, event) -> None:
         self._stop_serial()
