@@ -46,13 +46,13 @@ def _vdivider() -> QFrame:
 def _section(text: str) -> QLabel:
     lbl = QLabel(text)
     lbl.setStyleSheet(
-        f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:0.8px;'
+        f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:0.8px;'
         f'padding-top:1px;border:none;background:transparent;'
     )
     return lbl
 
 
-def _flat_btn(text: str, height: int = 26, width: int = 0, font_size: int = 10) -> QPushButton:
+def _flat_btn(text: str, height: int = 30, width: int = 0, font_size: int = 12) -> QPushButton:
     b = QPushButton(text)
     b.setFixedHeight(height)
     if width:
@@ -104,11 +104,11 @@ class CommandPanel(QWidget):
         hdr = QHBoxLayout(); hdr.setSpacing(8)
         sym = QLabel('>_')
         sym.setStyleSheet(
-            f'color:{_TEXT};font-size:12px;background:transparent;border:none;'
+            f'color:{_TEXT};font-size:14px;background:transparent;border:none;'
         )
         ttl = QLabel('COMMANDS')
         ttl.setStyleSheet(
-            f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
+            f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:1px;'
             f'background:transparent;border:none;'
         )
         hdr.addWidget(sym); hdr.addWidget(ttl); hdr.addStretch()
@@ -132,15 +132,15 @@ class CommandPanel(QWidget):
         col_a.addWidget(_section('IGNITION CONTROL'))
         note = QLabel('Available from ARMED through DESCENT')
         note.setStyleSheet(
-            f'color:{_MUTED};font-size:11px;border:none;background:transparent;'
+            f'color:{_MUTED};font-size:13px;border:none;background:transparent;'
         )
         col_a.addWidget(note)
 
         self._fire_btns: list[QPushButton] = []
         for ch in range(1, PYRO_CHANNELS + 1):
             btn = QPushButton(f'Fire  {_FIRE_NAMES[ch - 1]}')
-            btn.setFixedHeight(28)
-            btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+            btn.setFixedHeight(32)
+            btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
             btn.setEnabled(False)
             btn.clicked.connect(lambda checked, c=ch: self._on_fire(c))
             btn.setStyleSheet(f"""
@@ -172,17 +172,17 @@ class CommandPanel(QWidget):
 
         real_row = QHBoxLayout(); real_row.setSpacing(6)
         real_lbl = QLabel('Real (in-flight)')
-        real_lbl.setFixedWidth(96)
-        real_lbl.setStyleSheet(f'color:{_MUTED};font-size:11px;border:none;background:transparent;')
+        real_lbl.setFixedWidth(118)
+        real_lbl.setStyleSheet(f'color:{_MUTED};font-size:13px;border:none;background:transparent;')
         self._att_ctrl_btn = QPushButton('OFF')
-        self._att_ctrl_btn.setFixedHeight(24)
-        self._att_ctrl_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._att_ctrl_btn.setFixedHeight(28)
+        self._att_ctrl_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         self._att_ctrl_btn.setCheckable(True)
         self._att_ctrl_btn.clicked.connect(self._on_attitude_control_toggled)
         self._att_ctrl_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color:{_CARD2};color:{_TEXT};
-                border:1px solid {_BORDER};border-radius:5px;
+                border:1px solid {_BORDER};border-radius:5px;padding:0;
             }}
             QPushButton:hover {{ background-color:#222436; }}
             QPushButton:checked {{
@@ -195,17 +195,17 @@ class CommandPanel(QWidget):
 
         demo_row = QHBoxLayout(); demo_row.setSpacing(6)
         demo_lbl = QLabel('Demo (armed only)')
-        demo_lbl.setFixedWidth(96)
-        demo_lbl.setStyleSheet(f'color:{_MUTED};font-size:11px;border:none;background:transparent;')
+        demo_lbl.setFixedWidth(118)
+        demo_lbl.setStyleSheet(f'color:{_MUTED};font-size:13px;border:none;background:transparent;')
         self._att_demo_btn = QPushButton('OFF')
-        self._att_demo_btn.setFixedHeight(24)
-        self._att_demo_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._att_demo_btn.setFixedHeight(28)
+        self._att_demo_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         self._att_demo_btn.setCheckable(True)
         self._att_demo_btn.clicked.connect(self._on_attitude_demo_toggled)
         self._att_demo_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color:{_CARD2};color:{_TEXT};
-                border:1px solid {_BORDER};border-radius:5px;
+                border:1px solid {_BORDER};border-radius:5px;padding:0;
             }}
             QPushButton:hover {{ background-color:#222436; }}
             QPushButton:checked {{
@@ -220,7 +220,7 @@ class CommandPanel(QWidget):
         # Utilities -- also re-zeros the YAW readout on the 3D view, not just
         # the barometer, so the name can't just say "Baro" anymore.
         col_a.addWidget(_section('UTILITIES'))
-        calibrate_btn = _flat_btn('Calibrate', height=26)
+        calibrate_btn = _flat_btn('Calibrate')
         calibrate_btn.clicked.connect(self._on_calibrate)
         col_a.addWidget(calibrate_btn)
         col_a.addWidget(_divider())
@@ -232,14 +232,14 @@ class CommandPanel(QWidget):
         # itself lives in the sensor panel's STATUS section, not here.
         col_a.addWidget(_section('SD CARD  (FLIGHT LOG)'))
         self._sd_btn = QPushButton('Start Log')
-        self._sd_btn.setFixedHeight(28)
-        self._sd_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._sd_btn.setFixedHeight(32)
+        self._sd_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         self._sd_btn.setCheckable(True)
         self._sd_btn.clicked.connect(self._on_sd_toggled)
         self._sd_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color:{_CARD2};color:{_TEXT};
-                border:1px solid {_BORDER};border-radius:6px;font-weight:700;
+                border:1px solid {_BORDER};border-radius:6px;font-weight:700;padding:0;
             }}
             QPushButton:hover {{ background-color:#222436; }}
             QPushButton:checked {{
@@ -254,13 +254,13 @@ class CommandPanel(QWidget):
         col_b.addWidget(_section('FIN SERVOS  (BENCH TEST)'))
 
         preflight_btn = QPushButton('▶  PREFLIGHT  (S→E→N→W, ~6s)')
-        preflight_btn.setFixedHeight(28)
-        preflight_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        preflight_btn.setFixedHeight(32)
+        preflight_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         preflight_btn.clicked.connect(self.servo_preflight_requested.emit)
         preflight_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color:{_CARD2};color:{_BLUE};
-                border:1px solid {_BLUE};border-radius:6px;font-weight:700;
+                border:1px solid {_BLUE};border-radius:6px;font-weight:700;padding:0;
             }}
             QPushButton:hover {{ background-color:#0A1830; }}
         """)
@@ -268,7 +268,7 @@ class CommandPanel(QWidget):
 
         fin_note = QLabel('Test = sweep.  -/+ = nudge trim against your jig.')
         fin_note.setStyleSheet(
-            f'color:{_MUTED};font-size:11px;border:none;background:transparent;'
+            f'color:{_MUTED};font-size:13px;border:none;background:transparent;'
         )
         col_b.addWidget(fin_note)
 
@@ -277,14 +277,14 @@ class CommandPanel(QWidget):
             ch_row.setSpacing(4)
 
             lbl = QLabel(f'CH{ch} ({_COMPASS[ch]})')
-            lbl.setFixedWidth(52)
+            lbl.setFixedWidth(62)
             lbl.setStyleSheet(
-                f'color:{_MUTED};font-size:10px;font-weight:700;'
+                f'color:{_MUTED};font-size:12px;font-weight:700;'
                 f'border:none;background:transparent;'
             )
-            test_btn  = _flat_btn('Test', height=23)
-            minus_btn = _flat_btn('-', height=23, width=28, font_size=13)
-            plus_btn  = _flat_btn('+', height=23, width=28, font_size=13)
+            test_btn  = _flat_btn('Test', height=27)
+            minus_btn = _flat_btn('-', height=27, width=32, font_size=15)
+            plus_btn  = _flat_btn('+', height=27, width=32, font_size=15)
             test_btn.clicked.connect(lambda checked, c=ch: self.servo_test_requested.emit(c))
             minus_btn.clicked.connect(lambda checked, c=ch: self.servo_nudge_requested.emit(c, False))
             plus_btn.clicked.connect(lambda checked, c=ch: self.servo_nudge_requested.emit(c, True))
@@ -298,18 +298,18 @@ class CommandPanel(QWidget):
         cal_row = QHBoxLayout()
         cal_row.setSpacing(6)
 
-        center_btn = _flat_btn('Center All', height=26)
+        center_btn = _flat_btn('Center All')
         center_btn.setToolTip('Drive all 4 to raw center -- for mounting fins')
         center_btn.clicked.connect(self.servo_center_requested.emit)
 
         save_cal_btn = QPushButton('Save Calibration')
-        save_cal_btn.setFixedHeight(26)
-        save_cal_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        save_cal_btn.setFixedHeight(30)
+        save_cal_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         save_cal_btn.clicked.connect(self._on_save_calibration)
         save_cal_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color:{_CARD2};color:{_GREEN};
-                border:1px solid {_GREEN};border-radius:6px;font-weight:700;
+                border:1px solid {_GREEN};border-radius:6px;font-weight:700;padding:0;
             }}
             QPushButton:hover {{ background-color:#0A2010; }}
         """)
@@ -326,14 +326,14 @@ class CommandPanel(QWidget):
         # camera-confirmed one -- there's no ack on that link.
         col_b.addWidget(_section('CAMERA  (BENCH TEST)'))
         self._cam_btn = QPushButton('⏺  Toggle Recording')
-        self._cam_btn.setFixedHeight(28)
-        self._cam_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._cam_btn.setFixedHeight(32)
+        self._cam_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         self._cam_btn.setCheckable(True)
         self._cam_btn.clicked.connect(self.cam_toggle_requested.emit)
         self._cam_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color:{_CARD2};color:{_TEXT};
-                border:1px solid {_BORDER};border-radius:6px;font-weight:700;
+                border:1px solid {_BORDER};border-radius:6px;font-weight:700;padding:0;
             }}
             QPushButton:hover {{ background-color:#222436; }}
             QPushButton:checked {{

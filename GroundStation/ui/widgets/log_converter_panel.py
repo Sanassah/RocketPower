@@ -40,7 +40,7 @@ def _divider() -> QFrame:
 def _section(text: str) -> QLabel:
     lbl = QLabel(text)
     lbl.setStyleSheet(
-        f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:0.8px;'
+        f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:0.8px;'
         f'border:none;background:transparent;'
     )
     return lbl
@@ -63,10 +63,10 @@ class LogConverterPanel(QWidget):
 
         hdr = QHBoxLayout(); hdr.setSpacing(8)
         sym = QLabel('<>')
-        sym.setStyleSheet(f'color:{_TEXT};font-size:12px;background:transparent;border:none;')
+        sym.setStyleSheet(f'color:{_TEXT};font-size:14px;background:transparent;border:none;')
         ttl = QLabel('FLIGHT LOG CONVERTER')
         ttl.setStyleSheet(
-            f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
+            f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:1px;'
             f'background:transparent;border:none;'
         )
         hdr.addWidget(sym); hdr.addWidget(ttl); hdr.addStretch()
@@ -80,32 +80,32 @@ class LogConverterPanel(QWidget):
             "does the analysis-friendly conversion afterward, on your PC."
         )
         desc.setWordWrap(True)
-        desc.setStyleSheet(f'color:{_MUTED};font-size:11px;border:none;background:transparent;')
+        desc.setStyleSheet(f'color:{_MUTED};font-size:13px;border:none;background:transparent;')
         root.addWidget(desc)
 
         # ---- Step 1: pick a file ----
         root.addWidget(_section('1. SELECT LOG FILE'))
         browse_row = QHBoxLayout(); browse_row.setSpacing(8)
         self._browse_btn = QPushButton('Browse...')
-        self._browse_btn.setFixedHeight(28)
-        self._browse_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._browse_btn.setFixedHeight(32)
+        self._browse_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         self._browse_btn.clicked.connect(self._on_browse)
         self._browse_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color:{_CARD2};color:{_TEXT};
-                border:1px solid {_BORDER};border-radius:5px;
+                border:1px solid {_BORDER};border-radius:5px;padding:0;
             }}
             QPushButton:hover {{ background-color:#222436; }}
         """)
         self._path_lbl = QLabel('No file selected')
-        self._path_lbl.setStyleSheet(f'color:{_MUTED};font-size:11px;border:none;background:transparent;')
+        self._path_lbl.setStyleSheet(f'color:{_MUTED};font-size:13px;border:none;background:transparent;')
         browse_row.addWidget(self._browse_btn)
         browse_row.addWidget(self._path_lbl, stretch=1)
         root.addLayout(browse_row)
 
         self._summary_lbl = QLabel('')
         self._summary_lbl.setStyleSheet(
-            f'color:{_TEXT};font-size:11px;font-weight:600;border:none;background:transparent;'
+            f'color:{_TEXT};font-size:13px;font-weight:600;border:none;background:transparent;'
         )
         root.addWidget(self._summary_lbl)
         root.addWidget(_divider())
@@ -115,11 +115,11 @@ class LogConverterPanel(QWidget):
         fmt_row = QHBoxLayout(); fmt_row.setSpacing(16)
         self._csv_chk = QCheckBox('CSV')
         self._csv_chk.setChecked(True)
-        self._csv_chk.setStyleSheet(f'color:{_TEXT};font-size:11px;border:none;background:transparent;')
+        self._csv_chk.setStyleSheet(f'color:{_TEXT};font-size:13px;border:none;background:transparent;')
         self._mat_chk = QCheckBox('MATLAB (.mat)')
         self._mat_chk.setChecked(_SCIPY_AVAILABLE)
         self._mat_chk.setEnabled(_SCIPY_AVAILABLE)
-        self._mat_chk.setStyleSheet(f'color:{_TEXT};font-size:11px;border:none;background:transparent;')
+        self._mat_chk.setStyleSheet(f'color:{_TEXT};font-size:13px;border:none;background:transparent;')
         if not _SCIPY_AVAILABLE:
             self._mat_chk.setToolTip('Requires scipy -- pip install scipy')
         fmt_row.addWidget(self._csv_chk)
@@ -129,7 +129,7 @@ class LogConverterPanel(QWidget):
 
         if not _SCIPY_AVAILABLE:
             hint = QLabel('scipy not installed -- .mat export unavailable (pip install scipy)')
-            hint.setStyleSheet(f'color:{_MUTED};font-size:10px;border:none;background:transparent;')
+            hint.setStyleSheet(f'color:{_MUTED};font-size:12px;border:none;background:transparent;')
             root.addWidget(hint)
 
         root.addWidget(_divider())
@@ -137,14 +137,14 @@ class LogConverterPanel(QWidget):
         # ---- Step 3: convert ----
         root.addWidget(_section('3. CONVERT'))
         self._convert_btn = QPushButton('Convert & Save As...')
-        self._convert_btn.setFixedHeight(32)
-        self._convert_btn.setFont(QFont('Segoe UI', 11, QFont.Weight.Bold))
+        self._convert_btn.setFixedHeight(36)
+        self._convert_btn.setFont(QFont('Segoe UI', 13, QFont.Weight.Bold))
         self._convert_btn.setEnabled(False)
         self._convert_btn.clicked.connect(self._on_convert)
         self._convert_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color:{_BLUE};color:#FFF;border:none;
-                border-radius:6px;font-weight:700;letter-spacing:0.5px;
+                border-radius:6px;font-weight:700;letter-spacing:0.5px;padding:0;
             }}
             QPushButton:hover {{ background-color:#60A5FA; }}
             QPushButton:pressed {{ background-color:#2563EB; }}

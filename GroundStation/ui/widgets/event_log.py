@@ -41,10 +41,10 @@ class EventLog(QWidget):
 
         hdr = QHBoxLayout(); hdr.setSpacing(8)
         sym = QLabel('--')
-        sym.setStyleSheet(f'color:{_TEXT};font-size:12px;background:transparent;border:none;')
+        sym.setStyleSheet(f'color:{_TEXT};font-size:14px;background:transparent;border:none;')
         ttl = QLabel(title)
         ttl.setStyleSheet(
-            f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
+            f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:1px;'
             f'background:transparent;border:none;'
         )
         hdr.addWidget(sym); hdr.addWidget(ttl); hdr.addStretch()
@@ -53,7 +53,7 @@ class EventLog(QWidget):
 
         self._text = QTextEdit()
         self._text.setReadOnly(True)
-        self._text.setFont(QFont('JetBrains Mono', 11))
+        self._text.setFont(QFont('JetBrains Mono', 13))
         self._text.setStyleSheet(f"""
             QTextEdit {{
                 background-color: #0F0F10;
@@ -61,7 +61,7 @@ class EventLog(QWidget):
                 border: 1px solid {_BORDER};
                 border-radius: 6px;
                 padding: 6px 10px;
-                font-size: 11px;
+                font-size: 13px;
             }}
         """)
         root.addWidget(self._text)

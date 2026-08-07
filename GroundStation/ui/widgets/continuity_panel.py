@@ -32,32 +32,32 @@ class _CircuitRow(QWidget):
 
         # Status circle icon
         self._icon = QLabel('●')
-        self._icon.setFont(QFont('Segoe UI', 14))
-        self._icon.setFixedWidth(22)
+        self._icon.setFont(QFont('Segoe UI', 16))
+        self._icon.setFixedWidth(24)
         self._icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._icon.setStyleSheet(f'color:{_MUTED};border:none;background:transparent;')
 
         # Channel number ("PYRO 1")
         ch_lbl = QLabel(ch_label)
-        ch_lbl.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        ch_lbl.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         ch_lbl.setStyleSheet(
-            f'color:{_TEXT};font-size:10px;font-weight:700;letter-spacing:0.5px;'
-            f'border:none;background:transparent;min-width:50px;'
+            f'color:{_TEXT};font-size:12px;font-weight:700;letter-spacing:0.5px;'
+            f'border:none;background:transparent;min-width:58px;'
         )
 
         # Function name ("IGNITION")
         fn_lbl = QLabel(func_label)
-        fn_lbl.setFont(QFont('Segoe UI', 13))
+        fn_lbl.setFont(QFont('Segoe UI', 15))
         fn_lbl.setStyleSheet(
-            f'color:{_TEXT};font-size:13px;border:none;background:transparent;'
+            f'color:{_TEXT};font-size:15px;border:none;background:transparent;'
         )
 
         # Status text ("CONTINUOUS" / "OPEN CIRCUIT")
         self._status = QLabel('--')
-        self._status.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
+        self._status.setFont(QFont('Segoe UI', 14, QFont.Weight.Bold))
         self._status.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self._status.setStyleSheet(
-            f'color:{_MUTED};font-size:12px;font-weight:700;border:none;background:transparent;'
+            f'color:{_MUTED};font-size:14px;font-weight:700;border:none;background:transparent;'
         )
 
         row.addWidget(self._icon)
@@ -71,7 +71,7 @@ class _CircuitRow(QWidget):
         self._icon.setStyleSheet(f'color:{color};border:none;background:transparent;')
         self._status.setText('CONTINUOUS' if ok else 'OPEN CIRCUIT')
         self._status.setStyleSheet(
-            f'color:{color};font-size:12px;font-weight:700;border:none;background:transparent;'
+            f'color:{color};font-size:14px;font-weight:700;border:none;background:transparent;'
         )
 
 
@@ -89,11 +89,11 @@ class ContinuityPanel(QWidget):
         # Header
         hdr = QHBoxLayout(); hdr.setSpacing(8)
         sym = QLabel('()')
-        sym.setStyleSheet(f'color:{_TEXT};font-size:12px;background:transparent;border:none;')
+        sym.setStyleSheet(f'color:{_TEXT};font-size:14px;background:transparent;border:none;')
         ttl = QLabel('CONTINUITY STATUS')
-        ttl.setFont(QFont('Segoe UI', 11, QFont.Weight.Bold))
+        ttl.setFont(QFont('Segoe UI', 13, QFont.Weight.Bold))
         ttl.setStyleSheet(
-            f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
+            f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:1px;'
             f'background:transparent;border:none;'
         )
         hdr.addWidget(sym); hdr.addWidget(ttl); hdr.addStretch()

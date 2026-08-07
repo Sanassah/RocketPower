@@ -21,7 +21,7 @@ LOW_VOLTAGE_V = 7.0
 def _section(text: str) -> QLabel:
     lbl = QLabel(text)
     lbl.setStyleSheet(
-        f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:0.9px;'
+        f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:0.9px;'
         f'padding-top:8px;border:none;background:transparent;'
     )
     return lbl
@@ -39,12 +39,12 @@ class _Row:
     def __init__(self, grid: QGridLayout, row: int, label: str):
         lbl = QLabel(label)
         lbl.setStyleSheet(
-            f'color:{_MUTED};font-size:12px;border:none;background:transparent;'
+            f'color:{_MUTED};font-size:14px;border:none;background:transparent;'
         )
         self._val = QLabel('--')
         self._val.setStyleSheet(
             f'color:{_TEXT};font-family:"{_MONO}",monospace;'
-            f'font-size:13px;font-weight:600;border:none;background:transparent;'
+            f'font-size:15px;font-weight:600;border:none;background:transparent;'
         )
         self._val.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         grid.addWidget(lbl,       row, 0)
@@ -54,7 +54,7 @@ class _Row:
         c = _RED if warn else _GREEN if ok else _TEXT
         self._val.setStyleSheet(
             f'color:{c};font-family:"{_MONO}",monospace;'
-            f'font-size:13px;font-weight:600;border:none;background:transparent;'
+            f'font-size:15px;font-weight:600;border:none;background:transparent;'
         )
         self._val.setText(text)
 
@@ -72,20 +72,33 @@ class SensorPanel(QWidget):
 
         hdr = QHBoxLayout(); hdr.setSpacing(8)
         sym = QLabel('<<')
-        sym.setStyleSheet(f'color:{_TEXT};font-size:12px;background:transparent;border:none;')
+        sym.setStyleSheet(f'color:{_TEXT};font-size:14px;background:transparent;border:none;')
         ttl = QLabel('TELEMETRY')
         ttl.setStyleSheet(
-            f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
+            f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:1px;'
             f'background:transparent;border:none;'
         )
         hdr.addWidget(sym); hdr.addWidget(ttl); hdr.addStretch()
         root.addLayout(hdr)
         root.addWidget(_divider())
 
+        # Two side-by-side columns instead of one long stack -- this panel
+        # now spans the full page width (see main_window.py), so splitting
+        # it this way gives every row real horizontal room instead of a
+        # cramped single column with everything squeezed to one side.
+        columns = QHBoxLayout()
+        columns.setSpacing(24)
+        col_a = QVBoxLayout(); col_a.setSpacing(2)
+        col_b = QVBoxLayout(); col_b.setSpacing(2)
+        columns.addLayout(col_a, 1)
+        columns.addLayout(col_b, 1)
+        root.addLayout(columns)
+
+        # Column A: STATUS + GPS
         # Live sensor health -- "responded within the last 500ms", not a
         # one-time boot check. The only place this ever surfaces once the
         # airframe is closed up and the status LEDs are out of sight.
-        root.addWidget(_section('STATUS'))
+        col_a.addWidget(_section('STATUS'))
         status_grid = QGridLayout()
         status_grid.setColumnStretch(1, 1)
         status_grid.setVerticalSpacing(4)
@@ -96,10 +109,10 @@ class SensorPanel(QWidget):
         self._r_power_ok = _Row(status_grid, 4, 'Power Monitor')
         self._r_sd       = _Row(status_grid, 5, 'SD Card')
         self._r_attitude = _Row(status_grid, 6, 'Attitude Control')
-        root.addLayout(status_grid)
-        root.addWidget(_divider())
+        col_a.addLayout(status_grid)
+        col_a.addWidget(_divider())
 
-        root.addWidget(_section('GPS'))
+        col_a.addWidget(_section('GPS'))
         gps_grid = QGridLayout()
         gps_grid.setColumnStretch(1, 1)
         gps_grid.setVerticalSpacing(4)
@@ -108,10 +121,11 @@ class SensorPanel(QWidget):
         self._r_galt = _Row(gps_grid, 2, 'GPS Alt (m)')
         self._r_sats = _Row(gps_grid, 3, 'Satellites')
         self._r_fix  = _Row(gps_grid, 4, 'Fix')
-        root.addLayout(gps_grid)
-        root.addWidget(_divider())
+        col_a.addLayout(gps_grid)
+        col_a.addStretch()
 
-        root.addWidget(_section('BARO / IMU'))
+        # Column B: BARO / IMU + POWER
+        col_b.addWidget(_section('BARO / IMU'))
         baro_grid = QGridLayout()
         baro_grid.setColumnStretch(1, 1)
         baro_grid.setVerticalSpacing(4)
@@ -121,17 +135,17 @@ class SensorPanel(QWidget):
         self._r_ay   = _Row(baro_grid, 3, 'Accel Y (g)')
         self._r_az   = _Row(baro_grid, 4, 'Accel Z (g)')
         self._r_amag = _Row(baro_grid, 5, 'Lin. |accel| (g)')
-        root.addLayout(baro_grid)
-        root.addWidget(_divider())
+        col_b.addLayout(baro_grid)
+        col_b.addWidget(_divider())
 
-        root.addWidget(_section('POWER'))
+        col_b.addWidget(_section('POWER'))
         pwr_grid = QGridLayout()
         pwr_grid.setColumnStretch(1, 1)
         pwr_grid.setVerticalSpacing(4)
         self._r_volt = _Row(pwr_grid, 0, 'Voltage (V)')
         self._r_curr = _Row(pwr_grid, 1, 'Current (mA)')
-        root.addLayout(pwr_grid)
-        root.addStretch()
+        col_b.addLayout(pwr_grid)
+        col_b.addStretch()
 
     def update_data(self, data: TelemetryData) -> None:
         self._r_imu_ok.set('OK' if data.imu_ok else 'LOST', warn=not data.imu_ok, ok=data.imu_ok)

@@ -272,23 +272,23 @@ class GPSMap(QWidget):
             last_lat, last_lon = self._trail[-1]
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QBrush(QColor(20, 20, 22, 200)))
-            p.drawRoundedRect(10, 10, 160, 56, 6, 6)
-            p.setFont(QFont('JetBrains Mono', 10))
+            p.drawRoundedRect(10, 10, 190, 66, 6, 6)
+            p.setFont(QFont('JetBrains Mono', 12))
             p.setPen(QColor('#94A3B8'))
-            p.drawText(18, 26, 'LAT')
-            p.drawText(18, 41, 'LON')
-            p.drawText(18, 56, 'ALT')
+            p.drawText(18, 28, 'LAT')
+            p.drawText(18, 46, 'LON')
+            p.drawText(18, 64, 'ALT')
             alt_str = f'{self._last_gps_alt:.0f} m' if self._last_gps_alt is not None else '--'
             p.setPen(QColor('#F1F5F9'))
-            p.drawText(46, 26, f'{last_lat:.6f} deg')
-            p.drawText(46, 41, f'{last_lon:.6f} deg')
-            p.drawText(46, 56, alt_str)
+            p.drawText(52, 28, f'{last_lat:.6f} deg')
+            p.drawText(52, 46, f'{last_lon:.6f} deg')
+            p.drawText(52, 64, alt_str)
 
         # Info bar at bottom
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(QBrush(QColor(12, 12, 14, 210)))
-        p.drawRect(0, h - 24, w, 24)
-        p.setFont(QFont('JetBrains Mono', 9))
+        p.drawRect(0, h - 28, w, 28)
+        p.setFont(QFont('JetBrains Mono', 11))
 
         if self._has_fix:
             gps_color = '#22C55E'
@@ -299,11 +299,11 @@ class GPSMap(QWidget):
             gps_txt = f'NO FIX  {sats} SAT{"S" if sats != 1 else ""}  —  NEEDS OPEN SKY'
 
         p.setPen(QColor(gps_color))
-        p.drawText(8, h - 8, gps_txt)
+        p.drawText(8, h - 9, gps_txt)
 
         follow_txt = 'FOLLOWING' if self._auto_follow else 'MANUAL  DBL-CLICK TO FOLLOW'
         p.setPen(QColor('#64748B'))
-        p.drawText(w - 260, h - 8, f'Z={self._zoom}  SCROLL=ZOOM  DRAG=PAN  {follow_txt}')
+        p.drawText(w - 300, h - 9, f'Z={self._zoom}  SCROLL=ZOOM  DRAG=PAN  {follow_txt}')
 
         p.end()
 

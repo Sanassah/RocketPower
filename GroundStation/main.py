@@ -22,7 +22,7 @@ QMainWindow, QWidget {
     background-color: #0F0F10;
     color: #F1F5F9;
     font-family: 'Segoe UI', Arial, sans-serif;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 QScrollBar:vertical {
@@ -46,7 +46,7 @@ QStatusBar {
     background-color: #1A1A1B;
     color: #94A3B8;
     border-top: 1px solid #2E2E30;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 QComboBox {
@@ -54,8 +54,8 @@ QComboBox {
     color: #F1F5F9;
     border: 1px solid #2A2A2C;
     border-radius: 5px;
-    padding: 3px 7px;
-    font-size: 11px;
+    padding: 4px 8px;
+    font-size: 13px;
 }
 QComboBox:hover { border-color: #3B82F6; }
 QComboBox::drop-down { border: none; }
@@ -73,8 +73,8 @@ QPushButton {
     color: #F1F5F9;
     border: 1px solid #2A2A2C;
     border-radius: 5px;
-    padding: 6px 14px;
-    font-size: 11px;
+    padding: 7px 15px;
+    font-size: 13px;
 }
 QPushButton:hover   { background-color: #2A2A2C; border-color: #64748B; }
 QPushButton:pressed { background-color: #1A1A1B; }
@@ -85,7 +85,7 @@ QTextEdit {
     color: #F1F5F9;
     border: none;
     font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
-    font-size: 10px;
+    font-size: 12px;
     padding: 4px;
     selection-background-color: #222224;
     selection-color: #3B82F6;
@@ -98,8 +98,8 @@ QMessageBox {
     color: #F1F5F9;
 }
 QMessageBox QPushButton {
-    min-width: 80px;
-    padding: 7px 18px;
+    min-width: 90px;
+    padding: 8px 20px;
     border-radius: 5px;
 }
 """
@@ -110,7 +110,7 @@ def main() -> None:
     app.setApplicationName('RocketPower GCS')
     app.setStyle('Fusion')
     app.setStyleSheet(STYLESHEET)
-    app.setFont(QFont('Segoe UI', 11))
+    app.setFont(QFont('Segoe UI', 13))
 
     from ui.main_window import MainWindow
     window = MainWindow()

@@ -47,13 +47,13 @@ def _stat_widget(title: str) -> tuple[QWidget, QLabel]:
 
     t = QLabel(title)
     t.setStyleSheet(
-        f'color:{_MUTED};font-size:11px;font-weight:700;letter-spacing:0.6px;'
+        f'color:{_MUTED};font-size:13px;font-weight:700;letter-spacing:0.6px;'
         f'border:none;background:transparent;'
     )
     v = QLabel('--')
-    v.setFont(QFont('JetBrains Mono', 13, QFont.Weight.Bold))
+    v.setFont(QFont('JetBrains Mono', 15, QFont.Weight.Bold))
     v.setStyleSheet(
-        f'color:{_TEXT};font-size:13px;font-weight:700;border:none;background:transparent;'
+        f'color:{_TEXT};font-size:15px;font-weight:700;border:none;background:transparent;'
     )
     lay.addWidget(t)
     lay.addWidget(v)
@@ -83,11 +83,11 @@ class TrajectoryPlot(QWidget):
         hdr = QHBoxLayout(); hdr.setSpacing(8)
         sym = QLabel('~~')
         sym.setStyleSheet(
-            f'color:{_TEXT};font-size:12px;background:transparent;border:none;'
+            f'color:{_TEXT};font-size:14px;background:transparent;border:none;'
         )
         ttl = QLabel('FLIGHT PATH  (2D)')
         ttl.setStyleSheet(
-            f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
+            f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:1px;'
             f'background:transparent;border:none;'
         )
         hdr.addWidget(sym); hdr.addWidget(ttl); hdr.addStretch()
@@ -96,7 +96,7 @@ class TrajectoryPlot(QWidget):
         # Plot
         self._plot = pg.PlotWidget(background=_BG)
         p = self._plot
-        lbl = {'color': _MUTED, 'font-size': '10px'}
+        lbl = {'color': _MUTED, 'font-size': '12px'}
         p.setLabel('left',   'Altitude (m)',  **lbl)
         p.setLabel('bottom', 'Downrange (m)', **lbl)
         p.showGrid(x=True, y=True, alpha=0.12)

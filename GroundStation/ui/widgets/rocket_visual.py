@@ -528,7 +528,7 @@ class RocketVisual(QWidget):
 
         p.fillRect(0, 0, W, H, _BG)
 
-        READ_W   = 82
+        READ_W   = 96
         RENDER_W = W - READ_W
 
         cx = RENDER_W / 2
@@ -628,10 +628,10 @@ class RocketVisual(QWidget):
         for i, (label, val) in enumerate(labels):
             cy_v = ry + spacing * (i + 1)
 
-            p.setFont(QFont('Segoe UI', 8, QFont.Weight.Bold))
+            p.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
             p.setPen(_MUTED)
             p.drawText(QPointF(rx + 10, cy_v - 8), label)
 
-            p.setFont(QFont('JetBrains Mono', 12, QFont.Weight.Bold))
+            p.setFont(QFont('JetBrains Mono', 14, QFont.Weight.Bold))
             p.setPen(_TEXT)
-            p.drawText(QPointF(rx + 10, cy_v + 8), f'{val:+.1f}°')
+            p.drawText(QPointF(rx + 8, cy_v + 12), f'{val:+.1f}°')
