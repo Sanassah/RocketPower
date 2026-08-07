@@ -7,11 +7,16 @@ bool LoRaRadio::begin() {
     return true;
 }
 
-bool LoRaRadio::send(const TelemetryPacket& pkt) {
+TelemetryPacket LoRaRadio::_finalize(const TelemetryPacket& pkt) {
     TelemetryPacket out = pkt;
     out.seq = _txSeq++;
     size_t checksumLen = sizeof(TelemetryPacket) - sizeof(out.checksum);
     out.checksum = packetChecksum(reinterpret_cast<const uint8_t*>(&out), checksumLen);
+    return out;
+}
+
+bool LoRaRadio::send(const TelemetryPacket& pkt) {
+    TelemetryPacket out = _finalize(pkt);
     size_t written = LORA_SERIAL.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));
 
 #if USB_SERIAL_BINARY_MIRROR
@@ -31,6 +36,12 @@ bool LoRaRadio::send(const TelemetryPacket& pkt) {
     Serial.print(" sats=");       Serial.print(out.gps_sats);
     Serial.println();
 
+    return (written == sizeof(out));
+}
+
+bool LoRaRadio::sendUsbFast(const TelemetryPacket& pkt) {
+    TelemetryPacket out = _finalize(pkt);
+    size_t written = Serial.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));
     return (written == sizeof(out));
 }
 

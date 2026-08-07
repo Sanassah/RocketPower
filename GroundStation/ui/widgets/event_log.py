@@ -26,7 +26,7 @@ _COLORS = {
 
 
 class EventLog(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, title: str = 'EVENT LOG'):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(
@@ -42,7 +42,7 @@ class EventLog(QWidget):
         hdr = QHBoxLayout(); hdr.setSpacing(8)
         sym = QLabel('--')
         sym.setStyleSheet(f'color:{_TEXT};font-size:12px;background:transparent;border:none;')
-        ttl = QLabel('EVENT LOG')
+        ttl = QLabel(title)
         ttl.setStyleSheet(
             f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
             f'background:transparent;border:none;'

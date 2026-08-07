@@ -19,6 +19,8 @@
 
 This is where I track progress on a model rocket build — avionics included — showcasing work in PCB design, CAD, systems simulation, and control systems.
 
+**[→ Flight Procedure](./FLIGHT_PROCEDURE.md)** — step-by-step instructions for bench checkout, arming, launch, recovery, and post-flight data review, plus hardware-in-the-loop testing before you fly.
+
 ---
 
 ## Media

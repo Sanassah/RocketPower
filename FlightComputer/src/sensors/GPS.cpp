@@ -13,8 +13,8 @@ bool GPS::begin() {
     return true;
 }
 
-void GPS::update() {
-    _drainI2C();
+bool GPS::update() {
+    bool acked = _drainI2C();
 
     if (_parser.location.isValid()) {
         _data.lat    = _parser.location.lat();
@@ -34,19 +34,22 @@ void GPS::update() {
     _data.sentencesOk  = _parser.passedChecksum();
     _data.sentencesBad = _parser.failedChecksum();
     _data.valid        = true;
+    return acked;
 }
 
-void GPS::_drainI2C() {
+bool GPS::_drainI2C() {
     // Read how many NMEA bytes the module has buffered
     ZOEM8_I2C_BUS.beginTransmission(ZOEM8_I2C_ADDR);
     ZOEM8_I2C_BUS.write(ZOEM8_REG_BYTES_AVAIL);
-    if (ZOEM8_I2C_BUS.endTransmission(false) != 0) return;
+    if (ZOEM8_I2C_BUS.endTransmission(false) != 0) return false;   // module didn't ack
 
     ZOEM8_I2C_BUS.requestFrom((uint8_t)ZOEM8_I2C_ADDR, (uint8_t)2);
-    if (ZOEM8_I2C_BUS.available() < 2) return;
+    if (ZOEM8_I2C_BUS.available() < 2) return false;   // module didn't return the count bytes
     uint16_t avail = ((uint16_t)ZOEM8_I2C_BUS.read() << 8) | ZOEM8_I2C_BUS.read();
 
-    if (avail == 0 || avail == 0xFFFF) return;
+    // 0 or 0xFFFF just means "nothing buffered right now" -- not a comms
+    // failure, so still report the module as alive.
+    if (avail == 0 || avail == 0xFFFF) return true;
     if (avail > 512) avail = 512;   // sanity cap
 
     _data.bytesRxTotal += avail;
@@ -63,6 +66,7 @@ void GPS::_drainI2C() {
         }
         avail -= chunk;
     }
+    return true;
 }
 
 void GPS::printDebug() {

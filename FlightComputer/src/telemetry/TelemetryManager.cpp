@@ -4,6 +4,7 @@
 #include "../control/PyroController.h"
 #include "../control/FinController.h"
 #include "../control/CameraController.h"
+#include "../storage/DataLogger.h"
 #include <math.h>
 
 bool TelemetryManager::begin() {
@@ -13,11 +14,20 @@ bool TelemetryManager::begin() {
 void TelemetryManager::update(const FlightData& d) {
     uint32_t now = millis();
 
-    // Send telemetry at configured interval
-    if (now - _lastTxMs >= TELEMETRY_INTERVAL_MS) {
-        _lastTxMs = now;
-        _sendTelemetry(d);
+    // LoRa: airtime-limited, see TELEMETRY_INTERVAL_MS in config.h.
+    if (now - _lastLoraTxMs >= TELEMETRY_INTERVAL_MS) {
+        _lastLoraTxMs = now;
+        _lora.send(_buildPacket(d));
     }
+
+#if USB_SERIAL_BINARY_MIRROR
+    // USB: no airtime constraint, so this runs on its own, much faster clock
+    // instead of piggybacking on the LoRa cadence above.
+    if (now - _lastUsbTxMs >= USB_TELEMETRY_INTERVAL_MS) {
+        _lastUsbTxMs = now;
+        _lora.sendUsbFast(_buildPacket(d));
+    }
+#endif
 
     // Check for incoming commands — USB has priority when a PC is connected
     CommandPacket cmd;
@@ -62,7 +72,7 @@ void TelemetryManager::_sendAck(const CommandPacket& cmd) {
     _lora.sendAck(ack);
 }
 
-void TelemetryManager::_sendTelemetry(const FlightData& d) {
+TelemetryPacket TelemetryManager::_buildPacket(const FlightData& d) const {
     TelemetryPacket pkt{};
     pkt.magic[0]      = TELEM_MAGIC_0;
     pkt.magic[1]      = TELEM_MAGIC_1;
@@ -93,7 +103,15 @@ void TelemetryManager::_sendTelemetry(const FlightData& d) {
 
     pkt.cam_recording = _camera.isRecording() ? 1 : 0;
 
-    _lora.send(pkt);
+    pkt.system_status = (d.imu_ok   ? SENSOR_HEALTH_IMU_OK   : 0)
+                       | (d.baro_ok  ? SENSOR_HEALTH_BARO_OK  : 0)
+                       | (d.accel_ok ? SENSOR_HEALTH_ACCEL_OK : 0)
+                       | (d.gps_ok   ? SENSOR_HEALTH_GPS_OK   : 0)
+                       | (d.power_ok ? SENSOR_HEALTH_POWER_OK : 0)
+                       | (_logger.cardPresent() ? SD_STATUS_PRESENT   : 0)
+                       | (_logger.isOpen()      ? SD_STATUS_RECORDING : 0);
+
+    return pkt;
 }
 
 void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
@@ -149,6 +167,16 @@ void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
         case CommandType::SERVO_PREFLIGHT:
             Serial.println("[TELEM] CMD: SERVO_PREFLIGHT");
             _fins.preflightSequence();
+            break;
+
+        case CommandType::SD_START_RECORDING:
+            Serial.println("[TELEM] CMD: SD_START_RECORDING");
+            if (!_logger.open()) Serial.println("[TELEM] SD_START_RECORDING failed -- no card?");
+            break;
+
+        case CommandType::SD_STOP_RECORDING:
+            Serial.println("[TELEM] CMD: SD_STOP_RECORDING");
+            _logger.close();
             break;
 
         case CommandType::PING:

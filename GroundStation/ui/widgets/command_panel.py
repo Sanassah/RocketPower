@@ -79,6 +79,8 @@ class CommandPanel(QWidget):
     servo_save_cal_requested  = pyqtSignal()
     servo_center_requested    = pyqtSignal()
     servo_preflight_requested = pyqtSignal()
+    sd_start_requested        = pyqtSignal()
+    sd_stop_requested         = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -86,7 +88,9 @@ class CommandPanel(QWidget):
         self.setStyleSheet(
             f'background-color:{_BG};border:1px solid {_BORDER};border-radius:8px;'
         )
-        self._state = 0
+        self._state       = 0
+        self._sd_present  = False
+        self._sd_recording = False
 
         root = QVBoxLayout(self)
         root.setContentsMargins(14, 8, 14, 10)
@@ -197,6 +201,25 @@ class CommandPanel(QWidget):
             util_row.addWidget(btn)
 
         col_a.addLayout(util_row)
+        col_a.addWidget(_divider())
+
+        # SD card -- the FC auto-starts logging at boot and auto-stops on
+        # LANDED, so this is a manual override, not something you need to
+        # remember to press before flight. Useful for starting a fresh log or
+        # a card swapped in on the bench. Live PRESENT/RECORDING status
+        # itself lives in the sensor panel's STATUS section, not here.
+        col_a.addWidget(_section('SD CARD  (FLIGHT LOG)'))
+        sd_row = QHBoxLayout()
+        sd_row.setSpacing(6)
+
+        self._sd_start_btn = _flat_btn('Start Log', height=26)
+        self._sd_start_btn.clicked.connect(self.sd_start_requested.emit)
+        self._sd_stop_btn = _flat_btn('Stop Log', height=26)
+        self._sd_stop_btn.clicked.connect(self._on_sd_stop)
+
+        sd_row.addWidget(self._sd_start_btn)
+        sd_row.addWidget(self._sd_stop_btn)
+        col_a.addLayout(sd_row)
         col_a.addStretch()
 
         # ==== Column B: bench-test commands (FIN SERVOS / CAMERA) ====
@@ -302,10 +325,23 @@ class CommandPanel(QWidget):
         self._cam_btn.setChecked(data.is_recording)
         self._cam_btn.setText('⏺  Recording -- Tap to Stop' if data.is_recording else '⏺  Toggle Recording')
 
+        if data.sd_present != self._sd_present or data.sd_recording != self._sd_recording:
+            self._sd_present   = data.sd_present
+            self._sd_recording = data.sd_recording
+            self._update_button_states()
+
     def _update_button_states(self) -> None:
         can_fire = self._state in {1, 2, 3, 4, 5}
         for btn in self._fire_btns:
             btn.setEnabled(can_fire)
+
+        # Not gated on self._sd_present: the FC no longer polls for a card in
+        # the background (that was a plausible cause of telemetry stalls --
+        # see DataLogger::cardPresent() on the firmware side), so Start is
+        # now also the retry button -- e.g. after inserting a card that
+        # wasn't there at boot. It just re-attempts and reports the result.
+        self._sd_start_btn.setEnabled(not self._sd_recording)
+        self._sd_stop_btn.setEnabled(self._sd_recording)
 
     def _on_arm(self) -> None:
         reply = QMessageBox.question(
@@ -319,6 +355,18 @@ class CommandPanel(QWidget):
 
     def _on_disarm(self) -> None:
         self.disarm_requested.emit()
+
+    def _on_sd_stop(self) -> None:
+        reply = QMessageBox.question(
+            self, 'Confirm Stop Log',
+            'Stop the flight computer\'s onboard SD recording?\n\n'
+            'The FC auto-stops on LANDED already -- only do this manually '
+            'if you specifically want to end the current log early.',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            self.sd_stop_requested.emit()
 
     def _on_calibrate(self) -> None:
         reply = QMessageBox.question(

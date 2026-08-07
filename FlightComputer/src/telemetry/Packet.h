@@ -11,8 +11,23 @@
 #define ACK_MAGIC_0    0xAC
 #define ACK_MAGIC_1    0x4B
 
+// System status bitfield (TelemetryPacket.system_status). The SENSOR_HEALTH_*
+// bits are set when that sensor produced a successful reading within
+// SENSOR_HEALTH_TIMEOUT_MS of this packet being sent -- i.e. "alive right
+// now", not "passed its boot check" (see SensorManager). The SD_* bits
+// reflect DataLogger's last explicit presence check (boot, a ground
+// SD_START_RECORDING command, or write success/failure while recording) --
+// see DataLogger::cardPresent() for why this isn't continuously re-polled.
+#define SENSOR_HEALTH_IMU_OK    (1 << 0)
+#define SENSOR_HEALTH_BARO_OK   (1 << 1)
+#define SENSOR_HEALTH_ACCEL_OK  (1 << 2)
+#define SENSOR_HEALTH_GPS_OK    (1 << 3)
+#define SENSOR_HEALTH_POWER_OK  (1 << 4)
+#define SD_STATUS_PRESENT       (1 << 5)   // a card responded recently
+#define SD_STATUS_RECORDING     (1 << 6)   // a log file is currently open
+
 // ===== Rocket → Ground telemetry =====
-// Deliberately compact (49 bytes, was 81) -- the LoRa link is stuck at a slow
+// Deliberately compact (51 bytes, was 81) -- the LoRa link is stuck at a slow
 // factory-default air data rate (2.4kbps) and reconfiguring the radios is off
 // the table for now, so packet size is the only remaining lever to reduce
 // airtime per packet. Most fields are scaled fixed-point instead of float:
@@ -64,6 +79,12 @@ struct TelemetryPacket {
     // (e.g. sent while out of range) from the ground without touching a cable.
     uint8_t  cam_recording;  // 1=recording, 0=stopped
 
+    // Live sensor + SD card status, re-derived every loop -- see the bit
+    // #defines above. Distinct from a one-time boot check: this reflects
+    // "still true right now," so a mid-flight dropout (or a card pulled/
+    // inserted on the bench) shows up here.
+    uint8_t  system_status;
+
     uint16_t checksum;       // simple sum of all preceding bytes
 };
 #pragma pack(pop)
@@ -82,6 +103,8 @@ enum class CommandType : uint8_t {
     SERVO_SAVE_CAL  = 0x0B,  // param unused; persists all 4 channels' live position as new trim
     SERVO_CENTER_ALL = 0x0C, // param unused; drives all 4 to raw center, ignoring trim, not persisted
     SERVO_PREFLIGHT  = 0x0D, // param unused; blocking ~6s all-4 choreography, see FinController
+    SD_START_RECORDING = 0x0E, // param unused; opens a new log file (no-op if already recording)
+    SD_STOP_RECORDING  = 0x0F, // param unused; flushes and closes the current log file
 };
 
 #pragma pack(push, 1)

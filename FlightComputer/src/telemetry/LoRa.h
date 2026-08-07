@@ -8,6 +8,12 @@ class LoRaRadio {
 public:
     bool begin();
     bool send(const TelemetryPacket& pkt);
+
+    // High-rate USB-only telemetry mirror, decoupled from the LoRa airtime
+    // budget -- see USB_TELEMETRY_INTERVAL_MS in config.h. Binary bytes only,
+    // no human-readable summary line (that's fine at 1Hz, not at 20Hz+).
+    bool sendUsbFast(const TelemetryPacket& pkt);
+
     bool sendAck(const AckPacket& pkt);
     bool receiveCommand(CommandPacket& pkt);                  // reads from LoRa UART
     bool receiveCommandFrom(Stream& src, CommandPacket& pkt); // reads from any stream (e.g. USB Serial)
@@ -16,6 +22,10 @@ public:
 private:
     uint16_t _txSeq = 0;
     bool _validateCommand(const CommandPacket& pkt) const;
+
+    // Assigns the next seq number and checksum -- shared by send() and
+    // sendUsbFast() so both draw from the same seq space.
+    TelemetryPacket _finalize(const TelemetryPacket& pkt);
 
     // Resyncing receive buffers, one per stream so USB and LoRa command
     // reception never interleave. LoRa is a noisier link than a wired USB

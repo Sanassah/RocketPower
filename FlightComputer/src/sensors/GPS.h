@@ -24,7 +24,11 @@ struct GPSData {
 class GPS {
 public:
     bool begin();
-    void update();           // call every loop to drain the I2C NMEA buffer
+
+    // Call every loop to drain the I2C NMEA buffer. Returns true if the module
+    // acked on the bus this call -- independent of whether a full NMEA
+    // sentence completed or a fix exists, this just means "still there".
+    bool update();
     const GPSData& data() const { return _data; }
 
     void printDebug();       // dump a diagnostic line to Serial
@@ -34,5 +38,5 @@ private:
     GPSData       _data{};
     TinyGPSCustom _gsvSatsInView;   // $--GSV field 3: total satellites in view
 
-    void _drainI2C();
+    bool _drainI2C();
 };

@@ -3,7 +3,8 @@
 // =============================================================
 // config.h — All pin definitions and flight constants
 // Derived from KiCad schematics (main.kicad_sch and sub-sheets)
-// Board: Custom MIMXRT1062 (Teensy 4.1 compatible)
+// Board: Custom RocketPower PCB (NXP MIMXRT1062), programmed via the
+// Teensy 4.1 toolchain/bootloader -- not a Teensy dev board.
 // =============================================================
 
 // ===== I2C Bus Assignments =====
@@ -48,6 +49,13 @@
 // ===== SD Card =====
 // MicroSD via SDIO (Hirose DM3D-SF, SD_B0 bus)
 #define SD_CS_PIN        BUILTIN_SDCARD
+// There's no hardware card-detect pin on this socket, so presence can only
+// be inferred by actually attempting SD.begin()/a write -- see DataLogger.
+// Deliberately NOT polled on a timer from the main loop: SD.begin() isn't
+// cheap on real hardware (worse yet with no card to answer), and doing that
+// every couple seconds from the same real-time loop that also has to hit
+// its telemetry timing was a plausible cause of intermittent telemetry
+// stalls seen on the bench.
 
 // ===== Pyro Channels =====
 // From HighCurrentComponents.kicad_sch hierarchical labels
@@ -140,8 +148,28 @@
 // USB serial monitor for human debugging (e.g. command RX/dedup behavior);
 // set back to 1 only when the ground station actually needs to connect over
 // USB instead of the LoRa link.
-#define USB_SERIAL_BINARY_MIRROR   0
+#define USB_SERIAL_BINARY_MIRROR   1
+
+// USB telemetry mirror rate, independent of TELEMETRY_INTERVAL_MS above.
+// The 1Hz LoRa rate is a hard airtime limit (see the comment on that
+// constant) -- a direct USB link has no such ceiling, so throttling it to
+// match the radio would just be leaving USB performance on the table for no
+// reason. 50ms/20Hz is comfortably inside what Teensy's native USB serial
+// can move (a 51-byte packet is nothing) and well past what's visually
+// distinguishable on the ground station's attitude display; SensorManager
+// itself only refreshes at the ~100Hz loop rate, so this is not the
+// bottleneck. Lower it further if useful, there's plenty of headroom.
+#define USB_TELEMETRY_INTERVAL_MS  50     // 20 Hz
 #define LOG_INTERVAL_MS            10     // 100 Hz SD logging
+
+// A sensor is reported "down" in telemetry/logging if it hasn't produced a
+// successful reading within this window. Loose enough to absorb a sensor's
+// normal per-loop miss rate (e.g. BNO085 events interleave across report
+// types, so not every 10ms loop tick gets one) without flickering healthy
+// sensors, tight enough to flag a real mid-flight dropout within half a
+// second. Purely informational -- nothing in flight-critical control logic
+// (state transitions, pyro firing) gates on these flags.
+#define SENSOR_HEALTH_TIMEOUT_MS   500
 
 // Complementary filter weight for fused vertical velocity (SensorManager).
 // 0.98 = IMU integration dominates above ~0.5 Hz, baro corrects drift below that.
