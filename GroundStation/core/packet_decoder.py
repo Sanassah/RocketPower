@@ -1,7 +1,7 @@
 """
 Decodes binary TelemetryPacket from the flight computer.
 
-Packet layout (packed, little-endian, 51 bytes total). Deliberately compact --
+Packet layout (packed, little-endian, 52 bytes total). Deliberately compact --
 the LoRa link is stuck at a slow factory-default air data rate and packet size
 is the only remaining lever to reduce airtime per packet, so most fields are
 scaled fixed-point (int16) instead of float. Values are unscaled back to
@@ -37,7 +37,9 @@ ever sees the same TelemetryData fields/units as before this change.
   48      1     uint8     system_status (bit0 imu, bit1 baro, bit2 accel, bit3 gps, bit4 power ok --
                                           1=read successfully within the last 500ms, "alive right now";
                                           bit5 sd_present, bit6 sd_recording -- live, not boot-time)
-  49      2     uint16    checksum      (sum of bytes 0..48)
+  49      1     uint8     attitude_status (bit0 control_on, bit1 demo_on -- last ground-commanded
+                                          attitude-control mode, not sensor health; see AttitudeController)
+  50      2     uint16    checksum      (sum of bytes 0..49)
 """
 
 import struct
@@ -60,9 +62,13 @@ SENSOR_HEALTH_POWER_OK = 1 << 4
 SD_STATUS_PRESENT      = 1 << 5
 SD_STATUS_RECORDING    = 1 << 6
 
-# 28 fields, 51 bytes total
-TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBBBH'
-TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 51
+# Bits within attitude_status -- must mirror the #defines in Packet.h
+ATTITUDE_STATUS_CONTROL_ON = 1 << 0
+ATTITUDE_STATUS_DEMO_ON    = 1 << 1
+
+# 29 fields, 52 bytes total
+TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBBBBH'
+TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 52
 
 # AckPacket: magic0, magic1, cmdSeq, cmdType, checksum
 ACK_FORMAT = '<BBBBH'
@@ -118,6 +124,7 @@ class TelemetryData:
     pyro_cont_2:  int          # CH3 continuity
     cam_recording: int         # 1=recording, 0=stopped (FC's belief, no camera ack)
     system_status: int         # bitfield, see SENSOR_HEALTH_*_OK / SD_STATUS_* above
+    attitude_status: int       # bitfield, see ATTITUDE_STATUS_* above
     checksum:     int
     # Derived — populated by decode_packet()
     accel_mag_g:  float = 0.0
@@ -180,6 +187,16 @@ class TelemetryData:
     def sd_recording(self) -> bool:
         return bool(self.system_status & SD_STATUS_RECORDING)
 
+    # Last ground-commanded attitude-control mode -- see ATTITUDE_STATUS_*
+    # above. Reflects what the FC was TOLD to do, not sensor/hardware health.
+    @property
+    def attitude_control_on(self) -> bool:
+        return bool(self.attitude_status & ATTITUDE_STATUS_CONTROL_ON)
+
+    @property
+    def attitude_demo_on(self) -> bool:
+        return bool(self.attitude_status & ATTITUDE_STATUS_DEMO_ON)
+
 
 def decode_packet(raw: bytes) -> Optional[TelemetryData]:
     """
@@ -212,7 +229,7 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
      quat_w_i16, quat_x_i16, quat_y_i16, quat_z_i16,
      voltage_cv, current_ma,
      rssi, pyro_cont_0, pyro_cont_1, pyro_cont_2, cam_recording,
-     system_status, checksum) = vals
+     system_status, attitude_status, checksum) = vals
 
     # Unscale wire fixed-point values back to normal engineering units --
     # everything downstream of this function sees the same units as before.
@@ -236,6 +253,7 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
         pyro_cont_0=pyro_cont_0, pyro_cont_1=pyro_cont_1, pyro_cont_2=pyro_cont_2,
         cam_recording=cam_recording,
         system_status=system_status,
+        attitude_status=attitude_status,
         checksum=checksum,
     )
     data.accel_mag_g = math.sqrt(data.accel_x_g**2 + data.accel_y_g**2 + data.accel_z_g**2)

@@ -12,18 +12,20 @@
 #include "control/PyroController.h"
 #include "control/CameraController.h"
 #include "control/FinController.h"
+#include "control/AttitudeController.h"
 #include "control/StatusLED.h"
 
 // ===== Global objects =====
-SensorManager    sensors;
-PyroController   pyro;
-StateMachine     fsm(pyro);
-LoRaRadio        radio;
-FinController    fins;
-CameraController camera;
-DataLogger       logger;
-TelemetryManager telem(radio, fsm, pyro, fins, camera, logger);
-StatusLED        statusLed;
+SensorManager      sensors;
+PyroController     pyro;
+StateMachine       fsm(pyro);
+LoRaRadio          radio;
+FinController      fins;
+AttitudeController attitude;
+CameraController   camera;
+DataLogger         logger;
+TelemetryManager   telem(radio, fsm, pyro, fins, camera, logger, attitude);
+StatusLED          statusLed;
 
 // ===== Timing =====
 elapsedMillis loopTimer;     // tracks time since last loop start
@@ -120,6 +122,25 @@ void loop() {
     fsm.update(d);
     FlightState newState = fsm.state();
 
+    // ---- 2b. Active attitude control ----
+    // Two independent reasons to run this, from two independent ground-
+    // commanded runtime flags -- see AttitudeController.h for why they're
+    // kept separate:
+    //   - Real in-flight control (attitude.controlEnabled()): only
+    //     meaningful with real airflow over the fins, so POWERED_ASCENT/
+    //     COAST only -- not before liftoff, not once the chute's out.
+    //   - Ground demo/bench-validation (attitude.demoEnabled()): ARMED only,
+    //     for hand-rotating the airframe and watching the fin response --
+    //     never runs once real liftoff moves the state machine past ARMED.
+    // A no-op entirely when both are false (the default at every boot).
+    bool wantAttitudeControl =
+        (attitude.controlEnabled() && (newState == FlightState::POWERED_ASCENT ||
+                                        newState == FlightState::COAST)) ||
+        (attitude.demoEnabled()    && newState == FlightState::ARMED);
+    if (wantAttitudeControl) {
+        attitude.update(d, fins);
+    }
+
     // ---- 3. Handle state transitions ----
     if (newState != prevState) {
         camera.onStateChange(prevState, newState);
@@ -134,7 +155,10 @@ void loop() {
             sensors.calibrateBaro();
             Serial.println("[CALIB] Done.");
         }
-        if (newState == FlightState::IDLE || newState == FlightState::LANDED) pyro.disarm();
+        if (newState == FlightState::IDLE || newState == FlightState::LANDED) {
+            pyro.disarm();
+            attitude.reset();   // force both attitude modes back off, nothing carries between sessions
+        }
 
         // Close log after landing
         if (newState == FlightState::LANDED) logger.close();

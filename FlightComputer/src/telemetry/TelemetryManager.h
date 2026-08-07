@@ -8,12 +8,15 @@ class PyroController;
 class FinController;
 class CameraController;
 class DataLogger;
+class AttitudeController;
 
 class TelemetryManager {
 public:
     TelemetryManager(LoRaRadio& lora, StateMachine& sm, PyroController& pyro,
-                      FinController& fins, CameraController& camera, DataLogger& logger)
-        : _lora(lora), _sm(sm), _pyro(pyro), _fins(fins), _camera(camera), _logger(logger) {
+                      FinController& fins, CameraController& camera, DataLogger& logger,
+                      AttitudeController& attitude)
+        : _lora(lora), _sm(sm), _pyro(pyro), _fins(fins), _camera(camera), _logger(logger),
+          _attitude(attitude) {
         for (size_t i = 0; i < _CMD_TYPE_SLOTS; i++) _lastProcessedSeqByType[i] = -1;
     }
 
@@ -38,6 +41,7 @@ private:
     FinController&    _fins;
     CameraController& _camera;
     DataLogger&       _logger;
+    AttitudeController& _attitude;
     uint32_t        _lastLoraTxMs      = 0;
     uint32_t        _lastUsbTxMs       = 0;
     bool            _calibrateRequested = false;

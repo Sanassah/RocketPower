@@ -31,6 +31,15 @@ class LinkStats:
     tx_packets:     int
     tx_pkt_per_sec: float
     tx_bps:         float
+    # Real signal-integrity proxy, since the E22 radio can't report RSSI in
+    # transparent mode (see LoRa.h) -- every candidate packet found by its
+    # magic bytes that then fails checksum is a corrupted-in-flight packet
+    # (or, on a very noisy link, two garbage bytes that happened to match
+    # the magic pair -- itself still a sign of a noisy link). A rising
+    # error count/rate is a genuine, real-time link-quality signal that
+    # doesn't depend on the radio module supporting anything extra.
+    rx_bad_packets:     int     # running total since connect
+    rx_bad_pkt_per_sec: float
 
 
 class SerialWorker(QObject):
@@ -63,6 +72,8 @@ class SerialWorker(QObject):
         self._rx_bytes_window = 0
         self._tx_pkts_window = 0
         self._tx_bytes_window = 0
+        self._rx_bad_pkts_total  = 0
+        self._rx_bad_pkts_window = 0
         self._stats_window_start = time.time()
 
     @pyqtSlot()
@@ -107,6 +118,8 @@ class SerialWorker(QObject):
             self._rx_bytes_window = 0
             self._tx_pkts_window = 0
             self._tx_bytes_window = 0
+            self._rx_bad_pkts_total  = 0
+            self._rx_bad_pkts_window = 0
             self._stats_window_start = time.time()
             self.connection_changed.emit(True, f'Connected to {self._port} @ {self._baud} baud')
         except serial.SerialException as exc:
@@ -138,11 +151,14 @@ class SerialWorker(QObject):
                 tx_packets     = self._tx_pkts_total,
                 tx_pkt_per_sec = self._tx_pkts_window / elapsed,
                 tx_bps         = (self._tx_bytes_window * 8) / elapsed,
+                rx_bad_packets     = self._rx_bad_pkts_total,
+                rx_bad_pkt_per_sec = self._rx_bad_pkts_window / elapsed,
             ))
             self._rx_pkts_window  = 0
             self._rx_bytes_window = 0
             self._tx_pkts_window  = 0
             self._tx_bytes_window = 0
+            self._rx_bad_pkts_window = 0
             self._stats_window_start = now
 
         try:
@@ -192,7 +208,11 @@ class SerialWorker(QObject):
                     self._rx_bytes_window += size
                     self.packet_received.emit(data)
                 else:
-                    # Bad packet at this offset; skip one byte and retry sync
+                    # Bad packet at this offset (magic matched but checksum
+                    # didn't) -- real corruption or link noise, see
+                    # LinkStats.rx_bad_packets. Skip one byte and retry sync.
+                    self._rx_bad_pkts_total  += 1
+                    self._rx_bad_pkts_window += 1
                     self._buf = self._buf[1:]
             else:
                 ack = decode_ack(raw)
@@ -203,6 +223,8 @@ class SerialWorker(QObject):
                     self._rx_bytes_window += size
                     self.ack_received.emit(ack.cmd_seq, ack.cmd_type)
                 else:
+                    self._rx_bad_pkts_total  += 1
+                    self._rx_bad_pkts_window += 1
                     self._buf = self._buf[1:]
 
 

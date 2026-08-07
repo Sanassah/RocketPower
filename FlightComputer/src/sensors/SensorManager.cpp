@@ -33,7 +33,17 @@ bool SensorManager::begin() {
 void SensorManager::update() {
     uint32_t now = millis();
 
-    if (_imu.update())   _lastImuOkMs   = now;
+    // The BNO085 streams 3 report types (rotation vector, linear accel,
+    // gyro) at 100Hz each -- up to 300 events/s -- but this loop only runs
+    // at 100Hz itself. Pulling just one event per call can't keep up (it
+    // drains at most 1/3 of what's arriving), so the FIFO backs up and
+    // whichever report type loses the round-robin sees a growing lag before
+    // its value updates -- exactly what shows up as "the fins react late."
+    // Drain everything actually queued each call instead, bounded so a
+    // pathological flood can't stall the rest of the loop.
+    bool imuGotData = false;
+    for (uint8_t i = 0; i < 10 && _imu.update(); i++) imuGotData = true;
+    if (imuGotData) _lastImuOkMs = now;
     if (_baro.update())  _lastBaroOkMs  = now;
     if (_accel.update()) _lastAccelOkMs = now;
     if (_gps.update())   _lastGpsOkMs   = now;

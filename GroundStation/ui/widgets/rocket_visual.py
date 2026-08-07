@@ -20,14 +20,88 @@ from PyQt6.QtGui     import (
 
 from core.packet_decoder import TelemetryData
 
+# Raw-quaternion correction: the BNO085 reports orientation in its OWN chip-
+# frame axes, which were never verified to actually line up with this
+# renderer's assumed body frame (+Z=nose, +X=starboard, +Y=up-body -- see
+# the module docstring). Same category of problem as ATTITUDE_ROLL_RATE/etc
+# in the firmware's config.h, just on the ground-station rendering side
+# instead of the firmware control side.
+#
+# Bench-confirmed: pitch and yaw are correct as raw data comes in. Roll
+# comes in backwards (rolling right reads negative and the mesh visibly
+# rolls left) -- but negating a single raw component to fix it (an earlier
+# version of this function did that) turned out to be invalid: it's not a
+# real rotation/reflection of 3D space, just an ad-hoc tweak that happens to
+# look right for an isolated roll-from-identity test and breaks under
+# composition -- confirmed by it reintroducing pitch/roll cross-talk after
+# calibration. There IS no single linear operation on the quaternion that
+# flips one Euler angle's sign while leaving the other two alone, for every
+# orientation -- Euler angles aren't independent coordinates the way X/Y/Z
+# are. See _flip_roll_sign() below for the fix that actually holds up under
+# composition: decompose to (roll, pitch, yaw), negate roll, recompose.
+def _correct_quat(w: float, x: float, y: float, z: float) -> tuple[float, float, float, float]:
+    return (w, x, y, z)
+
+
+# ── Quaternion helpers (Hamilton product / conjugate) ────────────────────────
+def _qconj(q: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+    w, x, y, z = q
+    return (w, -x, -y, -z)
+
+
+def _qmul(q1: tuple[float, float, float, float],
+          q2: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+    return (
+        w1*w2 - x1*x2 - y1*y2 - z1*z2,
+        w1*x2 + x1*w2 + y1*z2 - z1*y2,
+        w1*y2 - x1*z2 + y1*w2 + z1*x2,
+        w1*z2 + x1*y2 - y1*x2 + z1*w2,
+    )
+
+
+# Standard aerospace ZYX Tait-Bryan decomposition -- bench-confirmed against
+# the mesh: the formula's asin term reads as PITCH on this renderer's model
+# and its atan2(x,...) term reads as ROLL, opposite of their usual aerospace
+# names, so swapped here to match.
+def _euler_deg_from_quat(w: float, x: float, y: float, z: float) -> tuple[float, float, float]:
+    sinp  = 2.0 * (w * y - z * x)
+    angle_asin  = math.degrees(math.asin(max(-1.0, min(1.0, sinp))))
+    angle_atan2 = math.degrees(math.atan2(2.0*(w*x+y*z), 1.0-2.0*(x*x+y*y)))
+    yaw         = math.degrees(math.atan2(2.0*(w*z+x*y), 1.0-2.0*(y*y+z*z)))
+    roll, pitch = angle_asin, angle_atan2
+    return roll, pitch, yaw
+
+
+# Inverse of _euler_deg_from_quat -- composition order verified (numerically,
+# round-tripped through the extraction above) to match: yaw outermost, then
+# roll (the asin/Y-linked term), then pitch (the atan2/X-linked term)
+# innermost.
+def _quat_from_euler_deg(roll_deg: float, pitch_deg: float, yaw_deg: float) -> tuple[float, float, float, float]:
+    r, p, y = math.radians(roll_deg) / 2, math.radians(pitch_deg) / 2, math.radians(yaw_deg) / 2
+    qz = (math.cos(y), 0.0, 0.0, math.sin(y))
+    qroll  = (math.cos(r), 0.0, math.sin(r), 0.0)
+    qpitch = (math.cos(p), math.sin(p), 0.0, 0.0)
+    return _qmul(_qmul(qz, qroll), qpitch)
+
+
+# Roll comes in backwards from the sensor (rolling right reads negative and
+# the mesh visibly rolls left) -- but there is NO single linear operation on
+# a quaternion (no fixed reflection or rotation) that flips one Euler angle's
+# sign while leaving the other two alone, for every orientation. Euler
+# angles aren't independent coordinates the way X/Y/Z axes are, so the only
+# construction that actually holds up under composition (verified: doesn't
+# reintroduce cross-talk after calibration, unlike an earlier version of
+# this fix that just negated a raw quaternion component) is to decompose,
+# negate roll, and recompose.
+def _flip_roll_sign(q: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+    roll, pitch, yaw = _euler_deg_from_quat(*q)
+    return _quat_from_euler_deg(-roll, pitch, yaw)
+
+
 # ── Palette ───────────────────────────────────────────────────────────────────
 _BG     = QColor(15, 15, 16)
-_GRID   = QColor(44, 44, 52, 160)
-_BOX    = QColor(62, 62, 75, 200)
-_TICK   = QColor(78, 78, 88, 200)
-_AXIS_X = QColor(239, 68,  68)
-_AXIS_Y = QColor(34,  197, 94)
-_AXIS_Z = QColor(59,  130, 246)
 _TEXT   = QColor(241, 245, 249)
 _MUTED  = QColor(71,  85,  105)
 
@@ -67,7 +141,15 @@ _STL_TARGET_FACES  = 6000
 _STL_COLOR         = QColor(228, 232, 242)
 
 # ── Camera ────────────────────────────────────────────────────────────────────
-def _view_matrix(az_deg: float = 0.0, el_deg: float = 20.0) -> np.ndarray:
+# el_deg=20 (the previous default) put a real cosine-shaped asymmetry into
+# how visible PITCH is on screen: the projected nose position follows
+# cos(pitch + el_deg), which has a near-zero-sensitivity "blind spot" at
+# pitch = -el_deg, and reaches a fully edge-on/foreshortened look at
+# pitch = +(90-el_deg) forward but only at pitch = -(90+el_deg) backward --
+# with el_deg=20 that's +70 vs -110, which is why -90 still looked "angled"
+# instead of flat. Smaller el_deg shrinks both the blind spot and the
+# forward/backward gap while still giving the resting pose some 3D depth.
+def _view_matrix(az_deg: float = 0.0, el_deg: float = 8.0) -> np.ndarray:
     az, el = math.radians(az_deg), math.radians(el_deg)
     ca, sa = math.cos(az), math.sin(az)
     ce, se = math.cos(el), math.sin(el)
@@ -76,6 +158,24 @@ def _view_matrix(az_deg: float = 0.0, el_deg: float = 20.0) -> np.ndarray:
     return Rx @ Ry
 
 _VM = _view_matrix()
+
+# Projected extent, at unit scale, of the bounding volume the rocket mesh
+# is normalized into (see _BX/_ZL/_ZH) -- used purely to size the mesh to
+# fit the widget below; nothing is actually drawn at these bounds anymore.
+# Precomputed once here since it depends only on the fixed camera/bounding
+# constants above, never on rocket orientation or widget size.
+def _box_extent_unit() -> tuple[float, float]:
+    B = _BX
+    corners = np.array([
+        [-B, -B, _ZL], [B, -B, _ZL], [B, B, _ZL], [-B, B, _ZL],
+        [-B, -B, _ZH], [B, -B, _ZH], [B, B, _ZH], [-B, B, _ZH],
+    ])
+    vv = corners @ _VM.T
+    width_unit  = float(vv[:, 0].max() - vv[:, 0].min())
+    height_unit = float(vv[:, 2].max() - vv[:, 2].min())
+    return width_unit, height_unit
+
+_BOX_W_UNIT, _BOX_H_UNIT = _box_extent_unit()
 
 _LT = np.array([0.8, -0.3, 1.0])
 _LT /= np.linalg.norm(_LT)
@@ -309,11 +409,6 @@ def _shade(col: QColor, n_world: np.ndarray, ambient: float = 0.35) -> QColor:
     return QColor(int(col.red()*t), int(col.green()*t), int(col.blue()*t))
 
 
-def _wp(pt3d, sc: float, cx: float, cy: float) -> tuple[float, float]:
-    vv = _VM @ np.asarray(pt3d, float)
-    return cx + vv[0] * sc, cy - vv[2] * sc
-
-
 def _proj(verts, sc, cx, cy):
     vv  = verts @ _VM.T
     sx  = vv[:, 0] * sc + cx
@@ -370,11 +465,54 @@ class RocketVisual(QWidget):
         self._state = 0
         self._last_repaint = 0.0
 
+        # Session-only YAW-FRAME reference, rebuilt by zero_yaw() -- NOT a
+        # scalar number offset, and NOT a full-pose latch. This is a PURE
+        # yaw rotation quaternion (zero pitch/roll content by construction),
+        # so subtracting it via proper quaternion math can only ever
+        # RE-ORIENT which raw axis reads as pitch vs roll to match the
+        # current heading -- it can never cancel real tilt, because there's
+        # no tilt in the reference to cancel with. That's the key difference
+        # from a full-pose latch: a genuinely tilted rocket still reads a
+        # genuinely nonzero pitch/roll after this, exactly as before, but
+        # (unlike a naive scalar yaw-number offset, which only changes the
+        # YAW NUMBER and does nothing about which physical direction gets
+        # called "pitch" vs "roll") it actually fixes cross-axis coupling
+        # caused by the IMU being mounted at some arbitrary HEADING relative
+        # to the airframe's intended forward direction. Identity = no
+        # calibration done yet this session.
+        self._yaw_ref_quat = (1.0, 0.0, 0.0, 0.0)
+
+        # The _correct_quat()-corrected reading from the most recent
+        # update_data() call -- kept separately so zero_yaw() can extract
+        # yaw from it (i.e. from the pre-yaw-frame-correction layer).
+        self._last_corrected_quat = (1.0, 0.0, 0.0, 0.0)
+
+    def zero_yaw(self) -> None:
+        """Re-orient the pitch/roll axes to match the CURRENT heading --
+        see the comment on _yaw_ref_quat above for why this is neither a
+        simple number offset nor a full-pose latch, and what each of those
+        alternatives gets wrong. The sensor's own gravity reference already
+        tells it whether it's truly vertical, so there's nothing else to
+        verify or calibrate here -- this is the only orientation calibration
+        this widget needs."""
+        w, x, y, z = self._last_corrected_quat
+        yaw_rad = math.atan2(2.0*(w*z+x*y), 1.0-2.0*(y*y+z*z))
+        self._yaw_ref_quat = (math.cos(yaw_rad/2), 0.0, 0.0, math.sin(yaw_rad/2))
+
+    def _current_euler_deg(self) -> tuple[float, float, float]:
+        return _euler_deg_from_quat(self._w, self._x, self._y, self._z)
+
     def update_data(self, data: TelemetryData) -> None:
-        self._w = data.quat_w
-        self._x = data.quat_x
-        self._y = data.quat_y
-        self._z = data.quat_z
+        self._last_corrected_quat = _correct_quat(
+            data.quat_w, data.quat_x, data.quat_y, data.quat_z
+        )
+        # Session yaw-frame correction (identity until zero_yaw() has been
+        # run this session) -- see _yaw_ref_quat's comment for why this is a
+        # quaternion-frame rotation, not a scalar number offset.
+        yaw_corrected = _qmul(_qconj(self._yaw_ref_quat), self._last_corrected_quat)
+        # Roll-sign fix -- see _flip_roll_sign() for why this has to be a
+        # decompose/negate/recompose instead of a quaternion-component tweak.
+        self._w, self._x, self._y, self._z = _flip_roll_sign(yaw_corrected)
         self._state = data.state
 
         now = time.monotonic()
@@ -395,9 +533,18 @@ class RocketVisual(QWidget):
 
         cx = RENDER_W / 2
         cy = H / 2 + H * 0.05
-        sc = min(RENDER_W, H) * 0.32
 
-        self._draw_scene(p, sc, cx, cy)
+        # Fit the mesh to whichever of width/height is actually the tighter
+        # constraint, based on its real (non-square) aspect ratio -- rather
+        # than a flat min(RENDER_W, H) * const, which caps the render at the
+        # SMALLER raw dimension even when the mesh itself is short-and-wide
+        # or tall-and-narrow, leaving the other dimension underused. A small
+        # fixed margin so the mesh doesn't touch the widget edges.
+        MARGIN_W, MARGIN_H = 16, 16
+        sc = min(
+            max(RENDER_W - MARGIN_W, 40) / _BOX_W_UNIT,
+            max(H - MARGIN_H, 40) / _BOX_H_UNIT,
+        )
 
         R = _qrot(self._w, self._x, self._y, self._z)
 
@@ -433,84 +580,9 @@ class RocketVisual(QWidget):
         if self._state == 2:
             self._draw_flame(p, R, sc, cx, cy)
 
-        # Static world-frame triad (axes never rotate)
-        self._draw_triad(p, RENDER_W - 50, 50, 34)
-
         self._draw_readout(p, W - READ_W, 0, READ_W, H)
 
         p.end()
-
-    # ── Scene frame with axis tick marks ───────────────────────────────────────
-    def _draw_scene(self, p: QPainter, sc: float, cx: float, cy: float) -> None:
-        B, ZL, ZH = _BX, _ZL, _ZH
-
-        corners = [
-            [-B, -B, ZL], [B, -B, ZL], [B, B, ZL], [-B, B, ZL],
-            [-B, -B, ZH], [B, -B, ZH], [B, B, ZH], [-B, B, ZH],
-        ]
-        sc_pts = [_wp(c, sc, cx, cy) for c in corners]
-
-        p.setPen(QPen(_BOX, 1.0))
-        for i, j in [(0,1),(1,2),(2,3),(3,0),(4,5),(5,6),(6,7),(7,4),(0,4),(1,5),(2,6),(3,7)]:
-            p.drawLine(QPointF(*sc_pts[i]), QPointF(*sc_pts[j]))
-
-        # Floor grid
-        p.setPen(QPen(_GRID, 0.7))
-        N = 6
-        for k in range(N + 1):
-            t = -B + 2 * B * k / N
-            x1, y1 = _wp([-B, t, ZL], sc, cx, cy)
-            x2, y2 = _wp([ B, t, ZL], sc, cx, cy)
-            p.drawLine(QPointF(x1, y1), QPointF(x2, y2))
-            x1, y1 = _wp([t, -B, ZL], sc, cx, cy)
-            x2, y2 = _wp([t,  B, ZL], sc, cx, cy)
-            p.drawLine(QPointF(x1, y1), QPointF(x2, y2))
-
-        # Z axis tick marks with numbers (left-front vertical edge)
-        p.setFont(QFont('JetBrains Mono', 7))
-        p.setPen(_TICK)
-        z_ticks = [(0, ZL), (50, ZL+(ZH-ZL)*0.25), (100, ZL+(ZH-ZL)*0.5),
-                   (150, ZL+(ZH-ZL)*0.75), (200, ZH)]
-        for lbl, z in z_ticks:
-            tx, ty = _wp([-B - 0.06, -B, z], sc, cx, cy)
-            p.drawText(QPointF(tx - 26, ty + 4), str(lbl))
-
-        # X axis tick marks (front-bottom edge)
-        for lbl, x in [(-50, -B), (0, 0.0), (50, B)]:
-            tx, ty = _wp([x, -B - 0.02, ZL + 0.02], sc, cx, cy)
-            p.drawText(QPointF(tx - 8, ty + 13), str(lbl))
-
-        # Y axis tick marks (left-bottom edge)
-        for lbl, y in [(-50, -B), (0, 0.0), (50, B)]:
-            tx, ty = _wp([-B - 0.04, y, ZL + 0.02], sc, cx, cy)
-            p.drawText(QPointF(tx - 26, ty + 10), str(lbl))
-
-        # Axis labels
-        p.setFont(QFont('JetBrains Mono', 8, QFont.Weight.Bold))
-        p.setPen(_MUTED)
-        zx, zy = _wp([-B - 0.16, -B, (ZL + ZH) / 2 + 0.1], sc, cx, cy)
-        p.drawText(QPointF(zx - 18, zy), 'Z (m)')
-        xx, xy = _wp([0, -B - 0.12, ZL - 0.10], sc, cx, cy)
-        p.drawText(QPointF(xx - 12, xy), 'X (m)')
-        yx, yy = _wp([-B - 0.04, 0, ZL - 0.14], sc, cx, cy)
-        p.drawText(QPointF(yx - 24, yy), 'Y (m)')
-
-    # ── Static world-frame axis triad ──────────────────────────────────────────
-    def _draw_triad(self, p: QPainter, ax: float, ay: float, ln: float) -> None:
-        axes = [
-            ('Z', np.array([0.0, 0.0, 1.0]), _AXIS_Z),
-            ('Y', np.array([0.0, 1.0, 0.0]), _AXIS_Y),
-            ('X', np.array([1.0, 0.0, 0.0]), _AXIS_X),
-        ]
-        for label, unit_v, col in axes:
-            vv = _VM @ unit_v   # fixed world frame -- no rocket rotation
-            ex = ax + vv[0] * ln
-            ey = ay - vv[2] * ln
-            p.setPen(QPen(col, 2.0))
-            p.drawLine(QPointF(ax, ay), QPointF(float(ex), float(ey)))
-            p.setFont(QFont('Segoe UI', 8, QFont.Weight.Bold))
-            p.setPen(col)
-            p.drawText(QPointF(float(ex) + 2, float(ey) + 4), label)
 
     # ── Flame ─────────────────────────────────────────────────────────────────
     def _draw_flame(self, p: QPainter, R: np.ndarray,
@@ -543,11 +615,9 @@ class RocketVisual(QWidget):
     # ── Angle readout panel ───────────────────────────────────────────────────
     def _draw_readout(self, p: QPainter, rx: float, ry: float,
                       rw: float, rh: float) -> None:
-        w, x, y, z = self._w, self._x, self._y, self._z
-        sinp  = 2.0 * (w * y - z * x)
-        pitch = math.degrees(math.asin(max(-1.0, min(1.0, sinp))))
-        roll  = math.degrees(math.atan2(2.0*(w*x+y*z), 1.0-2.0*(x*x+y*y)))
-        yaw   = math.degrees(math.atan2(2.0*(w*z+x*y), 1.0-2.0*(y*y+z*z)))
+        # Already baked into self._w/x/y/z via _yaw_ref_quat (see
+        # update_data()/zero_yaw()) -- no separate offset/wrap needed here.
+        roll, pitch, yaw = self._current_euler_deg()
 
         p.setPen(QPen(QColor(30, 31, 42), 1))
         p.drawLine(QPointF(rx, ry), QPointF(rx, ry + rh))

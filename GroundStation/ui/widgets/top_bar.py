@@ -246,18 +246,30 @@ class _StatTelem(QWidget):
     def set_bandwidth(self, stats: LinkStats) -> None:
         used_bps = stats.rx_bps + stats.tx_bps
         pct = used_bps / _LORA_AIR_RATE_BPS * 100.0
-        color = _RED if pct >= 90 else _ORANGE if pct >= 60 else _MUTED
+
+        # Real signal-integrity proxy -- see LinkStats.rx_bad_packets. The
+        # E22 radio can't report RSSI in transparent mode (LoRa.h always
+        # returns -1), so a rising corrupted-packet rate is what actually
+        # tells you the link is degrading here.
+        good_and_bad = stats.rx_pkt_per_sec + stats.rx_bad_pkt_per_sec
+        err_pct = (stats.rx_bad_pkt_per_sec / good_and_bad * 100.0) if good_and_bad > 0 else 0.0
+
+        color = _RED if (pct >= 90 or err_pct >= 10) else _ORANGE if (pct >= 60 or err_pct >= 2) else _MUTED
         self._bw_lbl.setStyleSheet(_lbl_css(color, 9, 600))
         self._bw_lbl.setText(
             f'RX {stats.rx_pkt_per_sec:.1f}/s {stats.rx_bps:.0f}bps  '
             f'TX {stats.tx_pkt_per_sec:.1f}/s {stats.tx_bps:.0f}bps  '
-            f'({pct:.0f}% of {_LORA_AIR_RATE_BPS}bps)'
+            f'({pct:.0f}% of {_LORA_AIR_RATE_BPS}bps)  ·  {err_pct:.0f}% err'
         )
         self._bw_lbl.setToolTip(
             f'RX total: {stats.rx_packets} packets\n'
             f'TX total: {stats.tx_packets} packets\n'
             f'Combined throughput: {used_bps:.0f} bps of the LoRa link\'s '
-            f'{_LORA_AIR_RATE_BPS} bps fixed air rate ({pct:.0f}%).'
+            f'{_LORA_AIR_RATE_BPS} bps fixed air rate ({pct:.0f}%).\n\n'
+            f'Corrupted packets: {stats.rx_bad_packets} total, '
+            f'{err_pct:.1f}% of traffic this window -- the real link-quality '
+            f'signal here, since the E22 radio can\'t report RSSI in '
+            f'transparent mode (see LoRa.h).'
         )
 
     def clear_bandwidth(self) -> None:

@@ -1,4 +1,5 @@
-"""ARM / FIRE / UTILITY commands -- dark dashboard style, two-column layout."""
+"""FIRE / ATTITUDE / UTILITY commands -- dark dashboard style, two-column
+layout. ARM/DISARM lives in the OVERVIEW page's ArmPanel, not here."""
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
@@ -61,6 +62,7 @@ def _flat_btn(text: str, height: int = 26, width: int = 0, font_size: int = 10) 
         QPushButton {{
             background-color:{_CARD2};color:{_TEXT};
             border:1px solid {_BORDER};border-radius:5px;
+            padding:0;
         }}
         QPushButton:hover {{ background-color:#222436; }}
     """)
@@ -68,10 +70,7 @@ def _flat_btn(text: str, height: int = 26, width: int = 0, font_size: int = 10) 
 
 
 class CommandPanel(QWidget):
-    arm_requested             = pyqtSignal()
-    disarm_requested          = pyqtSignal()
     fire_pyro_requested       = pyqtSignal(int)
-    ping_requested            = pyqtSignal()
     calibrate_requested       = pyqtSignal()
     servo_test_requested      = pyqtSignal(int)
     cam_toggle_requested      = pyqtSignal()
@@ -81,6 +80,10 @@ class CommandPanel(QWidget):
     servo_preflight_requested = pyqtSignal()
     sd_start_requested        = pyqtSignal()
     sd_stop_requested         = pyqtSignal()
+    attitude_control_enable_requested  = pyqtSignal()
+    attitude_control_disable_requested = pyqtSignal()
+    attitude_demo_enable_requested     = pyqtSignal()
+    attitude_demo_disable_requested    = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -91,6 +94,8 @@ class CommandPanel(QWidget):
         self._state       = 0
         self._sd_present  = False
         self._sd_recording = False
+        self._attitude_control_on = False
+        self._attitude_demo_on    = False
 
         root = QVBoxLayout(self)
         root.setContentsMargins(14, 8, 14, 10)
@@ -119,42 +124,9 @@ class CommandPanel(QWidget):
         columns.addLayout(col_b, 1)
         root.addLayout(columns)
 
-        # ==== Column A: flight commands (ARM / IGNITION / UTILITIES) ====
-
-        col_a.addWidget(_section('ARM CONTROL'))
-        arm_row = QHBoxLayout()
-        arm_row.setSpacing(6)
-
-        self._arm_btn = QPushButton('ARM')
-        self._arm_btn.setFixedHeight(32)
-        self._arm_btn.setFont(QFont('Segoe UI', 11, QFont.Weight.Bold))
-        self._arm_btn.clicked.connect(self._on_arm)
-        self._arm_btn.setStyleSheet(f"""
-            QPushButton {{
-                background-color:{_BLUE};color:#FFF;border:none;
-                border-radius:6px;font-weight:700;letter-spacing:0.5px;
-            }}
-            QPushButton:hover {{ background-color:#60A5FA; }}
-            QPushButton:pressed {{ background-color:#2563EB; }}
-        """)
-
-        self._disarm_btn = QPushButton('DISARM')
-        self._disarm_btn.setFixedHeight(32)
-        self._disarm_btn.setFont(QFont('Segoe UI', 11, QFont.Weight.Bold))
-        self._disarm_btn.clicked.connect(self._on_disarm)
-        self._disarm_btn.setStyleSheet(f"""
-            QPushButton {{
-                background-color:transparent;color:{_RED};
-                border:1px solid {_RED};border-radius:6px;
-                font-weight:700;letter-spacing:0.5px;
-            }}
-            QPushButton:hover {{ background-color:#200A0A; }}
-        """)
-
-        arm_row.addWidget(self._arm_btn)
-        arm_row.addWidget(self._disarm_btn)
-        col_a.addLayout(arm_row)
-        col_a.addWidget(_divider())
+        # ==== Column A: flight commands (IGNITION / ATTITUDE / UTILITIES) ====
+        # ARM/DISARM deliberately not duplicated here -- it already lives in
+        # the OVERVIEW page's ArmPanel.
 
         # Pyro fire
         col_a.addWidget(_section('IGNITION CONTROL'))
@@ -189,18 +161,68 @@ class CommandPanel(QWidget):
 
         col_a.addWidget(_divider())
 
-        # Utilities
+        # Attitude control -- runtime mode toggles, ground-commanded (not
+        # compile-time flags -- see AttitudeController). REAL engages fin
+        # correction during POWERED_ASCENT/COAST; DEMO does the same but only
+        # while ARMED, for hand-rotating the airframe on the bench and
+        # watching the fins react. Both default off at boot and reset off on
+        # DISARM. Live confirmed state shows in the sensor panel's STATUS
+        # section, not here -- these are just the action buttons.
+        col_a.addWidget(_section('ATTITUDE CONTROL'))
+
+        real_row = QHBoxLayout(); real_row.setSpacing(6)
+        real_lbl = QLabel('Real (in-flight)')
+        real_lbl.setFixedWidth(96)
+        real_lbl.setStyleSheet(f'color:{_MUTED};font-size:11px;border:none;background:transparent;')
+        self._att_ctrl_btn = QPushButton('OFF')
+        self._att_ctrl_btn.setFixedHeight(24)
+        self._att_ctrl_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._att_ctrl_btn.setCheckable(True)
+        self._att_ctrl_btn.clicked.connect(self._on_attitude_control_toggled)
+        self._att_ctrl_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color:{_CARD2};color:{_TEXT};
+                border:1px solid {_BORDER};border-radius:5px;
+            }}
+            QPushButton:hover {{ background-color:#222436; }}
+            QPushButton:checked {{
+                background-color:#2A0A0A;color:{_RED};border:1px solid {_RED};
+            }}
+        """)
+        real_row.addWidget(real_lbl)
+        real_row.addWidget(self._att_ctrl_btn)
+        col_a.addLayout(real_row)
+
+        demo_row = QHBoxLayout(); demo_row.setSpacing(6)
+        demo_lbl = QLabel('Demo (armed only)')
+        demo_lbl.setFixedWidth(96)
+        demo_lbl.setStyleSheet(f'color:{_MUTED};font-size:11px;border:none;background:transparent;')
+        self._att_demo_btn = QPushButton('OFF')
+        self._att_demo_btn.setFixedHeight(24)
+        self._att_demo_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._att_demo_btn.setCheckable(True)
+        self._att_demo_btn.clicked.connect(self._on_attitude_demo_toggled)
+        self._att_demo_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color:{_CARD2};color:{_TEXT};
+                border:1px solid {_BORDER};border-radius:5px;
+            }}
+            QPushButton:hover {{ background-color:#222436; }}
+            QPushButton:checked {{
+                background-color:#0A2010;color:{_GREEN};border:1px solid {_GREEN};
+            }}
+        """)
+        demo_row.addWidget(demo_lbl)
+        demo_row.addWidget(self._att_demo_btn)
+        col_a.addLayout(demo_row)
+        col_a.addWidget(_divider())
+
+        # Utilities -- also re-zeros the YAW readout on the 3D view, not just
+        # the barometer, so the name can't just say "Baro" anymore.
         col_a.addWidget(_section('UTILITIES'))
-        util_row = QHBoxLayout()
-        util_row.setSpacing(6)
-
-        for label, slot in [('Calibrate Baro', self._on_calibrate),
-                            ('Ping', self.ping_requested.emit)]:
-            btn = _flat_btn(label, height=26)
-            btn.clicked.connect(slot)
-            util_row.addWidget(btn)
-
-        col_a.addLayout(util_row)
+        calibrate_btn = _flat_btn('Calibrate', height=26)
+        calibrate_btn.clicked.connect(self._on_calibrate)
+        col_a.addWidget(calibrate_btn)
         col_a.addWidget(_divider())
 
         # SD card -- the FC auto-starts logging at boot and auto-stops on
@@ -209,17 +231,22 @@ class CommandPanel(QWidget):
         # a card swapped in on the bench. Live PRESENT/RECORDING status
         # itself lives in the sensor panel's STATUS section, not here.
         col_a.addWidget(_section('SD CARD  (FLIGHT LOG)'))
-        sd_row = QHBoxLayout()
-        sd_row.setSpacing(6)
-
-        self._sd_start_btn = _flat_btn('Start Log', height=26)
-        self._sd_start_btn.clicked.connect(self.sd_start_requested.emit)
-        self._sd_stop_btn = _flat_btn('Stop Log', height=26)
-        self._sd_stop_btn.clicked.connect(self._on_sd_stop)
-
-        sd_row.addWidget(self._sd_start_btn)
-        sd_row.addWidget(self._sd_stop_btn)
-        col_a.addLayout(sd_row)
+        self._sd_btn = QPushButton('Start Log')
+        self._sd_btn.setFixedHeight(28)
+        self._sd_btn.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._sd_btn.setCheckable(True)
+        self._sd_btn.clicked.connect(self._on_sd_toggled)
+        self._sd_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color:{_CARD2};color:{_TEXT};
+                border:1px solid {_BORDER};border-radius:6px;font-weight:700;
+            }}
+            QPushButton:hover {{ background-color:#222436; }}
+            QPushButton:checked {{
+                background-color:#200A0A;color:{_RED};border:1px solid {_RED};
+            }}
+        """)
+        col_a.addWidget(self._sd_btn)
         col_a.addStretch()
 
         # ==== Column B: bench-test commands (FIN SERVOS / CAMERA) ====
@@ -239,7 +266,7 @@ class CommandPanel(QWidget):
         """)
         col_b.addWidget(preflight_btn)
 
-        fin_note = QLabel('Test = sweep.  −/+ = nudge trim against your jig.')
+        fin_note = QLabel('Test = sweep.  -/+ = nudge trim against your jig.')
         fin_note.setStyleSheet(
             f'color:{_MUTED};font-size:11px;border:none;background:transparent;'
         )
@@ -256,8 +283,8 @@ class CommandPanel(QWidget):
                 f'border:none;background:transparent;'
             )
             test_btn  = _flat_btn('Test', height=23)
-            minus_btn = _flat_btn('−', height=23, width=28)
-            plus_btn  = _flat_btn('+', height=23, width=28)
+            minus_btn = _flat_btn('-', height=23, width=28, font_size=13)
+            plus_btn  = _flat_btn('+', height=23, width=28, font_size=13)
             test_btn.clicked.connect(lambda checked, c=ch: self.servo_test_requested.emit(c))
             minus_btn.clicked.connect(lambda checked, c=ch: self.servo_nudge_requested.emit(c, False))
             plus_btn.clicked.connect(lambda checked, c=ch: self.servo_nudge_requested.emit(c, True))
@@ -330,6 +357,12 @@ class CommandPanel(QWidget):
             self._sd_recording = data.sd_recording
             self._update_button_states()
 
+        if (data.attitude_control_on != self._attitude_control_on or
+                data.attitude_demo_on != self._attitude_demo_on):
+            self._attitude_control_on = data.attitude_control_on
+            self._attitude_demo_on    = data.attitude_demo_on
+            self._update_button_states()
+
     def _update_button_states(self) -> None:
         can_fire = self._state in {1, 2, 3, 4, 5}
         for btn in self._fire_btns:
@@ -337,26 +370,25 @@ class CommandPanel(QWidget):
 
         # Not gated on self._sd_present: the FC no longer polls for a card in
         # the background (that was a plausible cause of telemetry stalls --
-        # see DataLogger::cardPresent() on the firmware side), so Start is
-        # now also the retry button -- e.g. after inserting a card that
-        # wasn't there at boot. It just re-attempts and reports the result.
-        self._sd_start_btn.setEnabled(not self._sd_recording)
-        self._sd_stop_btn.setEnabled(self._sd_recording)
+        # see DataLogger::cardPresent() on the firmware side), so pressing
+        # this while unchecked is also the retry button -- e.g. after
+        # inserting a card that wasn't there at boot. It just re-attempts
+        # and reports the result.
+        self._sd_btn.setChecked(self._sd_recording)
+        self._sd_btn.setText('Recording -- Tap to Stop' if self._sd_recording else 'Start Log')
 
-    def _on_arm(self) -> None:
-        reply = QMessageBox.question(
-            self, 'Confirm ARM',
-            'Send ARM command to the flight computer?\n\nThis will arm the pyro channels.',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
-        )
-        if reply == QMessageBox.StandardButton.Yes:
-            self.arm_requested.emit()
+        # Toggle buttons stay clickable in both directions -- setChecked()
+        # here is a programmatic sync from telemetry, not a click, so it
+        # does not re-trigger the toggled handlers/confirmation dialogs.
+        self._att_ctrl_btn.setChecked(self._attitude_control_on)
+        self._att_ctrl_btn.setText('ON' if self._attitude_control_on else 'OFF')
+        self._att_demo_btn.setChecked(self._attitude_demo_on)
+        self._att_demo_btn.setText('ON' if self._attitude_demo_on else 'OFF')
 
-    def _on_disarm(self) -> None:
-        self.disarm_requested.emit()
-
-    def _on_sd_stop(self) -> None:
+    def _on_sd_toggled(self, checked: bool) -> None:
+        if checked:
+            self.sd_start_requested.emit()
+            return
         reply = QMessageBox.question(
             self, 'Confirm Stop Log',
             'Stop the flight computer\'s onboard SD recording?\n\n'
@@ -367,11 +399,38 @@ class CommandPanel(QWidget):
         )
         if reply == QMessageBox.StandardButton.Yes:
             self.sd_stop_requested.emit()
+        else:
+            self._sd_btn.setChecked(True)   # revert -- still recording, nothing changed
+
+    def _on_attitude_control_toggled(self, checked: bool) -> None:
+        if not checked:
+            self.attitude_control_disable_requested.emit()
+            return
+        reply = QMessageBox.warning(
+            self, 'Confirm Enable Real Attitude Control',
+            'Enable REAL in-flight fin control?\n\n'
+            'This engages active fin correction during POWERED_ASCENT/COAST on the '
+            'next flight. Only do this once the gyro-axis mapping and gains have '
+            'been bench-validated (see config.h / ATTITUDE_DEMO for that check).',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            self.attitude_control_enable_requested.emit()
+        else:
+            self._att_ctrl_btn.setChecked(False)   # revert -- nothing was actually sent
+
+    def _on_attitude_demo_toggled(self, checked: bool) -> None:
+        if checked:
+            self.attitude_demo_enable_requested.emit()
+        else:
+            self.attitude_demo_disable_requested.emit()
 
     def _on_calibrate(self) -> None:
         reply = QMessageBox.question(
             self, 'Confirm Calibrate',
-            'Re-zero the barometer at the current altitude?\n\nDo this only when the rocket is on the ground.',
+            'Re-zero the barometer at the current altitude, and the YAW readout '
+            'to the current heading?\n\nDo this only when the rocket is on the ground.',
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )

@@ -9,7 +9,7 @@ For the full operating procedure (arm, launch, recover, review data), see [`../F
 Three pages, left sidebar:
 
 - **OVERVIEW** — GPS map (custom-drawn, tile-fetching + QPainter, no WebEngine dependency), scrolling trajectory plot, live 3D rocket orientation (renders your actual STL model, driven by the BNO085 quaternion), pyro channel status, per-channel continuity, and an arm/disarm panel.
-- **TELEMETRY** — sensor panel (live health for IMU/baro/accelerometer/GPS/power/SD card — re-checked every packet, not just at boot), command panel (ARM/DISARM, per-channel pyro fire, fin servo bench-test controls, camera toggle, SD start/stop), and a timestamped event log with its own local CSV recorder ("⏺ REC" — separate from the flight computer's own SD card).
+- **TELEMETRY** — sensor panel (live health for IMU/baro/accelerometer/GPS/power/SD card/attitude-control mode — re-checked every packet, not just at boot), command panel (ARM/DISARM, per-channel pyro fire, fin servo bench-test controls, camera toggle, SD start/stop, attitude control real/demo mode toggles), and a timestamped event log with its own local CSV recorder ("⏺ REC" — separate from the flight computer's own SD card).
 - **DATA TOOLS** — pulls a `.BIN` log off the flight computer's SD card and converts it to CSV and/or MATLAB `.mat` for analysis.
 
 Other things worth knowing:
@@ -21,7 +21,7 @@ Other things worth knowing:
 
 Binary, little-endian, magic-prefixed. See `core/packet_decoder.py` and `core/packet_encoder.py` for the authoritative field-by-field layout (kept in sync with `FlightComputer/src/telemetry/Packet.h`):
 
-- `TelemetryPacket` (rocket → ground): 51 bytes, magic `0xAA 0x55`.
+- `TelemetryPacket` (rocket → ground): 52 bytes, magic `0xAA 0x55`.
 - `CommandPacket` (ground → rocket): 7 bytes, magic `0xBB 0x44`.
 - `AckPacket` (rocket → ground): 6 bytes, magic `0xAC 0x4B`.
 

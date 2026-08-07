@@ -19,6 +19,7 @@ _CSV_FIELDS = [
     'voltage_v', 'current_ma', 'rssi',
     'imu_ok', 'baro_ok', 'accel_ok', 'gps_ok', 'power_ok',
     'sd_present', 'sd_recording',
+    'attitude_control_on', 'attitude_demo_on',
 ]
 
 
@@ -78,6 +79,8 @@ class DataLogger:
             'power_ok':     int(data.power_ok),
             'sd_present':   int(data.sd_present),
             'sd_recording': int(data.sd_recording),
+            'attitude_control_on': int(data.attitude_control_on),
+            'attitude_demo_on':    int(data.attitude_demo_on),
         })
         self._row_count += 1
         # Flush every 50 rows so we don't lose too much data on crash
