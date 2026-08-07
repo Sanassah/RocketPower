@@ -36,32 +36,32 @@ class _ChannelRow(QWidget):
 
         # Continuity dot
         self._cont_dot = QLabel('●')
-        self._cont_dot.setFont(QFont('Segoe UI', 13))
-        self._cont_dot.setFixedWidth(20)
+        self._cont_dot.setFont(QFont('Segoe UI', 15))
+        self._cont_dot.setFixedWidth(22)
         self._cont_dot.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._cont_dot.setStyleSheet(f'color:{_MUTED};border:none;background:transparent;')
 
         # Channel number label ("PYRO 1")
         ch_lbl = QLabel(f'PYRO {ch}')
-        ch_lbl.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        ch_lbl.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         ch_lbl.setStyleSheet(
-            f'color:{_TEXT};font-size:10px;font-weight:700;letter-spacing:0.5px;'
-            f'border:none;background:transparent;min-width:52px;'
+            f'color:{_TEXT};font-size:12px;font-weight:700;letter-spacing:0.5px;'
+            f'border:none;background:transparent;min-width:60px;'
         )
 
         # Function name ("Ignition" / "Parachute" / "Backup")
         name_lbl = QLabel(_PYRO_NAMES[ch])
-        name_lbl.setFont(QFont('Segoe UI', 13))
+        name_lbl.setFont(QFont('Segoe UI', 15))
         name_lbl.setStyleSheet(
-            f'color:{_TEXT};font-size:13px;border:none;background:transparent;'
+            f'color:{_TEXT};font-size:15px;border:none;background:transparent;'
         )
 
         # Status badge
         self._badge = QLabel('IDLE')
-        self._badge.setFixedWidth(64)
-        self._badge.setFixedHeight(24)
+        self._badge.setFixedWidth(74)
+        self._badge.setFixedHeight(27)
         self._badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._badge.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
+        self._badge.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
 
         row.addWidget(self._cont_dot)
         row.addWidget(ch_lbl)
@@ -90,7 +90,7 @@ class _ChannelRow(QWidget):
         self._badge.setText(text)
         self._badge.setStyleSheet(
             f'color:{fg};background-color:{bg};border:1px solid {border};'
-            f'border-radius:12px;font-size:10px;font-weight:700;letter-spacing:0.5px;'
+            f'border-radius:13px;font-size:12px;font-weight:700;letter-spacing:0.5px;'
         )
 
 
@@ -111,11 +111,11 @@ class PyroPanel(QWidget):
         # Header
         hdr = QHBoxLayout(); hdr.setSpacing(8)
         sym = QLabel('/\\')
-        sym.setStyleSheet(f'color:{_TEXT};font-size:12px;background:transparent;border:none;')
+        sym.setStyleSheet(f'color:{_TEXT};font-size:14px;background:transparent;border:none;')
         ttl = QLabel('PYRO CHANNELS')
-        ttl.setFont(QFont('Segoe UI', 11, QFont.Weight.Bold))
+        ttl.setFont(QFont('Segoe UI', 13, QFont.Weight.Bold))
         ttl.setStyleSheet(
-            f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
+            f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:1px;'
             f'background:transparent;border:none;'
         )
         hdr.addWidget(sym); hdr.addWidget(ttl); hdr.addStretch()

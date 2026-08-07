@@ -41,7 +41,7 @@ def _card_css() -> str:
     return f'background-color:{_CARD};border:1px solid {_BORDER};border-radius:7px;'
 
 
-def _lbl_css(color: str, size: int = 10, weight: int = 600) -> str:
+def _lbl_css(color: str, size: int = 12, weight: int = 600) -> str:
     return (
         f'color:{color};font-size:{size}px;font-weight:{weight};'
         f'letter-spacing:0.9px;border:none;background:transparent;'
@@ -60,14 +60,14 @@ class _Stat(QWidget):
         lbl = QLabel(title)
         lbl.setStyleSheet(_lbl_css(_MUTED))
         self._val = QLabel('--')
-        self._val.setFont(QFont('Segoe UI', 14, QFont.Weight.Bold))
-        self._val.setStyleSheet(_lbl_css(_TEXT, 14, 700))
+        self._val.setFont(QFont('Segoe UI', 16, QFont.Weight.Bold))
+        self._val.setStyleSheet(_lbl_css(_TEXT, 16, 700))
         lay.addWidget(lbl)
         lay.addWidget(self._val)
 
     def set(self, text: str, color: str = _TEXT) -> None:
         self._val.setText(text)
-        self._val.setStyleSheet(_lbl_css(color, 14, 700))
+        self._val.setStyleSheet(_lbl_css(color, 16, 700))
 
 
 # ── State badge card (replaces Vehicle ID) ────────────────────────────────────
@@ -84,12 +84,12 @@ class _StatStateBadge(QWidget):
         lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self._badge = QLabel('IDLE')
-        self._badge.setFont(QFont('Segoe UI', 13, QFont.Weight.ExtraBold))
+        self._badge.setFont(QFont('Segoe UI', 15, QFont.Weight.ExtraBold))
         self._badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._badge.setStyleSheet(
             f'color:#0A0A0B;background:{_STATE_COLOR["IDLE"]};'
-            f'border-radius:10px;padding:6px 14px;'
-            f'font-size:13px;font-weight:800;letter-spacing:2px;border:none;'
+            f'border-radius:10px;padding:7px 16px;'
+            f'font-size:15px;font-weight:800;letter-spacing:2px;border:none;'
         )
 
         lay.addStretch()
@@ -101,8 +101,8 @@ class _StatStateBadge(QWidget):
         self._badge.setText(state_name.replace('_', ' '))
         self._badge.setStyleSheet(
             f'color:#0A0A0B;background:{color};'
-            f'border-radius:10px;padding:6px 14px;'
-            f'font-size:13px;font-weight:800;letter-spacing:2px;border:none;'
+            f'border-radius:10px;padding:7px 16px;'
+            f'font-size:15px;font-weight:800;letter-spacing:2px;border:none;'
         )
 
 
@@ -114,7 +114,7 @@ class _BatteryIcon(QWidget):
         super().__init__(parent)
         self._pct   = 0.0
         self._color = _MUTED
-        self.setFixedSize(58, 28)
+        self.setFixedSize(64, 30)
 
     def set(self, pct: float, color: str) -> None:
         self._pct   = pct
@@ -184,8 +184,8 @@ class _StatBattery(QWidget):
         row.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self._val = QLabel('-- %')
-        self._val.setFont(QFont('Segoe UI', 14, QFont.Weight.Bold))
-        self._val.setStyleSheet(_lbl_css(_MUTED, 14, 700))
+        self._val.setFont(QFont('Segoe UI', 16, QFont.Weight.Bold))
+        self._val.setStyleSheet(_lbl_css(_MUTED, 16, 700))
 
         self._icon = _BatteryIcon()
 
@@ -196,7 +196,7 @@ class _StatBattery(QWidget):
 
     def set_pct(self, pct: float, color: str) -> None:
         self._val.setText(f'{pct:.0f} %')
-        self._val.setStyleSheet(_lbl_css(color, 14, 700))
+        self._val.setStyleSheet(_lbl_css(color, 16, 700))
         self._icon.set(pct, color)
 
 
@@ -220,11 +220,11 @@ class _StatTelem(QWidget):
         row.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self._val = QLabel('NO LINK')
-        self._val.setFont(QFont('Segoe UI', 14, QFont.Weight.Bold))
-        self._val.setStyleSheet(_lbl_css(_RED, 14, 700))
+        self._val.setFont(QFont('Segoe UI', 16, QFont.Weight.Bold))
+        self._val.setStyleSheet(_lbl_css(_RED, 16, 700))
 
         self._dot = QLabel('●')
-        self._dot.setFont(QFont('Segoe UI', 11))
+        self._dot.setFont(QFont('Segoe UI', 13))
         self._dot.setStyleSheet(f'color:{_RED};background:transparent;border:none;')
         self._dot.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
@@ -234,13 +234,13 @@ class _StatTelem(QWidget):
         lay.addLayout(row)
 
         self._bw_lbl = QLabel('RX -- / TX --')
-        self._bw_lbl.setStyleSheet(_lbl_css(_MUTED, 9, 600))
+        self._bw_lbl.setStyleSheet(_lbl_css(_MUTED, 11, 600))
         self._bw_lbl.setToolTip('Live throughput vs. the LoRa link\'s fixed air data rate.')
         lay.addWidget(self._bw_lbl)
 
     def set(self, text: str, color: str) -> None:
         self._val.setText(text)
-        self._val.setStyleSheet(_lbl_css(color, 14, 700))
+        self._val.setStyleSheet(_lbl_css(color, 16, 700))
         self._dot.setStyleSheet(f'color:{color};background:transparent;border:none;')
 
     def set_bandwidth(self, stats: LinkStats) -> None:
@@ -255,7 +255,7 @@ class _StatTelem(QWidget):
         err_pct = (stats.rx_bad_pkt_per_sec / good_and_bad * 100.0) if good_and_bad > 0 else 0.0
 
         color = _RED if (pct >= 90 or err_pct >= 10) else _ORANGE if (pct >= 60 or err_pct >= 2) else _MUTED
-        self._bw_lbl.setStyleSheet(_lbl_css(color, 9, 600))
+        self._bw_lbl.setStyleSheet(_lbl_css(color, 11, 600))
         self._bw_lbl.setText(
             f'RX {stats.rx_pkt_per_sec:.1f}/s {stats.rx_bps:.0f}bps  '
             f'TX {stats.tx_pkt_per_sec:.1f}/s {stats.tx_bps:.0f}bps  '
@@ -273,7 +273,7 @@ class _StatTelem(QWidget):
         )
 
     def clear_bandwidth(self) -> None:
-        self._bw_lbl.setStyleSheet(_lbl_css(_MUTED, 9, 600))
+        self._bw_lbl.setStyleSheet(_lbl_css(_MUTED, 11, 600))
         self._bw_lbl.setText('RX -- / TX --')
 
 
@@ -283,7 +283,7 @@ class TopBar(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(f'background-color:{_BG};border-bottom:1px solid {_BORDER};')
-        self.setFixedHeight(108)
+        self.setFixedHeight(122)
 
         root = QVBoxLayout(self)
         root.setContentsMargins(16, 8, 16, 8)
@@ -294,17 +294,17 @@ class TopBar(QWidget):
         row1.setSpacing(8)
 
         logo = QLabel('/ /  ROCKETPOWER')
-        logo.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
+        logo.setFont(QFont('Segoe UI', 14, QFont.Weight.Bold))
         logo.setStyleSheet(
             f'color:{_TEXT};letter-spacing:3px;background:transparent;border:none;'
         )
         dash = QLabel('DASHBOARD')
-        dash.setFont(QFont('Segoe UI', 12))
+        dash.setFont(QFont('Segoe UI', 14))
         dash.setStyleSheet(
             f'color:{_MUTED};letter-spacing:3px;background:transparent;border:none;'
         )
         self._clock = QLabel()
-        self._clock.setFont(QFont('JetBrains Mono', 10))
+        self._clock.setFont(QFont('JetBrains Mono', 12))
         self._clock.setStyleSheet(f'color:{_MUTED};background:transparent;border:none;')
 
         row1.addWidget(logo)

@@ -57,6 +57,19 @@ bool PyroController::fire(uint8_t channel) {
     return true;
 }
 
+bool PyroController::fireBackupUnconditional() {
+    const uint8_t channel = PYRO_BACKUP;
+    uint8_t pin = _firePins[channel - 1];
+    Serial.println("[PYRO] BACKUP AUTO-FIRE ch3 -- independent apogee evidence, bypassing arm check");
+
+    digitalWrite(pin, HIGH);
+    delay(PYRO_FIRE_DURATION_MS);
+    digitalWrite(pin, LOW);
+
+    Serial.println("[PYRO] backup ch3 auto-fire complete");
+    return true;
+}
+
 bool PyroController::_safetyCheck(uint8_t ch) const {
     if (!_armed) {
         Serial.println("[PYRO] SAFETY: not armed");

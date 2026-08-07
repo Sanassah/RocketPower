@@ -17,6 +17,18 @@ public:
     // Refuses to fire if not armed or continuity check fails.
     bool fire(uint8_t channel);
 
+    // Fires CH3 (backup) UNCONDITIONALLY -- deliberately bypasses the
+    // normal _armed check. This exists for exactly one caller: BackupDeploy,
+    // an independent apogee monitor that runs regardless of StateMachine's
+    // state or this class's armed flag (neither survives a reset -- see the
+    // comment above BACKUP_MIN_ALT_GAIN_M in config.h for why that matters).
+    // Its own multi-stage physical evidence (sustained accel, real altitude
+    // gain, a confirmed velocity zero-crossing, plus an extra delay) IS the
+    // safety gate for this path -- the same principle commercial dual-
+    // deploy altimeters use for their backup channel. Hardcoded to channel 3
+    // only; this is not a general-purpose bypass of fire()'s safety check.
+    bool fireBackupUnconditional();
+
     // Returns true if continuity detected on channel (1-3)
     bool continuityOk(uint8_t channel) const;
 

@@ -14,6 +14,7 @@
 #include "control/FinController.h"
 #include "control/AttitudeController.h"
 #include "control/StatusLED.h"
+#include "safety/BackupDeploy.h"
 
 // ===== Global objects =====
 SensorManager      sensors;
@@ -26,6 +27,8 @@ CameraController   camera;
 DataLogger         logger;
 TelemetryManager   telem(radio, fsm, pyro, fins, camera, logger, attitude);
 StatusLED          statusLed;
+// Independent of fsm/pyro's armed state on purpose -- see BackupDeploy.h.
+BackupDeploy        backupDeploy;
 
 // ===== Timing =====
 elapsedMillis loopTimer;     // tracks time since last loop start
@@ -121,6 +124,14 @@ void loop() {
     // ---- 2. Update state machine ----
     fsm.update(d);
     FlightState newState = fsm.state();
+
+    // ---- 2a. Independent backup apogee monitor ----
+    // Deliberately unconditional -- no state or armed-flag check here. See
+    // BackupDeploy.h for why: if fsm/pyro's state got reset mid-flight
+    // (neither survives a reboot), this is the only thing that can still
+    // notice the rocket already went through a real boost and reached
+    // apogee, and fire the backup channel anyway.
+    backupDeploy.update(d, pyro);
 
     // ---- 2b. Active attitude control ----
     // Two independent reasons to run this, from two independent ground-

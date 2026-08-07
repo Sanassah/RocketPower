@@ -66,9 +66,9 @@ class _NavBtn(QPushButton):
     def __init__(self, label: str, parent=None):
         super().__init__(parent)
         self.setCheckable(True)
-        self.setFixedHeight(44)
+        self.setFixedHeight(46)
         self.setText(label)
-        self.setFont(QFont('Segoe UI', 9, QFont.Weight.Bold))
+        self.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
         self._refresh(False)
 
     def _refresh(self, active: bool) -> None:
@@ -82,7 +82,7 @@ class _NavBtn(QPushButton):
                     border-radius: 0;
                     padding: 0 16px;
                     text-align: left;
-                    font-size: 9px;
+                    font-size: 10px;
                     font-weight: 700;
                     letter-spacing: 1px;
                 }}
@@ -97,7 +97,7 @@ class _NavBtn(QPushButton):
                     border-radius: 0;
                     padding: 0 16px;
                     text-align: left;
-                    font-size: 9px;
+                    font-size: 10px;
                     font-weight: 700;
                     letter-spacing: 1px;
                 }}
@@ -161,7 +161,7 @@ class MainWindow(QMainWindow):
         body.addWidget(self._pages, stretch=1)
 
         self._status_bar = QStatusBar()
-        self._status_bar.setFont(QFont('JetBrains Mono', 9))
+        self._status_bar.setFont(QFont('JetBrains Mono', 11))
         self._status_bar.setStyleSheet(
             f'background-color:{_SIDEBAR};color:{_MUTED};'
             f'border-top:1px solid {_BORDER};'
@@ -176,7 +176,7 @@ class MainWindow(QMainWindow):
         sb.setStyleSheet(
             f'background-color:{_SIDEBAR};border-right:1px solid {_BORDER};'
         )
-        sb.setFixedWidth(110)
+        sb.setFixedWidth(132)
 
         lay = QVBoxLayout(sb)
         lay.setContentsMargins(0, 16, 0, 12)
@@ -184,7 +184,7 @@ class MainWindow(QMainWindow):
 
         # Wordmark
         wm = QLabel('RP')
-        wm.setFont(QFont('Segoe UI', 16, QFont.Weight.ExtraBold))
+        wm.setFont(QFont('Segoe UI', 18, QFont.Weight.ExtraBold))
         wm.setAlignment(Qt.AlignmentFlag.AlignCenter)
         wm.setStyleSheet(
             f'color:{_TEXT};letter-spacing:3px;background:transparent;border:none;padding:0 0 4px 0;'
@@ -214,11 +214,11 @@ class MainWindow(QMainWindow):
         status_row = QHBoxLayout()
         status_row.setContentsMargins(10, 4, 10, 4)
         self._sys_dot = QLabel('o')
-        self._sys_dot.setFont(QFont('Segoe UI', 10))
+        self._sys_dot.setFont(QFont('Segoe UI', 12))
         self._sys_dot.setStyleSheet(f'color:{_RED};background:transparent;border:none;')
         self._sys_lbl = QLabel('OFFLINE')
         self._sys_lbl.setStyleSheet(
-            f'color:{_MUTED};font-size:10px;font-weight:700;letter-spacing:0.5px;'
+            f'color:{_MUTED};font-size:12px;font-weight:700;letter-spacing:0.5px;'
             f'background:transparent;border:none;'
         )
         status_row.addWidget(self._sys_dot)
@@ -234,7 +234,7 @@ class MainWindow(QMainWindow):
         def _small_label(text):
             l = QLabel(text)
             l.setStyleSheet(
-                f'color:{_MUTED};font-size:10px;font-weight:700;letter-spacing:0.5px;'
+                f'color:{_MUTED};font-size:12px;font-weight:700;letter-spacing:0.5px;'
                 f'background:transparent;border:none;padding:4px 10px 1px 10px;'
             )
             return l
@@ -243,7 +243,7 @@ class MainWindow(QMainWindow):
             QComboBox {{
                 background-color:#141520;color:{_TEXT};
                 border:1px solid {_BORDER};border-radius:4px;
-                padding:2px 6px;font-size:10px;margin:0 8px;
+                padding:3px 6px;font-size:12px;margin:0 8px;
             }}
             QComboBox::drop-down {{ border:none; }}
             QComboBox QAbstractItemView {{
@@ -253,13 +253,13 @@ class MainWindow(QMainWindow):
 
         lay.addWidget(_small_label('PORT'))
         self._port_combo = QComboBox()
-        self._port_combo.setFixedHeight(24)
+        self._port_combo.setFixedHeight(27)
         self._port_combo.setStyleSheet(_combo_css)
         lay.addWidget(self._port_combo)
 
         lay.addWidget(_small_label('BAUD'))
         self._baud_combo = QComboBox()
-        self._baud_combo.setFixedHeight(24)
+        self._baud_combo.setFixedHeight(27)
         self._baud_combo.addItems(_BAUD_RATES)
         self._baud_combo.setCurrentText(_DEFAULT_BAUD)
         self._baud_combo.setStyleSheet(_combo_css)
@@ -267,20 +267,20 @@ class MainWindow(QMainWindow):
 
         lay.addSpacing(6)
         self._conn_btn = QPushButton('CONNECT')
-        self._conn_btn.setFixedHeight(28)
-        self._conn_btn.setFont(QFont('Segoe UI', 9, QFont.Weight.Bold))
+        self._conn_btn.setFixedHeight(30)
+        self._conn_btn.setFont(QFont('Segoe UI', 11, QFont.Weight.Bold))
         self._conn_btn.clicked.connect(self._toggle_connection)
         self._conn_btn.setStyleSheet(self._conn_btn_style(False))
         lay.addWidget(self._conn_btn)
 
         ref = QPushButton('refresh')
-        ref.setFixedHeight(20)
-        ref.setFont(QFont('Segoe UI', 8))
+        ref.setFixedHeight(22)
+        ref.setFont(QFont('Segoe UI', 10))
         ref.clicked.connect(self._refresh_ports)
         ref.setStyleSheet(f"""
             QPushButton {{
                 background:transparent;color:{_MUTED};border:none;
-                font-size:8px;margin:0 8px;
+                font-size:10px;margin:0 8px;
             }}
             QPushButton:hover {{ color:{_TEXT}; }}
         """)
@@ -289,7 +289,7 @@ class MainWindow(QMainWindow):
         lay.addSpacing(4)
         ver = QLabel('v1.0.0')
         ver.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        ver.setStyleSheet(f'color:{_BORDER};font-size:8px;background:transparent;border:none;')
+        ver.setStyleSheet(f'color:{_BORDER};font-size:10px;background:transparent;border:none;')
         lay.addWidget(ver)
 
         self._refresh_ports()
@@ -387,7 +387,7 @@ class MainWindow(QMainWindow):
 
         lbl = QLabel(header_text)
         lbl.setStyleSheet(
-            f'color:{_MUTED};font-size:10px;font-weight:700;letter-spacing:1px;'
+            f'color:{_MUTED};font-size:12px;font-weight:700;letter-spacing:1px;'
             f'background:transparent;border:none;'
         )
         hl.addWidget(lbl)
@@ -420,7 +420,7 @@ class MainWindow(QMainWindow):
 
         lbl = QLabel('[]  3D ORIENTATION')
         lbl.setStyleSheet(
-            f'color:{_MUTED};font-size:10px;font-weight:700;letter-spacing:1px;'
+            f'color:{_MUTED};font-size:12px;font-weight:700;letter-spacing:1px;'
             f'background:transparent;border:none;'
         )
         hl.addWidget(lbl); hl.addStretch()
@@ -439,28 +439,25 @@ class MainWindow(QMainWindow):
         page.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         page.setStyleSheet(f'background-color:{_BG};')
 
-        root = QHBoxLayout(page)
+        root = QVBoxLayout(page)
         root.setContentsMargins(14, 14, 14, 14)
-        root.setSpacing(0)
+        root.setSpacing(14)
 
-        # Left column: sensor data (top-left) + commands/utilities (bottom-left)
-        self._sensor_panel  = SensorPanel()
+        # Top: sensor/telemetry data, full page width (it has its own 2
+        # internal columns now -- see SensorPanel -- so it needs the room a
+        # single side column never gave it; a single-column layout squeezed
+        # against a full-height event log made every row's label and value
+        # overlap at the current font size).
+        self._sensor_panel = SensorPanel()
+
+        # Bottom: commands/utilities (left) + event log (right, now just a
+        # bottom strip instead of full page height).
         self._command_panel = CommandPanel()
-
-        left = QSplitter(Qt.Orientation.Vertical)
-        left.setChildrenCollapsible(False)
-        left.setHandleWidth(14)
-        left.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
-        left.addWidget(self._sensor_panel)
-        left.addWidget(self._command_panel)
-        left.setSizes([560, 390])
-
-        # Right column: event log (full height) + REC button in its header
-        self._event_log = EventLog()
+        self._event_log     = EventLog()
 
         self._rec_btn = QPushButton('⏺  REC')
-        self._rec_btn.setFixedHeight(24)
-        self._rec_btn.setFont(QFont('Segoe UI', 9, QFont.Weight.Bold))
+        self._rec_btn.setFixedHeight(27)
+        self._rec_btn.setFont(QFont('Segoe UI', 11, QFont.Weight.Bold))
         self._rec_btn.setCheckable(True)
         self._rec_btn.setEnabled(False)
         self._rec_btn.clicked.connect(self._toggle_recording)
@@ -480,16 +477,25 @@ class MainWindow(QMainWindow):
         """)
         self._event_log.hdr_layout.addWidget(self._rec_btn)
 
-        # Main horizontal split
-        hsplit = QSplitter(Qt.Orientation.Horizontal)
-        hsplit.setChildrenCollapsible(False)
-        hsplit.setHandleWidth(14)
-        hsplit.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
-        hsplit.addWidget(left)
-        hsplit.addWidget(self._event_log)
-        hsplit.setSizes([600, 740])
+        bottom = QSplitter(Qt.Orientation.Horizontal)
+        bottom.setChildrenCollapsible(False)
+        bottom.setHandleWidth(14)
+        bottom.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
+        bottom.addWidget(self._command_panel)
+        bottom.addWidget(self._event_log)
+        bottom.setSizes([750, 650])
 
-        root.addWidget(hsplit)
+        vsplit = QSplitter(Qt.Orientation.Vertical)
+        vsplit.setChildrenCollapsible(False)
+        vsplit.setHandleWidth(14)
+        vsplit.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
+        vsplit.addWidget(self._sensor_panel)
+        vsplit.addWidget(bottom)
+        # Event log confined to the bottom strip's height now instead of the
+        # full page -- roughly half of what it had before.
+        vsplit.setSizes([480, 440])
+
+        root.addWidget(vsplit)
         return page
 
     def _toggle_recording(self) -> None:

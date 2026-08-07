@@ -76,7 +76,11 @@
 // ===== Pyro channel aliases =====
 #define PYRO_IGNITION   1   // CH1 — motor igniter, fired by ground command
 #define PYRO_PARACHUTE  2   // CH2 — recovery parachute, fired at apogee
-#define PYRO_BACKUP     3   // CH3 — backup charge, fired manually if CH2 fails
+#define PYRO_BACKUP     3   // CH3 — backup charge: fireable manually by ground
+                            // command at any time, AND auto-fired by
+                            // BackupDeploy on independent apogee evidence
+                            // (see below) as a failsafe if the primary path
+                            // never reaches APOGEE at all
 
 // ===== Camera =====
 // JST-GH 4-pin, Serial7 at 115200 baud (RunCam Split 4-25 compatible)
@@ -243,6 +247,31 @@
 #define APOGEE_DETECTION_WINDOW_MS 200    // vertical-velocity zero-crossing window
 #define LANDED_STABLE_MS           10000  // altitude stable for this long = LANDED
 #define LANDED_ALT_TOLERANCE_M     2.0f   // ±m to count as "stable"
+
+// ===== Independent backup apogee detection (see BackupDeploy) =====
+// StateMachine's flight state and PyroController's armed flag both live in
+// RAM only -- neither survives a reset. If the flight computer resets
+// mid-flight (vibration-induced brownout on a custom board is a real risk),
+// it boots back into IDLE + disarmed, and since IDLE only ever exits via a
+// ground-commanded ARM, the state machine can never reach APOGEE again on
+// its own -- the primary parachute deployment then never fires. BackupDeploy
+// is a second, completely independent detector using the same physical
+// signature (sustained accel, then real altitude gain, then a velocity
+// zero-crossing) but never touching StateMachine or requiring
+// PyroController's armed flag -- its own multi-stage evidence is the safety
+// gate instead. See PyroController::fireBackupUnconditional().
+#define BACKUP_MIN_ALT_GAIN_M   50.0f  // must climb this far past the boost
+                                        // point before apogee-watching even
+                                        // starts -- rules out a G-spike from
+                                        // being carried/dropped on the bench.
+                                        // Kept well clear of that rather than
+                                        // tuned tight to any one motor/rocket
+#define BACKUP_FIRE_DELAY_MS    2000   // wait this long after a confirmed
+                                        // zero-crossing before firing --
+                                        // gives the primary path (and a
+                                        // ground operator) every chance to
+                                        // act first; a redundant fire into
+                                        // an already-open bay is harmless
 
 // Requesting 200ms (5Hz) outran what the LoRa link could actually clear over
 // the air, leaving the radio almost continuously transmitting -- observed

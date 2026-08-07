@@ -43,10 +43,10 @@ _STATE_SUB = {
 def _card_header(symbol: str, title: str) -> QHBoxLayout:
     h = QHBoxLayout(); h.setSpacing(8)
     sym = QLabel(symbol)
-    sym.setStyleSheet(f'color:{_TEXT};font-size:12px;background:transparent;border:none;')
+    sym.setStyleSheet(f'color:{_TEXT};font-size:14px;background:transparent;border:none;')
     lbl = QLabel(title)
     lbl.setStyleSheet(
-        f'color:{_TEXT};font-size:11px;font-weight:800;letter-spacing:1px;'
+        f'color:{_TEXT};font-size:13px;font-weight:800;letter-spacing:1px;'
         f'background:transparent;border:none;'
     )
     h.addWidget(sym); h.addWidget(lbl); h.addStretch()
@@ -86,12 +86,12 @@ class ArmPanel(QWidget):
         centre.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self._shield = QLabel('[ ]')
-        self._shield.setFont(QFont('Segoe UI', 28, QFont.Weight.Light))
+        self._shield.setFont(QFont('Segoe UI', 30, QFont.Weight.Light))
         self._shield.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._shield.setStyleSheet(f'color:{_MUTED};background:transparent;border:none;')
 
         self._state_lbl = QLabel('IDLE')
-        self._state_lbl.setFont(QFont('Segoe UI', 26, QFont.Weight.ExtraBold))
+        self._state_lbl.setFont(QFont('Segoe UI', 28, QFont.Weight.ExtraBold))
         self._state_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._state_lbl.setStyleSheet(
             f'color:{_MUTED};letter-spacing:3px;background:transparent;border:none;'
@@ -100,7 +100,7 @@ class ArmPanel(QWidget):
         self._sub_lbl = QLabel('ROCKET IS SAFE')
         self._sub_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._sub_lbl.setStyleSheet(
-            f'color:{_MUTED};font-size:12px;letter-spacing:1px;background:transparent;border:none;'
+            f'color:{_MUTED};font-size:14px;letter-spacing:1px;background:transparent;border:none;'
         )
 
         centre.addStretch()
@@ -112,8 +112,8 @@ class ArmPanel(QWidget):
 
         # ARM button (full width, slide-to-arm style)
         self._arm_btn = QPushButton('ARM ROCKET   >')
-        self._arm_btn.setFixedHeight(40)
-        self._arm_btn.setFont(QFont('Segoe UI', 11, QFont.Weight.Bold))
+        self._arm_btn.setFixedHeight(44)
+        self._arm_btn.setFont(QFont('Segoe UI', 13, QFont.Weight.Bold))
         self._arm_btn.clicked.connect(self._on_arm)
         self._arm_btn.setStyleSheet(f"""
             QPushButton {{
@@ -135,8 +135,8 @@ class ArmPanel(QWidget):
         """)
 
         self._disarm_btn = QPushButton('DISARM')
-        self._disarm_btn.setFixedHeight(40)
-        self._disarm_btn.setFont(QFont('Segoe UI', 11, QFont.Weight.Bold))
+        self._disarm_btn.setFixedHeight(44)
+        self._disarm_btn.setFont(QFont('Segoe UI', 13, QFont.Weight.Bold))
         self._disarm_btn.setEnabled(False)
         self._disarm_btn.clicked.connect(self.disarm_requested.emit)
         self._disarm_btn.setStyleSheet(f"""
@@ -167,11 +167,11 @@ class ArmPanel(QWidget):
 
         self._state_lbl.setText(sn.replace('_', ' '))
         self._state_lbl.setStyleSheet(
-            f'color:{color};font-size:26px;font-weight:800;letter-spacing:3px;'
+            f'color:{color};font-size:28px;font-weight:800;letter-spacing:3px;'
             f'background:transparent;border:none;'
         )
         self._shield.setStyleSheet(
-            f'color:{color};font-size:28px;background:transparent;border:none;'
+            f'color:{color};font-size:30px;background:transparent;border:none;'
         )
         self._sub_lbl.setText(_STATE_SUB.get(sn, ''))
 
@@ -190,7 +190,7 @@ class ArmPanel(QWidget):
         self._flash_on = not self._flash_on
         c = _BLUE if self._flash_on else _MUTED
         self._state_lbl.setStyleSheet(
-            f'color:{c};font-size:26px;font-weight:800;letter-spacing:3px;'
+            f'color:{c};font-size:28px;font-weight:800;letter-spacing:3px;'
             f'background:transparent;border:none;'
         )
 
