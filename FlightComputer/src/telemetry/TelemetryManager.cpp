@@ -4,6 +4,7 @@
 #include "../control/PyroController.h"
 #include "../control/FinController.h"
 #include "../control/CameraController.h"
+#include "../control/AttitudeController.h"
 #include "../storage/DataLogger.h"
 #include <math.h>
 
@@ -111,6 +112,9 @@ TelemetryPacket TelemetryManager::_buildPacket(const FlightData& d) const {
                        | (_logger.cardPresent() ? SD_STATUS_PRESENT   : 0)
                        | (_logger.isOpen()      ? SD_STATUS_RECORDING : 0);
 
+    pkt.attitude_status = (_attitude.controlEnabled() ? ATTITUDE_STATUS_CONTROL_ON : 0)
+                         | (_attitude.demoEnabled()    ? ATTITUDE_STATUS_DEMO_ON    : 0);
+
     return pkt;
 }
 
@@ -177,6 +181,26 @@ void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
         case CommandType::SD_STOP_RECORDING:
             Serial.println("[TELEM] CMD: SD_STOP_RECORDING");
             _logger.close();
+            break;
+
+        case CommandType::ATTITUDE_CONTROL_ENABLE:
+            Serial.println("[TELEM] CMD: ATTITUDE_CONTROL_ENABLE");
+            _attitude.setControlEnabled(true);
+            break;
+
+        case CommandType::ATTITUDE_CONTROL_DISABLE:
+            Serial.println("[TELEM] CMD: ATTITUDE_CONTROL_DISABLE");
+            _attitude.setControlEnabled(false);
+            break;
+
+        case CommandType::ATTITUDE_DEMO_ENABLE:
+            Serial.println("[TELEM] CMD: ATTITUDE_DEMO_ENABLE");
+            _attitude.setDemoEnabled(true);
+            break;
+
+        case CommandType::ATTITUDE_DEMO_DISABLE:
+            Serial.println("[TELEM] CMD: ATTITUDE_DEMO_DISABLE");
+            _attitude.setDemoEnabled(false);
             break;
 
         case CommandType::PING:

@@ -26,6 +26,13 @@
 #define SD_STATUS_PRESENT       (1 << 5)   // a card responded recently
 #define SD_STATUS_RECORDING     (1 << 6)   // a log file is currently open
 
+// Attitude control status bitfield (TelemetryPacket.attitude_status) --
+// separate from system_status since this is a commanded MODE, not sensor/
+// hardware health. Set/cleared by the ATTITUDE_CONTROL_ENABLE/DISABLE and
+// ATTITUDE_DEMO_ENABLE/DISABLE commands below; see AttitudeController.
+#define ATTITUDE_STATUS_CONTROL_ON  (1 << 0)
+#define ATTITUDE_STATUS_DEMO_ON     (1 << 1)
+
 // ===== Rocket → Ground telemetry =====
 // Deliberately compact (51 bytes, was 81) -- the LoRa link is stuck at a slow
 // factory-default air data rate (2.4kbps) and reconfiguring the radios is off
@@ -85,6 +92,12 @@ struct TelemetryPacket {
     // inserted on the bench) shows up here.
     uint8_t  system_status;
 
+    // Current attitude-control mode, as last set by a ground command -- see
+    // the ATTITUDE_STATUS_* bits above. Not sensor health; this is "what did
+    // the ground tell it to do," so the operator can confirm a command
+    // actually landed instead of guessing from silence.
+    uint8_t  attitude_status;
+
     uint16_t checksum;       // simple sum of all preceding bytes
 };
 #pragma pack(pop)
@@ -105,6 +118,15 @@ enum class CommandType : uint8_t {
     SERVO_PREFLIGHT  = 0x0D, // param unused; blocking ~6s all-4 choreography, see FinController
     SD_START_RECORDING = 0x0E, // param unused; opens a new log file (no-op if already recording)
     SD_STOP_RECORDING  = 0x0F, // param unused; flushes and closes the current log file
+
+    // Runtime attitude-control mode toggles -- param unused. See
+    // AttitudeController and config.h for what each mode actually does and
+    // the checklist to clear before ever sending ATTITUDE_CONTROL_ENABLE for
+    // a real flight. Both default off at boot and reset off on DISARM.
+    ATTITUDE_CONTROL_ENABLE  = 0x10,
+    ATTITUDE_CONTROL_DISABLE = 0x11,
+    ATTITUDE_DEMO_ENABLE     = 0x12,
+    ATTITUDE_DEMO_DISABLE    = 0x13,
 };
 
 #pragma pack(push, 1)

@@ -83,7 +83,9 @@
 
 // ===== Fin actuation servos =====
 // From HighCurrentComponents.kicad_sch hierarchical labels Servo1_PWM..Servo4_PWM.
-// No closed-loop control yet -- pins only, driven manually for bench testing.
+// Closed-loop attitude control exists (see AttitudeController) but is OFF by
+// default -- see ATTITUDE_CONTROL_ENABLED below. Bench-test-only functions
+// (testSweep, preflightSequence, trim nudge/save) are unaffected either way.
 #define SERVO1_PIN   36
 #define SERVO2_PIN   8
 #define SERVO3_PIN   7
@@ -121,6 +123,118 @@
 // Set to 1-4 to leave that one channel unattached, isolating the other three
 // for one-at-a-time testing. 0 = attach all 4 normally.
 #define FIN_TEST_SKIP_CHANNEL 0
+
+// ===== Active attitude control (fin-based PD attitude hold) =====
+// See AttitudeController.h for the full design writeup. Short version: a PD
+// controller per axis with two independent terms --
+//   ANGLE (position): how far the current orientation has drifted from a
+//     REFERENCE orientation, latched the instant control/demo starts
+//     actually running (see AttitudeController::update()). Drives that
+//     drift back toward zero -- this is what makes it hold an attitude
+//     instead of just resisting motion.
+//   RATE (damping): sensed angular rate, same as before -- keeps the angle
+//     term from overshooting/oscillating on the way back.
+// A wrong RATE gain only ever under/over-damps. A wrong ANGLE gain is a
+// different, higher-stakes failure mode: it can actively steer AWAY from
+// the reference instead of toward it. Both need the same bench-verification
+// discipline below, and the angle term needs it more.
+//
+// Whether it's actually ACTIVE is a runtime, ground-commanded thing now
+// (ATTITUDE_CONTROL_ENABLE/DISABLE and ATTITUDE_DEMO_ENABLE/DISABLE command
+// packets, see Packet.h + TelemetryManager) -- not a flag here. That mirrors
+// how ARM/DISARM and pyro fire already work in this codebase: the ground
+// station commands the mode, the firmware's state-machine gating (see
+// main.cpp step 2b) is what actually keeps it safe, not requiring a reflash
+// to change your mind. Both runtime flags default OFF on every boot and get
+// forced back OFF on DISARM, so nothing carries over between sessions.
+//
+// Before ever sending ATTITUDE_CONTROL_ENABLE for a real flight:
+//   1. ATTITUDE_*_RATE and ATTITUDE_*_ANGLE_ERR below are verified on the
+//      bench (see the comments there -- this is the single most important
+//      thing to get right; a flipped sign REINFORCES the error instead of
+//      opposing it, which is worse than no control at all).
+//   2. The gains below have been validated in simulation (closed-loop --
+//      see the HIL discussion; open-loop replay can't test this, there's
+//      nothing to close the loop against a fin command with).
+//   3. You're comfortable with a bench functional test via
+//      ATTITUDE_DEMO_ENABLE: hand-tilt the armed (but not flying) airframe
+//      away from whatever orientation it was in when you hit Enable, HOLD
+//      it there, and confirm the fins hold a deflection that opposes the
+//      tilt (not just react while you're actively moving it).
+
+// Which raw gyro_x/y/z channel corresponds to which physical rotation axis.
+// UNVERIFIED -- there is no documented BNO085-mounting-orientation
+// convention anywhere in this codebase (checked). The assignment below is
+// only a starting guess (roll = gyro_z, matching the ground station's own
+// rendering convention, which is itself not verified against the real PCB).
+// To find the real mapping: rotate the airframe by hand about its actual
+// long axis (roll) and watch which of gyro_x/gyro_y/gyro_z shows the large
+// signal in Serial/telemetry -- that's your real roll axis. Repeat about
+// the other two physical axes for pitch/yaw. Update these three lines
+// (swap which field each reads, and negate if the sign opposes what you
+// observed) -- nothing else in AttitudeController needs to change.
+#define ATTITUDE_ROLL_RATE(d)   ((d).gyro_z)
+#define ATTITUDE_PITCH_RATE(d)  ((d).gyro_x)
+#define ATTITUDE_YAW_RATE(d)    ((d).gyro_y)
+
+// Same idea, but for the ANGLE (position) term: which component of the
+// quaternion-error vector (ex, ey, ez -- see AttitudeController.cpp for how
+// that's computed from the current vs. latched-reference orientation) maps
+// to which physical rotation axis. These MIRROR the gyro mapping above on
+// purpose -- the quaternion and the raw gyro come from the same physical
+// sensor/frame, so whatever channel/sign you find correct for rate here
+// applies unchanged to angle, and vice versa. Verify once via the rate
+// mapping above (or this one, either order), then copy the same
+// channel/sign choice to both.
+#define ATTITUDE_ROLL_ANGLE_ERR(ex, ey, ez)   (ez)
+#define ATTITUDE_PITCH_ANGLE_ERR(ex, ey, ez)  (ex)
+#define ATTITUDE_YAW_ANGLE_ERR(ex, ey, ez)    (ey)
+
+// Angle (position) gain: fin correction (deg) per radian of drift away from
+// the latched reference orientation. This is the term that makes the
+// controller actually HOLD an attitude instead of just resisting motion --
+// see the class comment in AttitudeController.h for why a wrong sign here
+// is worse than a wrong rate-gain sign (it can actively steer away from the
+// reference, not just fail to help). Starting at a small nonzero value (not
+// 0) specifically so demo mode is usable for its actual purpose -- checking
+// axis mapping/allocation signs by hand-tilting the airframe and watching
+// whether the fins pull it back or push it further. Provisional bench/demo
+// value, NOT simulation-validated -- see the checklist above before ever
+// using this for a real flight.
+#define ATTITUDE_ROLL_ANGLE_KP   10.0f
+#define ATTITUDE_PITCH_ANGLE_KP  10.0f
+#define ATTITUDE_YAW_ANGLE_KP    10.0f
+
+// Rate (damping) gain: fin correction (deg) per (rad/s) of sensed rate on
+// that axis. Keeps the angle term above from overshooting/oscillating on
+// the way back to the reference -- the PD controller's "D" term, in effect.
+// Independent per axis since fin authority and the rocket's moment of
+// inertia aren't the same for roll vs. pitch/yaw. Same "provisional demo
+// value" caveat as the angle gains above.
+#define ATTITUDE_ROLL_RATE_KP    4.0f
+#define ATTITUDE_PITCH_RATE_KP   4.0f
+#define ATTITUDE_YAW_RATE_KP     4.0f
+
+// Optional integral gains on the RATE term -- 0 = pure-PD (recommended
+// starting point, and the only mode that's been reasoned about above). An
+// integral term here can null out a steady rate bias but risks winding up
+// over a short, dynamic powered-ascent phase. Only consider enabling these
+// after PD-only behavior is validated.
+#define ATTITUDE_ROLL_RATE_KI    0.0f
+#define ATTITUDE_PITCH_RATE_KI   0.0f
+#define ATTITUDE_YAW_RATE_KI     0.0f
+
+// Below this sensed rate (rad/s), treat it as sensor noise and command
+// zero correction -- without a deadband a "stable" rocket still dithers
+// the servos constantly chasing gyro noise around zero.
+#define ATTITUDE_RATE_DEADBAND_RADS  0.02f
+
+// Per-axis correction authority limit (deg), clamped BEFORE allocating
+// across the 4 fins -- keeps one noisy or saturated axis from eating the
+// whole servo range at the expense of the other two. The per-fin total
+// (after allocation) is still hard-clamped again by FinController to
+// SERVO_MIN_US/SERVO_MAX_US regardless, as a second, independent backstop.
+#define ATTITUDE_MAX_AXIS_DEG   10.0f
 
 // ===== Flight Constants =====
 #define LIFTOFF_ACCEL_THRESHOLD    2.5f   // g — triggers POWERED_ASCENT

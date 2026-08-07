@@ -13,10 +13,12 @@ from core.serial_worker   import SerialWorker, LinkStats, list_serial_ports
 from core.packet_decoder  import TelemetryData
 from core.packet_encoder  import (
     encode_arm, encode_disarm, encode_fire_pyro,
-    encode_ping, encode_calibrate,
+    encode_calibrate,
     encode_servo_test, encode_cam_toggle,
     encode_servo_nudge, encode_servo_save_cal, encode_servo_center_all,
     encode_servo_preflight, encode_sd_start, encode_sd_stop,
+    encode_attitude_control_enable, encode_attitude_control_disable,
+    encode_attitude_demo_enable, encode_attitude_demo_disable,
 )
 from core.data_logger import DataLogger
 
@@ -334,7 +336,10 @@ class MainWindow(QMainWindow):
         top.addWidget(self._wrap(self._gps_map, 'o  GPS MAP'))
         top.addWidget(self._traj_plot)           # already has its own header
         top.addWidget(self._wrap_rocket())
-        top.setSizes([400, 440, 360])
+        # Matches the bottom row's sizes exactly (see bot.setSizes below) so
+        # all 3 columns line up top-to-bottom: GPS/Pyro, Trajectory/
+        # Continuity, 3D/Arm.
+        top.setSizes([390, 390, 400])
 
         # Bottom: Pyro | Continuity | Arm
         bot = QSplitter(Qt.Orientation.Horizontal)
@@ -349,7 +354,7 @@ class MainWindow(QMainWindow):
         bot.addWidget(self._pyro_panel)
         bot.addWidget(self._cont_panel)
         bot.addWidget(self._arm_panel)
-        bot.setSizes([390, 390, 400])
+        bot.setSizes([390, 390, 400])   # top.setSizes above matches this exactly
 
         vsplit = QSplitter(Qt.Orientation.Vertical)
         vsplit.setChildrenCollapsible(False)
@@ -515,10 +520,7 @@ class MainWindow(QMainWindow):
     def _connect_signals(self) -> None:
         self._arm_panel.arm_requested.connect(self._send_arm)
         self._arm_panel.disarm_requested.connect(self._send_disarm)
-        self._command_panel.arm_requested.connect(self._send_arm)
-        self._command_panel.disarm_requested.connect(self._send_disarm)
         self._command_panel.fire_pyro_requested.connect(self._send_fire)
-        self._command_panel.ping_requested.connect(self._send_ping)
         self._command_panel.calibrate_requested.connect(self._send_calibrate)
         self._command_panel.servo_test_requested.connect(self._send_servo_test)
         self._command_panel.cam_toggle_requested.connect(self._send_cam_toggle)
@@ -528,6 +530,10 @@ class MainWindow(QMainWindow):
         self._command_panel.servo_preflight_requested.connect(self._send_servo_preflight)
         self._command_panel.sd_start_requested.connect(self._send_sd_start)
         self._command_panel.sd_stop_requested.connect(self._send_sd_stop)
+        self._command_panel.attitude_control_enable_requested.connect(self._send_attitude_control_enable)
+        self._command_panel.attitude_control_disable_requested.connect(self._send_attitude_control_disable)
+        self._command_panel.attitude_demo_enable_requested.connect(self._send_attitude_demo_enable)
+        self._command_panel.attitude_demo_disable_requested.connect(self._send_attitude_demo_disable)
 
     def _switch_page(self, idx: int) -> None:
         self._pages.setCurrentIndex(idx)
@@ -688,11 +694,16 @@ class MainWindow(QMainWindow):
         )
         self._pyro_panel.mark_fired(channel)
 
-    def _send_ping(self) -> None:
-        self._send_tracked(encode_ping, label='PING', level='info')
-
     def _send_calibrate(self) -> None:
-        self._send_tracked(encode_calibrate, label='CALIBRATE BARO')
+        self._send_tracked(encode_calibrate, label='CALIBRATE')
+        # Bench-test convenience, ground-station-only: also re-zero the YAW
+        # readout to whatever heading it's currently facing. Deliberately
+        # yaw-only, not roll/pitch -- those have a real physical zero from
+        # gravity and must keep showing true tilt, not whatever pose the
+        # rocket happened to be in when this was pressed. Doesn't touch the
+        # firmware, telemetry, or AttitudeController's own (separately
+        # latched) reference -- see RocketVisual.zero_yaw().
+        self._rocket_vis.zero_yaw()
 
     def _send_servo_test(self, channel: int) -> None:
         self._send_tracked(encode_servo_test, channel, label=f'SERVO TEST CH{channel}')
@@ -721,6 +732,18 @@ class MainWindow(QMainWindow):
 
     def _send_sd_stop(self) -> None:
         self._send_tracked(encode_sd_stop, label='SD STOP RECORDING', level='warn')
+
+    def _send_attitude_control_enable(self) -> None:
+        self._send_tracked(encode_attitude_control_enable, label='ATTITUDE CONTROL ENABLE (REAL)', level='warn')
+
+    def _send_attitude_control_disable(self) -> None:
+        self._send_tracked(encode_attitude_control_disable, label='ATTITUDE CONTROL DISABLE (REAL)', level='ok')
+
+    def _send_attitude_demo_enable(self) -> None:
+        self._send_tracked(encode_attitude_demo_enable, label='ATTITUDE DEMO ENABLE', level='ok')
+
+    def _send_attitude_demo_disable(self) -> None:
+        self._send_tracked(encode_attitude_demo_disable, label='ATTITUDE DEMO DISABLE')
 
     def closeEvent(self, event) -> None:
         self._stop_serial()

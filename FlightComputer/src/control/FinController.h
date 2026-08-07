@@ -22,6 +22,16 @@ public:
     // Move one channel (1-4) to an angle in degrees (0-180, 90 = center pulse width).
     void setAngle(uint8_t channel, uint8_t angleDeg);
 
+    // Fast, direct deflection from the trimmed center (0 = trimmed-neutral,
+    // + / - = deflection in each direction, degrees) -- for a real-time
+    // control loop (see AttitudeController), not bench-test choreography.
+    // Unlike setAngle(), this is relative to the per-channel trim rather
+    // than an absolute 0-180 sweep, and unlike testSweep()/
+    // preflightSequence() there's no ramping -- it writes immediately, still
+    // hard-clamped to SERVO_MIN_US/SERVO_MAX_US by _writeUs() same as
+    // everything else.
+    void setCorrectionDeg(uint8_t channel, float correctionDeg);
+
     // Blocking sweep test: trimmed center -> min -> max -> trimmed center.
     void testSweep(uint8_t channel);
 

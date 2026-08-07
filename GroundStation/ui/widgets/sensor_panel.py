@@ -95,6 +95,7 @@ class SensorPanel(QWidget):
         self._r_gps_ok   = _Row(status_grid, 3, 'GPS Module')
         self._r_power_ok = _Row(status_grid, 4, 'Power Monitor')
         self._r_sd       = _Row(status_grid, 5, 'SD Card')
+        self._r_attitude = _Row(status_grid, 6, 'Attitude Control')
         root.addLayout(status_grid)
         root.addWidget(_divider())
 
@@ -129,7 +130,6 @@ class SensorPanel(QWidget):
         pwr_grid.setVerticalSpacing(4)
         self._r_volt = _Row(pwr_grid, 0, 'Voltage (V)')
         self._r_curr = _Row(pwr_grid, 1, 'Current (mA)')
-        self._r_rssi = _Row(pwr_grid, 2, 'RSSI (dBm)')
         root.addLayout(pwr_grid)
         root.addStretch()
 
@@ -154,6 +154,16 @@ class SensorPanel(QWidget):
         else:
             self._r_sd.set('NO CARD', warn=True)
 
+        # Last ground-commanded attitude-control mode -- see command panel's
+        # ATTITUDE CONTROL section for the actual toggles. This is read-only,
+        # reflecting what the FC confirms it's doing, not a boot-time check.
+        if data.attitude_control_on:
+            self._r_attitude.set('REAL CONTROL', warn=True)
+        elif data.attitude_demo_on:
+            self._r_attitude.set('DEMO', ok=True)
+        else:
+            self._r_attitude.set('OFF')
+
         has_fix = data.has_gps_fix
         self._r_lat.set(f'{data.lat:.6f} deg' if has_fix else '--')
         self._r_lon.set(f'{data.lon:.6f} deg' if has_fix else '--')
@@ -171,4 +181,3 @@ class SensorPanel(QWidget):
         low_v = data.voltage_v < LOW_VOLTAGE_V
         self._r_volt.set(f'{data.voltage_v:.2f}', warn=low_v)
         self._r_curr.set(f'{data.current_ma:.0f}')
-        self._r_rssi.set(f'{data.rssi}')

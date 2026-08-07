@@ -2,6 +2,7 @@
 #include "../config.h"
 #include <Arduino.h>
 #include <EEPROM.h>
+#include <math.h>
 
 const uint8_t FinController::_pins[4] = {
     SERVO1_PIN, SERVO2_PIN, SERVO3_PIN, SERVO4_PIN,
@@ -56,6 +57,16 @@ void FinController::setAngle(uint8_t channel, uint8_t angleDeg) {
     uint8_t idx = channel - 1;
     int32_t us  = SERVO_MIN_US + (int32_t)(SERVO_MAX_US - SERVO_MIN_US) * angleDeg / 180;
     _writeUs(idx, us);
+}
+
+void FinController::setCorrectionDeg(uint8_t channel, float correctionDeg) {
+    if (channel < 1 || channel > 4) return;
+    uint8_t idx = channel - 1;
+    // Same us-per-degree scale as SERVO_MIN_US/SERVO_MAX_US in config.h
+    // (800us / 90deg on the BMS-101HV datasheet).
+    int32_t us = (int32_t)SERVO_CENTER_US + _trimUs[idx]
+               + (int32_t)lroundf(800.0f * correctionDeg / 90.0f);
+    _writeUs(idx, us);   // still hard-clamped to SERVO_MIN_US/MAX_US in here
 }
 
 void FinController::testSweep(uint8_t channel) {

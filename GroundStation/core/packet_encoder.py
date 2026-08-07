@@ -35,6 +35,10 @@ class CommandType(IntEnum):
     SERVO_PREFLIGHT  = 0x0D  # param unused; blocking ~6s all-4 choreography
     SD_START_RECORDING = 0x0E  # param unused; opens a new log file (no-op if already recording)
     SD_STOP_RECORDING  = 0x0F  # param unused; flushes and closes the current log file
+    ATTITUDE_CONTROL_ENABLE  = 0x10  # param unused; real in-flight fin control, engages POWERED_ASCENT/COAST
+    ATTITUDE_CONTROL_DISABLE = 0x11  # param unused
+    ATTITUDE_DEMO_ENABLE     = 0x12  # param unused; ground-demo fin control, engages ARMED only
+    ATTITUDE_DEMO_DISABLE    = 0x13  # param unused
 
 
 def encode_command(cmd_type: CommandType, param: int = 0, seq: int = 0) -> bytes:
@@ -47,7 +51,6 @@ def encode_command(cmd_type: CommandType, param: int = 0, seq: int = 0) -> bytes
 def encode_arm(seq: int = 0)                  -> bytes: return encode_command(CommandType.ARM, 0, seq)
 def encode_disarm(seq: int = 0)               -> bytes: return encode_command(CommandType.DISARM, 0, seq)
 def encode_fire_pyro(ch: int, seq: int = 0)   -> bytes: return encode_command(CommandType.FIRE_PYRO, ch, seq)
-def encode_ping(seq: int = 0)                 -> bytes: return encode_command(CommandType.PING, 0, seq)
 def encode_calibrate(seq: int = 0)            -> bytes: return encode_command(CommandType.CALIBRATE_BARO, 0, seq)
 def encode_servo_test(ch: int, seq: int = 0)  -> bytes: return encode_command(CommandType.SERVO_TEST, ch, seq)
 def encode_cam_toggle(seq: int = 0)           -> bytes: return encode_command(CommandType.CAM_TOGGLE, 0, seq)
@@ -60,3 +63,8 @@ def encode_servo_center_all(seq: int = 0)   -> bytes: return encode_command(Comm
 def encode_servo_preflight(seq: int = 0)    -> bytes: return encode_command(CommandType.SERVO_PREFLIGHT, 0, seq)
 def encode_sd_start(seq: int = 0)           -> bytes: return encode_command(CommandType.SD_START_RECORDING, 0, seq)
 def encode_sd_stop(seq: int = 0)            -> bytes: return encode_command(CommandType.SD_STOP_RECORDING, 0, seq)
+
+def encode_attitude_control_enable(seq: int = 0)  -> bytes: return encode_command(CommandType.ATTITUDE_CONTROL_ENABLE, 0, seq)
+def encode_attitude_control_disable(seq: int = 0) -> bytes: return encode_command(CommandType.ATTITUDE_CONTROL_DISABLE, 0, seq)
+def encode_attitude_demo_enable(seq: int = 0)     -> bytes: return encode_command(CommandType.ATTITUDE_DEMO_ENABLE, 0, seq)
+def encode_attitude_demo_disable(seq: int = 0)    -> bytes: return encode_command(CommandType.ATTITUDE_DEMO_DISABLE, 0, seq)
