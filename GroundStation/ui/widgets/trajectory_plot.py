@@ -65,7 +65,7 @@ class TrajectoryPlot(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(
-            f'background-color:{_CARD};border:1px solid {_BORDER};border-radius:8px;'
+            f'background-color:{_CARD};border:none;border-radius:10px;'
         )
 
         self._x: deque[float] = deque(maxlen=_MAX_POINTS)
@@ -76,8 +76,8 @@ class TrajectoryPlot(QWidget):
         self._apogee_x = 0.0
 
         root = QVBoxLayout(self)
-        root.setContentsMargins(14, 10, 14, 10)
-        root.setSpacing(4)
+        root.setContentsMargins(18, 14, 18, 14)
+        root.setSpacing(6)
 
         # Header
         hdr = QHBoxLayout(); hdr.setSpacing(8)
@@ -141,7 +141,7 @@ class TrajectoryPlot(QWidget):
         sep = QFrame()
         sep.setFrameShape(QFrame.Shape.HLine)
         sep.setFixedHeight(1)
-        sep.setStyleSheet(f'background-color:{_BORDER};')
+        sep.setStyleSheet('background-color:rgba(255,255,255,18);')
         root.addWidget(sep)
 
         stats_row = QHBoxLayout()
@@ -159,7 +159,7 @@ class TrajectoryPlot(QWidget):
                 div = QFrame()
                 div.setFrameShape(QFrame.Shape.VLine)
                 div.setFixedWidth(1)
-                div.setStyleSheet(f'background-color:{_BORDER};')
+                div.setStyleSheet('background-color:rgba(255,255,255,18);')
                 stats_row.addWidget(div)
                 stats_row.addSpacing(12)
 

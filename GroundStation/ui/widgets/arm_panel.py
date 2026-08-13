@@ -61,7 +61,7 @@ class ArmPanel(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(
-            f'background-color:{_BG};border:1px solid {_BORDER};border-radius:8px;'
+            f'background-color:{_BG};border:none;border-radius:10px;'
         )
         self._state_name = 'IDLE'
         self._flash_on   = True
@@ -71,14 +71,10 @@ class ArmPanel(QWidget):
         self._flash_timer.timeout.connect(self._do_flash)
 
         root = QVBoxLayout(self)
-        root.setContentsMargins(16, 12, 16, 16)
-        root.setSpacing(0)
+        root.setContentsMargins(20, 16, 20, 18)
+        root.setSpacing(6)
 
         root.addLayout(_card_header('[]', 'ARM / SAFETY STATUS'))
-
-        sep = QFrame(); sep.setFrameShape(QFrame.Shape.HLine)
-        sep.setFixedHeight(1); sep.setStyleSheet(f'background:{_BORDER};margin:8px 0;')
-        root.addWidget(sep)
 
         # Shield symbol + state
         centre = QVBoxLayout()

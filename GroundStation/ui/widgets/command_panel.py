@@ -28,10 +28,12 @@ _COMPASS = {1: 'S', 2: 'E', 3: 'N', 4: 'W'}
 
 
 def _divider() -> QFrame:
+    # Softer than a full _BORDER line -- this panel is control-dense, so
+    # section separation still helps scanability without an outer-card-loud line.
     f = QFrame()
     f.setFrameShape(QFrame.Shape.HLine)
     f.setFixedHeight(1)
-    f.setStyleSheet(f'background-color:{_BORDER};margin:2px 0;')
+    f.setStyleSheet('background-color:rgba(255,255,255,18);margin:6px 0;')
     return f
 
 
@@ -39,7 +41,7 @@ def _vdivider() -> QFrame:
     f = QFrame()
     f.setFrameShape(QFrame.Shape.VLine)
     f.setFixedWidth(1)
-    f.setStyleSheet(f'background-color:{_BORDER};margin:0 2px;')
+    f.setStyleSheet('background-color:rgba(255,255,255,18);margin:0 6px;')
     return f
 
 
@@ -89,7 +91,7 @@ class CommandPanel(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(
-            f'background-color:{_BG};border:1px solid {_BORDER};border-radius:8px;'
+            f'background-color:{_BG};border:none;border-radius:10px;'
         )
         self._state       = 0
         self._sd_present  = False
@@ -98,7 +100,7 @@ class CommandPanel(QWidget):
         self._attitude_demo_on    = False
 
         root = QVBoxLayout(self)
-        root.setContentsMargins(14, 8, 14, 10)
+        root.setContentsMargins(18, 12, 18, 14)
         root.setSpacing(4)
 
         hdr = QHBoxLayout(); hdr.setSpacing(8)
@@ -116,7 +118,7 @@ class CommandPanel(QWidget):
         root.addWidget(_divider())
 
         columns = QHBoxLayout()
-        columns.setSpacing(10)
+        columns.setSpacing(16)
         col_a = QVBoxLayout(); col_a.setSpacing(4)
         col_b = QVBoxLayout(); col_b.setSpacing(4)
         columns.addLayout(col_a, 1)

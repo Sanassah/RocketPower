@@ -28,10 +28,13 @@ def _section(text: str) -> QLabel:
 
 
 def _divider() -> QFrame:
+    # Softer than a full _BORDER line -- section separation still helps
+    # scanability in a data-dense panel like this, but doesn't need to be as
+    # loud as an outer card outline.
     f = QFrame()
     f.setFrameShape(QFrame.Shape.HLine)
     f.setFixedHeight(1)
-    f.setStyleSheet(f'background-color:{_BORDER};margin:3px 0;')
+    f.setStyleSheet('background-color:rgba(255,255,255,18);margin:6px 0;')
     return f
 
 
@@ -64,10 +67,10 @@ class SensorPanel(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(
-            f'background-color:{_BG};border:1px solid {_BORDER};border-radius:8px;'
+            f'background-color:{_BG};border:none;border-radius:10px;'
         )
         root = QVBoxLayout(self)
-        root.setContentsMargins(16, 12, 16, 16)
+        root.setContentsMargins(20, 16, 20, 18)
         root.setSpacing(2)
 
         hdr = QHBoxLayout(); hdr.setSpacing(8)
@@ -87,7 +90,7 @@ class SensorPanel(QWidget):
         # it this way gives every row real horizontal room instead of a
         # cramped single column with everything squeezed to one side.
         columns = QHBoxLayout()
-        columns.setSpacing(24)
+        columns.setSpacing(32)
         col_a = QVBoxLayout(); col_a.setSpacing(2)
         col_b = QVBoxLayout(); col_b.setSpacing(2)
         columns.addLayout(col_a, 1)
