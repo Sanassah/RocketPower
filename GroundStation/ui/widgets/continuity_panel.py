@@ -80,10 +80,10 @@ class ContinuityPanel(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(
-            f'background-color:{_BG};border:1px solid {_BORDER};border-radius:8px;'
+            f'background-color:{_BG};border:none;border-radius:10px;'
         )
         root = QVBoxLayout(self)
-        root.setContentsMargins(16, 14, 16, 14)
+        root.setContentsMargins(20, 16, 20, 16)
         root.setSpacing(0)
 
         # Header
@@ -101,7 +101,7 @@ class ContinuityPanel(QWidget):
 
         sep = QFrame(); sep.setFrameShape(QFrame.Shape.HLine)
         sep.setFixedHeight(1)
-        sep.setStyleSheet(f'background:{_BORDER};margin:6px 0;')
+        sep.setStyleSheet('background-color:rgba(255,255,255,18);margin:6px 0;')
         root.addWidget(sep)
 
         self._rows: list[_CircuitRow] = []
@@ -112,7 +112,7 @@ class ContinuityPanel(QWidget):
             if i < len(_CH_NAMES) - 1:
                 d = QFrame(); d.setFrameShape(QFrame.Shape.HLine)
                 d.setFixedHeight(1)
-                d.setStyleSheet(f'background:{_BORDER};')
+                d.setStyleSheet('background-color:rgba(255,255,255,18);')
                 root.addWidget(d)
 
         root.addStretch()

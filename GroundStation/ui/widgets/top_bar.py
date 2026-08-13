@@ -38,7 +38,7 @@ _STATE_COLOR = {
 
 
 def _card_css() -> str:
-    return f'background-color:{_CARD};border:1px solid {_BORDER};border-radius:7px;'
+    return f'background-color:{_CARD};border:none;border-radius:9px;'
 
 
 def _lbl_css(color: str, size: int = 12, weight: int = 600) -> str:
@@ -55,7 +55,7 @@ class _Stat(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(_card_css())
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(12, 6, 12, 6)
+        lay.setContentsMargins(16, 10, 16, 10)
         lay.setSpacing(2)
         lbl = QLabel(title)
         lbl.setStyleSheet(_lbl_css(_MUTED))
@@ -171,7 +171,7 @@ class _StatBattery(QWidget):
         self.setStyleSheet(_card_css())
 
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(12, 6, 12, 6)
+        lay.setContentsMargins(16, 10, 16, 10)
         lay.setSpacing(2)
 
         ttl = QLabel('BATTERY')
@@ -207,7 +207,7 @@ class _StatTelem(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(_card_css())
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(12, 6, 12, 6)
+        lay.setContentsMargins(16, 10, 16, 10)
         lay.setSpacing(2)
 
         ttl = QLabel('TELEMETRY')
@@ -283,7 +283,7 @@ class TopBar(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(f'background-color:{_BG};border-bottom:1px solid {_BORDER};')
-        self.setFixedHeight(122)
+        self.setFixedHeight(130)
 
         root = QVBoxLayout(self)
         root.setContentsMargins(16, 8, 16, 8)
@@ -315,7 +315,7 @@ class TopBar(QWidget):
 
         # Stats row
         row2 = QHBoxLayout()
-        row2.setSpacing(6)
+        row2.setSpacing(10)
 
         self._s_state_badge = _StatStateBadge()
         self._s_met         = _Stat('MISSION TIME')

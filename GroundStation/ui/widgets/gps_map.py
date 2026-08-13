@@ -301,9 +301,30 @@ class GPSMap(QWidget):
         p.setPen(QColor(gps_color))
         p.drawText(8, h - 9, gps_txt)
 
-        follow_txt = 'FOLLOWING' if self._auto_follow else 'MANUAL  DBL-CLICK TO FOLLOW'
-        p.setPen(QColor('#64748B'))
-        p.drawText(w - 300, h - 9, f'Z={self._zoom}  SCROLL=ZOOM  DRAG=PAN  {follow_txt}')
+        # Right-hand hint text -- measured and right-aligned (not a hardcoded
+        # offset) so it never overlaps the left GPS text regardless of panel
+        # width or how long gps_txt happens to be. Falls back to shorter
+        # forms, then disappears entirely, rather than clipping/overlapping
+        # when the panel gets narrow.
+        follow_txt = 'FOLLOWING' if self._auto_follow else 'MANUAL — DBL-CLICK TO FOLLOW'
+        fm = p.fontMetrics()
+        gps_w = fm.horizontalAdvance(gps_txt)
+
+        candidates = [
+            f'Z={self._zoom}  SCROLL=ZOOM  DRAG=PAN  {follow_txt}',
+            f'Z={self._zoom}  {follow_txt}',
+            follow_txt,
+            '',
+        ]
+        right_txt = ''
+        for cand in candidates:
+            right_txt = cand
+            if not cand or gps_w + fm.horizontalAdvance(cand) + 32 <= w:
+                break
+
+        if right_txt:
+            p.setPen(QColor('#64748B'))
+            p.drawText(w - fm.horizontalAdvance(right_txt) - 10, h - 9, right_txt)
 
         p.end()
 

@@ -30,13 +30,13 @@ class EventLog(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(
-            f'background-color:{_BG};border:1px solid {_BORDER};border-radius:8px;'
+            f'background-color:{_BG};border:none;border-radius:10px;'
         )
         self._last_state: int | None = None
         self._line_count = 0
 
         root = QVBoxLayout(self)
-        root.setContentsMargins(16, 12, 16, 12)
+        root.setContentsMargins(20, 16, 20, 16)
         root.setSpacing(8)
 
         hdr = QHBoxLayout(); hdr.setSpacing(8)

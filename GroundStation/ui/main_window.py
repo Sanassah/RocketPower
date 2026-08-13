@@ -320,13 +320,13 @@ class MainWindow(QMainWindow):
         page.setStyleSheet(f'background-color:{_BG};')
 
         root = QVBoxLayout(page)
-        root.setContentsMargins(14, 14, 14, 14)
-        root.setSpacing(14)
+        root.setContentsMargins(18, 18, 18, 18)
+        root.setSpacing(18)
 
         # Top: GPS | Trajectory | 3D
         top = QSplitter(Qt.Orientation.Horizontal)
         top.setChildrenCollapsible(False)
-        top.setHandleWidth(14)
+        top.setHandleWidth(18)
         top.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
 
         self._gps_map    = GPSMap()
@@ -344,7 +344,7 @@ class MainWindow(QMainWindow):
         # Bottom: Pyro | Continuity | Arm
         bot = QSplitter(Qt.Orientation.Horizontal)
         bot.setChildrenCollapsible(False)
-        bot.setHandleWidth(14)
+        bot.setHandleWidth(18)
         bot.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
 
         self._pyro_panel = PyroPanel()
@@ -358,7 +358,7 @@ class MainWindow(QMainWindow):
 
         vsplit = QSplitter(Qt.Orientation.Vertical)
         vsplit.setChildrenCollapsible(False)
-        vsplit.setHandleWidth(14)
+        vsplit.setHandleWidth(18)
         vsplit.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
         vsplit.addWidget(top)
         vsplit.addWidget(bot)
@@ -368,11 +368,12 @@ class MainWindow(QMainWindow):
         return page
 
     def _wrap(self, widget: QWidget, header_text: str) -> QWidget:
-        """Wrap a widget in a dark card with a subtle header label."""
+        """Wrap a widget in a flat card (no outline -- background-shade
+        contrast against the page does the separating) with a header label."""
         card = QWidget()
         card.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         card.setStyleSheet(
-            f'background-color:{_CARD};border:1px solid {_BORDER};border-radius:8px;'
+            f'background-color:{_CARD};border:none;border-radius:10px;'
         )
         lay = QVBoxLayout(card)
         lay.setContentsMargins(0, 0, 0, 0)
@@ -381,9 +382,9 @@ class MainWindow(QMainWindow):
         hdr = QWidget()
         hdr.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         hdr.setStyleSheet('background:transparent;')
-        hdr.setFixedHeight(32)
+        hdr.setFixedHeight(38)
         hl = QHBoxLayout(hdr)
-        hl.setContentsMargins(14, 0, 14, 0)
+        hl.setContentsMargins(18, 0, 18, 0)
 
         lbl = QLabel(header_text)
         lbl.setStyleSheet(
@@ -393,11 +394,7 @@ class MainWindow(QMainWindow):
         hl.addWidget(lbl)
         hl.addStretch()
 
-        sep = QFrame(); sep.setFrameShape(QFrame.Shape.HLine)
-        sep.setFixedHeight(1); sep.setStyleSheet(f'background:{_BORDER};')
-
         lay.addWidget(hdr)
-        lay.addWidget(sep)
         lay.addWidget(widget)
         return card
 
@@ -405,7 +402,7 @@ class MainWindow(QMainWindow):
         card = QWidget()
         card.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         card.setStyleSheet(
-            f'background-color:{_CARD};border:1px solid {_BORDER};border-radius:8px;'
+            f'background-color:{_CARD};border:none;border-radius:10px;'
         )
         lay = QVBoxLayout(card)
         lay.setContentsMargins(0, 0, 0, 0)
@@ -414,9 +411,9 @@ class MainWindow(QMainWindow):
         hdr = QWidget()
         hdr.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         hdr.setStyleSheet('background:transparent;')
-        hdr.setFixedHeight(32)
+        hdr.setFixedHeight(38)
         hl = QHBoxLayout(hdr)
-        hl.setContentsMargins(14, 0, 14, 0)
+        hl.setContentsMargins(18, 0, 18, 0)
 
         lbl = QLabel('[]  3D ORIENTATION')
         lbl.setStyleSheet(
@@ -425,11 +422,7 @@ class MainWindow(QMainWindow):
         )
         hl.addWidget(lbl); hl.addStretch()
 
-        sep = QFrame(); sep.setFrameShape(QFrame.Shape.HLine)
-        sep.setFixedHeight(1); sep.setStyleSheet(f'background:{_BORDER};')
-
         lay.addWidget(hdr)
-        lay.addWidget(sep)
         lay.addWidget(self._rocket_vis)
         return card
 
@@ -440,8 +433,8 @@ class MainWindow(QMainWindow):
         page.setStyleSheet(f'background-color:{_BG};')
 
         root = QVBoxLayout(page)
-        root.setContentsMargins(14, 14, 14, 14)
-        root.setSpacing(14)
+        root.setContentsMargins(18, 18, 18, 18)
+        root.setSpacing(18)
 
         # Top: sensor/telemetry data, full page width (it has its own 2
         # internal columns now -- see SensorPanel -- so it needs the room a
@@ -479,7 +472,7 @@ class MainWindow(QMainWindow):
 
         bottom = QSplitter(Qt.Orientation.Horizontal)
         bottom.setChildrenCollapsible(False)
-        bottom.setHandleWidth(14)
+        bottom.setHandleWidth(18)
         bottom.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
         bottom.addWidget(self._command_panel)
         bottom.addWidget(self._event_log)
@@ -487,7 +480,7 @@ class MainWindow(QMainWindow):
 
         vsplit = QSplitter(Qt.Orientation.Vertical)
         vsplit.setChildrenCollapsible(False)
-        vsplit.setHandleWidth(14)
+        vsplit.setHandleWidth(18)
         vsplit.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
         vsplit.addWidget(self._sensor_panel)
         vsplit.addWidget(bottom)
@@ -515,7 +508,7 @@ class MainWindow(QMainWindow):
         page.setStyleSheet(f'background-color:{_BG};')
 
         root = QVBoxLayout(page)
-        root.setContentsMargins(14, 14, 14, 14)
+        root.setContentsMargins(18, 18, 18, 18)
         root.setSpacing(0)
 
         self._log_converter = LogConverterPanel()
