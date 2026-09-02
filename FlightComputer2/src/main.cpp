@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include "sensors/FlightData.h"
+#include "sensors/IMU.h"
 
 FlightData flightData;
-// put function declarations here:
-int myFunction(int, int);
+IMU imu;
 
 const uint32_t LOOP_PERIOD_MS     = 10;    // target loop period -> 100Hz
 const uint32_t REPORT_INTERVAL_MS = 5000;  // how often diagnostics print
@@ -15,12 +15,12 @@ uint32_t iterationsCount = 0;
 
 void setup() {
   Serial.begin(115200);
-  int result = myFunction(2, 3);
 }
 
 void loop() {
   loopStart = millis();
   iterationsCount++;
+
 
   uint32_t loopDuration = millis() - loopStart;
   maxLoopTime = max(maxLoopTime, loopDuration);   // worst case since the last report
@@ -42,9 +42,4 @@ void loop() {
   while (millis() - loopStart < LOOP_PERIOD_MS) {
     // do nothing
   }
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
 }
