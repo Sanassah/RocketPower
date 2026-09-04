@@ -19,6 +19,7 @@ from core.packet_encoder  import (
     encode_servo_preflight, encode_sd_start, encode_sd_stop,
     encode_attitude_control_enable, encode_attitude_control_disable,
     encode_attitude_demo_enable, encode_attitude_demo_disable,
+    encode_reset,
 )
 from core.data_logger import DataLogger
 
@@ -519,6 +520,8 @@ class MainWindow(QMainWindow):
     def _connect_signals(self) -> None:
         self._arm_panel.arm_requested.connect(self._send_arm)
         self._arm_panel.disarm_requested.connect(self._send_disarm)
+        self._arm_panel.attitude_control_enable_requested.connect(self._send_attitude_control_enable)
+        self._arm_panel.attitude_control_disable_requested.connect(self._send_attitude_control_disable)
         self._command_panel.fire_pyro_requested.connect(self._send_fire)
         self._command_panel.calibrate_requested.connect(self._send_calibrate)
         self._command_panel.servo_test_requested.connect(self._send_servo_test)
@@ -529,10 +532,9 @@ class MainWindow(QMainWindow):
         self._command_panel.servo_preflight_requested.connect(self._send_servo_preflight)
         self._command_panel.sd_start_requested.connect(self._send_sd_start)
         self._command_panel.sd_stop_requested.connect(self._send_sd_stop)
-        self._command_panel.attitude_control_enable_requested.connect(self._send_attitude_control_enable)
-        self._command_panel.attitude_control_disable_requested.connect(self._send_attitude_control_disable)
         self._command_panel.attitude_demo_enable_requested.connect(self._send_attitude_demo_enable)
         self._command_panel.attitude_demo_disable_requested.connect(self._send_attitude_demo_disable)
+        self._command_panel.reset_requested.connect(self._send_reset)
 
     def _switch_page(self, idx: int) -> None:
         self._pages.setCurrentIndex(idx)
@@ -743,6 +745,16 @@ class MainWindow(QMainWindow):
 
     def _send_attitude_demo_disable(self) -> None:
         self._send_tracked(encode_attitude_demo_disable, label='ATTITUDE DEMO DISABLE')
+
+    def _send_reset(self) -> None:
+        # Clear the log FIRST -- _send_tracked's own "^ RESET sent" line
+        # (and the ack confirmation right after) become the first fresh
+        # entries, giving the next test flight a clean slate instead of
+        # scrolling past the previous run's history. Doesn't touch the
+        # flight computer's own SD log -- that's closed/reopened firmware-
+        # side (see main.cpp's RESET handling).
+        self._event_log.clear()
+        self._send_tracked(encode_reset, label='RESET', level='warn')
 
     def closeEvent(self, event) -> None:
         self._stop_serial()

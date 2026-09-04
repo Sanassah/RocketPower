@@ -176,6 +176,14 @@ void FinController::centerAll() {
     }
 }
 
+float FinController::liveCorrectionDeg(uint8_t channel) const {
+    if (channel < 1 || channel > 4) return 0.0f;
+    uint8_t idx = channel - 1;
+    // Inverse of setCorrectionDeg()'s us-per-degree scale, applied to the
+    // post-clamp live value -- see the comment on _writeUs().
+    return ((float)_liveUs[idx] - (float)SERVO_CENTER_US - (float)_trimUs[idx]) * 90.0f / 800.0f;
+}
+
 void FinController::saveCalibration() {
     FinCalibration cal;
     cal.magic = SERVO_CAL_MAGIC;

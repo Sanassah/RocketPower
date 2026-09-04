@@ -31,12 +31,13 @@
 //     POWERED_ASCENT/COAST by main.cpp. OFF at every boot and forced back
 //     OFF on DISARM; read the checklist on it in config.h before ever
 //     enabling it for a real flight.
-//   demoEnabled() -- same control law/gains, gated to ARMED only
-//     (ground-held or on the pad, never in flight) by main.cpp. This is the
-//     bench validation check as a standing capability: arm the rocket,
-//     hand-rotate it, watch whether the fins actually oppose the rotation.
-//     Leaving this on can't sneak active control into a real flight -- it
-//     stops mattering the instant the state machine moves past ARMED.
+//   demoEnabled() -- same control law/gains, gated to IDLE or ARMED (ground-
+//     held or on the pad, never in flight) by main.cpp. This is the bench
+//     validation check as a standing capability: no need to arm pyro just
+//     to hand-rotate the airframe and watch whether the fins actually
+//     oppose the rotation -- IDLE alone is enough. Leaving this on can't
+//     sneak active control into a real flight -- it stops mattering the
+//     instant the state machine moves past ARMED.
 //
 // ATTITUDE_ROLL_RATE/PITCH_RATE/YAW_RATE and the matching
 // ATTITUDE_*_ANGLE_ERR macros (which raw gyro_x/y/z channel / quaternion-
@@ -47,10 +48,14 @@
 //
 // Fin layout (bench-confirmed via testSweep against the physical airframe):
 //   CH1 = S, CH2 = E, CH3 = N, CH4 = W
-// Control allocation, once rate errors are known:
-//   Roll:  all 4 fins deflect the same rotational sense
-//   Pitch: N/S differential (CH3 vs CH1)
-//   Yaw:   E/W differential (CH2 vs CH4)
+// Control allocation, once rate errors are known (roll/pitch/yaw here
+// follow Simulation/RocketPowerSim.slx's convention, NOT the more common
+// aerospace one where "roll" is the spin axis -- see the header note above
+// config.h's ATTITUDE_ROLL_RATE/etc. macros):
+//   Yaw:   all 4 fins deflect the same rotational sense (spin about the
+//          rocket's own longitudinal axis)
+//   Roll:  N/S differential (CH3 vs CH1) -- a transverse tilt axis
+//   Pitch: E/W differential (CH2 vs CH4) -- the other transverse tilt axis
 // The channel-to-compass mapping above is confirmed; the +/- signs in that
 // allocation are not -- exactly as unverified as the gyro mapping, and
 // checked by the same demo-mode bench test (see config.h).

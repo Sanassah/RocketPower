@@ -1,6 +1,107 @@
 #include "SensorManager.h"
 #include "../config.h"
 #include <Wire.h>
+#include <math.h>
+#include <string.h>
+
+#ifdef HITL_MODE
+
+bool SensorManager::_hitlReadPacket(SensorInjectPacket& out, uint32_t timeoutMs) {
+    uint8_t buf[sizeof(SensorInjectPacket)];
+    size_t  have = 0;
+    uint32_t deadline = millis() + timeoutMs;
+    while ((int32_t)(deadline - millis()) > 0) {
+        if (SerialUSB1.available() == 0) continue;
+        uint8_t b = (uint8_t)SerialUSB1.read();
+        if (have == 0) {
+            if (b != HITL_SENSOR_MAGIC_0) continue;
+            buf[have++] = b;
+        } else if (have == 1) {
+            if (b != HITL_SENSOR_MAGIC_1) { have = 0; continue; }
+            buf[have++] = b;
+        } else {
+            buf[have++] = b;
+            if (have == sizeof(SensorInjectPacket)) {
+                uint16_t expected = packetChecksum(buf, sizeof(SensorInjectPacket) - 2);
+                uint16_t stored;
+                memcpy(&stored, buf + sizeof(SensorInjectPacket) - 2, 2);
+                if (expected == stored) {
+                    memcpy(&out, buf, sizeof(SensorInjectPacket));
+                    return true;
+                }
+                have = 0;   // bad checksum -- resync from scratch, don't get stuck out of frame
+            }
+        }
+    }
+    return false;   // timed out -- caller falls back to _lastHitlPkt
+}
+
+bool SensorManager::begin() {
+    Serial.println("[SENSOR] HITL_MODE build -- sensors are SIMULATED, injected over SerialUSB1.");
+    SerialUSB1.begin(115200);   // baud is ignored by Teensy's native USB CDC; kept for host-side portability
+
+    // No real hardware to probe -- report healthy so boot doesn't halt on
+    // the imu_ok/baro_ok gate below. gps/power aren't modeled by the bridge;
+    // nothing flight-critical gates on those two (see SENSOR_HEALTH_TIMEOUT_MS
+    // in config.h), so leaving them "unhealthy" is honest and harmless.
+    _data.imu_ok = _data.baro_ok = _data.accel_ok = true;
+    _data.gps_ok = _data.power_ok = false;
+
+    // Safe default until the very first real packet arrives -- "resting on
+    // the pad": identity orientation, zero rates, ~1g on highg_z (matches
+    // what a real accelerometer reads sitting still). See update()/the note
+    // on _lastHitlPkt in the header for why this matters: it's what keeps
+    // the loop (and telemetry) running normally before a HITL bridge is
+    // actually connected, instead of the whole build silently hanging on
+    // the first sensors.update() call.
+    _lastHitlPkt = SensorInjectPacket{};
+    _lastHitlPkt.quat_w   = 1.0f;
+    _lastHitlPkt.highg_z  = 1.0f;
+    _hasHitlPacket = false;
+
+    return true;
+}
+
+void SensorManager::update() {
+    SensorInjectPacket pkt;
+    // 20ms: comfortably longer than a real bridge round-trip (sub-ms to a
+    // few ms over USB), short enough that the loop still heartbeats at a
+    // reasonable rate (~50Hz) while idle/unconnected. See the header note
+    // on _hitlReadPacket/_lastHitlPkt for why this can't just block forever.
+    if (_hitlReadPacket(pkt, 20)) {
+        _lastHitlPkt   = pkt;
+        _hasHitlPacket = true;
+    }
+    const SensorInjectPacket& src = _lastHitlPkt;
+
+    _data.timestamp_ms = millis();
+
+    _data.quat_w = src.quat_w; _data.quat_x = src.quat_x;
+    _data.quat_y = src.quat_y; _data.quat_z = src.quat_z;
+    _data.gyro_x = src.gyro_x; _data.gyro_y = src.gyro_y; _data.gyro_z = src.gyro_z;
+    _data.lin_accel_x = src.lin_accel_x;
+    _data.lin_accel_y = src.lin_accel_y;
+    _data.lin_accel_z = src.lin_accel_z;
+
+    _data.highg_x_g = src.highg_x; _data.highg_y_g = src.highg_y; _data.highg_z_g = src.highg_z;
+    _data.highg_mag_g = sqrtf(src.highg_x * src.highg_x + src.highg_y * src.highg_y + src.highg_z * src.highg_z);
+
+    _data.baro_alt_m  = src.baro_alt_m;
+    _data.vert_vel_ms = src.vert_vel_ms;   // sim ground truth -- bypasses the complementary filter below entirely
+
+    // Not modeled by the HITL bridge -- zeroed, harmless (see begin()'s note
+    // on gps_ok/power_ok; nothing flight-critical reads these otherwise).
+    _data.pressure_hpa = 0.0f; _data.temperature_c = 0.0f;
+    _data.lat = 0.0; _data.lon = 0.0; _data.gps_alt_m = 0.0f; _data.gps_sats = 0; _data.gps_fix = false;
+    _data.voltage_v = 0.0f; _data.current_ma = 0.0f; _data.power_mw = 0.0f;
+}
+
+void SensorManager::calibrateBaro() {
+    // No physical baro to zero -- the bridge already sends pad-relative
+    // altitude directly (see Simulation/hitl/). No-op.
+}
+
+#else
 
 bool SensorManager::begin() {
     Wire.begin();
@@ -129,3 +230,5 @@ void SensorManager::calibrateBaro() {
     _fusedVel_ms     = 0.0f;
     _prevFuseTime_ms = 0;     // forces a one-cycle skip so no spurious velocity spike
 }
+
+#endif // HITL_MODE

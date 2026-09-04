@@ -55,6 +55,15 @@ public:
     // (0 deg reference) to EEPROM. Applied automatically on the next boot.
     void saveCalibration();
 
+    // Last commanded correction (deg) for one channel, relative to trim,
+    // AFTER the hard SERVO_MIN_US/MAX_US clamp in _writeUs() -- i.e. the real
+    // value actually written to the servo this loop, not the pre-clamp
+    // request. Pure read-only derivation from _liveUs/_trimUs, no state of
+    // its own. Used by TelemetryManager's HITL_MODE report (see Packet.h's
+    // HITLResponsePacket and Simulation/hitl/) so a closed-loop HITL run
+    // sees exactly what the real control code decided, clamping included.
+    float liveCorrectionDeg(uint8_t channel) const;
+
 private:
     static const uint8_t _pins[4];
     Servo    _servos[4];

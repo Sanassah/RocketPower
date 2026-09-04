@@ -34,6 +34,13 @@ public:
     // main.cpp polls this and calls sensors.calibrateBaro().
     bool calibrateRequested() { bool r = _calibrateRequested; _calibrateRequested = false; return r; }
 
+    // Returns true (once) when a RESET command arrived. main.cpp polls this
+    // and does the actual reset -- this class doesn't hold references to
+    // BackupDeploy or main.cpp's own prevState, so it can only flag the
+    // request, not perform it. See Packet.h's RESET for exactly what a
+    // reset touches.
+    bool resetRequested() { bool r = _resetRequested; _resetRequested = false; return r; }
+
 private:
     LoRaRadio&        _lora;
     StateMachine&     _sm;
@@ -45,6 +52,7 @@ private:
     uint32_t        _lastLoraTxMs      = 0;
     uint32_t        _lastUsbTxMs       = 0;
     bool            _calibrateRequested = false;
+    bool            _resetRequested     = false;
 
     // Last-processed seq, tracked PER command type (indexed by the raw
     // CommandType byte) rather than one global value. A single global last-

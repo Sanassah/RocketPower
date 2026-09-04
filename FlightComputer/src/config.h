@@ -161,25 +161,44 @@
 //      see the HIL discussion; open-loop replay can't test this, there's
 //      nothing to close the loop against a fin command with).
 //   3. You're comfortable with a bench functional test via
-//      ATTITUDE_DEMO_ENABLE: hand-tilt the armed (but not flying) airframe
-//      away from whatever orientation it was in when you hit Enable, HOLD
-//      it there, and confirm the fins hold a deflection that opposes the
-//      tilt (not just react while you're actively moving it).
+//      ATTITUDE_DEMO_ENABLE (works IDLE or ARMED -- no need to arm pyro
+//      just to watch the fins move): hand-tilt the airframe away from
+//      whatever orientation it was in when you hit Enable, HOLD it there,
+//      and confirm the fins hold a deflection that opposes the tilt (not
+//      just react while you're actively moving it).
+
+// ===== Axis-naming convention =====
+// "roll"/"pitch"/"yaw" here follow Simulation/RocketPowerSim.slx's own
+// convention (see its Constants.m header comment: "spin about z = your
+// 'yaw'"), NOT the more common aerospace convention where "roll" is the
+// spin axis. Here:
+//   roll, pitch  -- the two TRANSVERSE tilt axes (nose direction drifting
+//                    off vertical)
+//   yaw          -- spin about the rocket's own longitudinal axis
+// This matters for HITL: Simulation/hitl/build_hitl_model.m wires this
+// firmware's roll/pitch/yaw commands straight into RocketPowerSim's
+// same-named actuator channels. Renaming/re-mapping either side without
+// the other silently swaps which physical moment each correction actually
+// produces -- confirmed the hard way: a same-named-but-wrong mapping here
+// once made the controller diverge instead of converge, with no error
+// anywhere, because it was applying spin corrections as tilt moments and
+// vice versa. If you ever change which raw channel maps to which of
+// roll/pitch/yaw below, re-check that convention is still consistent with
+// build_hitl_model.m's comment on it.
 
 // Which raw gyro_x/y/z channel corresponds to which physical rotation axis.
 // UNVERIFIED -- there is no documented BNO085-mounting-orientation
 // convention anywhere in this codebase (checked). The assignment below is
-// only a starting guess (roll = gyro_z, matching the ground station's own
-// rendering convention, which is itself not verified against the real PCB).
-// To find the real mapping: rotate the airframe by hand about its actual
-// long axis (roll) and watch which of gyro_x/gyro_y/gyro_z shows the large
-// signal in Serial/telemetry -- that's your real roll axis. Repeat about
-// the other two physical axes for pitch/yaw. Update these three lines
+// only a starting guess. To find the real mapping: rotate the airframe by
+// hand about its actual long axis (yaw, in THIS file's convention -- see
+// above) and watch which of gyro_x/gyro_y/gyro_z shows the large signal in
+// Serial/telemetry -- that's your real yaw axis. Repeat about the other
+// two physical (transverse) axes for roll/pitch. Update these three lines
 // (swap which field each reads, and negate if the sign opposes what you
 // observed) -- nothing else in AttitudeController needs to change.
-#define ATTITUDE_ROLL_RATE(d)   ((d).gyro_z)
-#define ATTITUDE_PITCH_RATE(d)  ((d).gyro_x)
-#define ATTITUDE_YAW_RATE(d)    ((d).gyro_y)
+#define ATTITUDE_ROLL_RATE(d)   ((d).gyro_x)
+#define ATTITUDE_PITCH_RATE(d)  ((d).gyro_y)
+#define ATTITUDE_YAW_RATE(d)    ((d).gyro_z)
 
 // Same idea, but for the ANGLE (position) term: which component of the
 // quaternion-error vector (ex, ey, ez -- see AttitudeController.cpp for how
@@ -190,9 +209,9 @@
 // applies unchanged to angle, and vice versa. Verify once via the rate
 // mapping above (or this one, either order), then copy the same
 // channel/sign choice to both.
-#define ATTITUDE_ROLL_ANGLE_ERR(ex, ey, ez)   (ez)
-#define ATTITUDE_PITCH_ANGLE_ERR(ex, ey, ez)  (ex)
-#define ATTITUDE_YAW_ANGLE_ERR(ex, ey, ez)    (ey)
+#define ATTITUDE_ROLL_ANGLE_ERR(ex, ey, ez)   (ex)
+#define ATTITUDE_PITCH_ANGLE_ERR(ex, ey, ez)  (ey)
+#define ATTITUDE_YAW_ANGLE_ERR(ex, ey, ez)    (ez)
 
 // Angle (position) gain: fin correction (deg) per radian of drift away from
 // the latched reference orientation. This is the term that makes the

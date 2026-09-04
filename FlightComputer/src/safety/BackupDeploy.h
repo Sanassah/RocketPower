@@ -41,6 +41,18 @@ public:
     // the caller's side. That's the entire point.
     void update(const FlightData& d, PyroController& pyro);
 
+    // Ground-commanded soft reset (see Packet.h's RESET). This class
+    // otherwise fires at MOST ONCE PER BOOT by design -- a real flight only
+    // gets one apogee, so that's correct for an actual flight computer reset
+    // (a physical power cycle). But a soft reset explicitly exists to run
+    // repeated bench/HITL test flights without power-cycling, and without
+    // this, the backup monitor would silently stay latched DONE (or stuck
+    // mid-stage) for every test after the first -- a real, easy-to-miss gap
+    // in exactly the tool meant to make repeated testing safe. Back to
+    // WAITING_FOR_BOOST and all detection state cleared, same as a fresh
+    // boot would give it.
+    void reset();
+
 private:
     enum class _Stage {
         WAITING_FOR_BOOST,

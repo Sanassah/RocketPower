@@ -71,3 +71,14 @@ void BackupDeploy::update(const FlightData& d, PyroController& pyro) {
             break;
     }
 }
+
+void BackupDeploy::reset() {
+    _stage           = _Stage::WAITING_FOR_BOOST;
+    _boostFirstMs    = 0;
+    _boostDetecting  = false;
+    _refAltAtBoost   = 0.0f;
+    _prevVertVel     = 0.0f;
+    _apogeeWindowMs  = 0;
+    _apogeeDetecting = false;
+    _apogeeConfirmedMs = 0;
+}

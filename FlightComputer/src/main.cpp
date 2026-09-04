@@ -140,14 +140,17 @@ void loop() {
     //   - Real in-flight control (attitude.controlEnabled()): only
     //     meaningful with real airflow over the fins, so POWERED_ASCENT/
     //     COAST only -- not before liftoff, not once the chute's out.
-    //   - Ground demo/bench-validation (attitude.demoEnabled()): ARMED only,
-    //     for hand-rotating the airframe and watching the fin response --
-    //     never runs once real liftoff moves the state machine past ARMED.
+    //   - Ground demo/bench-validation (attitude.demoEnabled()): IDLE or
+    //     ARMED, for hand-rotating the airframe and watching the fin
+    //     response -- deliberately doesn't require ARMED (pyro doesn't need
+    //     to be hot just to watch the fins move), and never runs once real
+    //     liftoff moves the state machine past ARMED either way.
     // A no-op entirely when both are false (the default at every boot).
     bool wantAttitudeControl =
         (attitude.controlEnabled() && (newState == FlightState::POWERED_ASCENT ||
                                         newState == FlightState::COAST)) ||
-        (attitude.demoEnabled()    && newState == FlightState::ARMED);
+        (attitude.demoEnabled()    && (newState == FlightState::IDLE ||
+                                        newState == FlightState::ARMED));
     if (wantAttitudeControl) {
         attitude.update(d, fins);
     }
@@ -188,6 +191,25 @@ void loop() {
         Serial.println("[CALIB] Calibrating barometer...");
         sensors.calibrateBaro();
         Serial.println("[CALIB] Done.");
+    }
+
+    // ---- 5c. Soft reset if requested by ground station ----
+    // Fresh-boot-equivalent IDLE without an actual power cycle -- see
+    // Packet.h's RESET for why this exists (repeated bench/HITL test
+    // flights). Touches every piece of RAM-only flight/detection state this
+    // file itself owns references to; TelemetryManager only flags the
+    // request since it doesn't hold a BackupDeploy reference.
+    if (telem.resetRequested()) {
+        Serial.println("[RESET] Soft reset requested -- clearing all flight/detection state.");
+        fsm.reset();
+        pyro.disarm();
+        attitude.reset();
+        backupDeploy.reset();
+        if (camera.isRecording()) camera.toggleRecording();
+        logger.close();
+        if (logger.cardPresent()) logger.open();   // fresh log file for the next run, same as a real reboot would get
+        prevState = FlightState::IDLE;             // keep this loop's own change-detection var in sync with fsm's new state
+        Serial.println("[RESET] Done. State: IDLE");
     }
 
     // ---- 6. Loop timing diagnostics ----

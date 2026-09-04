@@ -37,8 +37,9 @@ class CommandType(IntEnum):
     SD_STOP_RECORDING  = 0x0F  # param unused; flushes and closes the current log file
     ATTITUDE_CONTROL_ENABLE  = 0x10  # param unused; real in-flight fin control, engages POWERED_ASCENT/COAST
     ATTITUDE_CONTROL_DISABLE = 0x11  # param unused
-    ATTITUDE_DEMO_ENABLE     = 0x12  # param unused; ground-demo fin control, engages ARMED only
+    ATTITUDE_DEMO_ENABLE     = 0x12  # param unused; ground-demo fin control, engages in IDLE or ARMED
     ATTITUDE_DEMO_DISABLE    = 0x13  # param unused
+    RESET = 0x14  # param unused; soft reset -- fresh-boot-equivalent IDLE without a power cycle
 
 
 def encode_command(cmd_type: CommandType, param: int = 0, seq: int = 0) -> bytes:
@@ -68,3 +69,5 @@ def encode_attitude_control_enable(seq: int = 0)  -> bytes: return encode_comman
 def encode_attitude_control_disable(seq: int = 0) -> bytes: return encode_command(CommandType.ATTITUDE_CONTROL_DISABLE, 0, seq)
 def encode_attitude_demo_enable(seq: int = 0)     -> bytes: return encode_command(CommandType.ATTITUDE_DEMO_ENABLE, 0, seq)
 def encode_attitude_demo_disable(seq: int = 0)    -> bytes: return encode_command(CommandType.ATTITUDE_DEMO_DISABLE, 0, seq)
+
+def encode_reset(seq: int = 0) -> bytes: return encode_command(CommandType.RESET, 0, seq)

@@ -94,11 +94,15 @@ void AttitudeController::update(const FlightData& d, FinController& fins) {
     // Allocation across the 4 fins -- CH1=S, CH2=E, CH3=N, CH4=W. That
     // channel-to-compass mapping itself is bench-confirmed (testSweep per
     // channel, watched against the physical airframe). The +/- SIGNS below
-    // (which direction of pitch/yaw differential is "positive") are not --
+    // (which direction of roll/pitch differential is "positive") are not --
     // still exactly as unverified as the axis mappings in config.h, and need
     // the same bench/demo-mode check before this is ever trusted.
-    fins.setCorrectionDeg(1, rollCmd - pitchCmd);   // S
-    fins.setCorrectionDeg(2, rollCmd - yawCmd);     // E
-    fins.setCorrectionDeg(3, rollCmd + pitchCmd);   // N
-    fins.setCorrectionDeg(4, rollCmd + yawCmd);     // W
+    //
+    // yawCmd (spin, in this file's Simulation-matching convention -- see
+    // config.h's axis-naming note) is uniform across all 4 fins; rollCmd/
+    // pitchCmd are the two transverse-tilt differentials (N/S, E/W).
+    fins.setCorrectionDeg(1, yawCmd - rollCmd);   // S
+    fins.setCorrectionDeg(2, yawCmd - pitchCmd);  // E
+    fins.setCorrectionDeg(3, yawCmd + rollCmd);   // N
+    fins.setCorrectionDeg(4, yawCmd + pitchCmd);  // W
 }

@@ -127,6 +127,19 @@ enum class CommandType : uint8_t {
     ATTITUDE_CONTROL_DISABLE = 0x11,
     ATTITUDE_DEMO_ENABLE     = 0x12,
     ATTITUDE_DEMO_DISABLE    = 0x13,
+
+    // Soft reset -- param unused. Puts the flight computer back to a fresh-
+    // boot-equivalent IDLE without an actual power cycle: disarms, clears
+    // StateMachine's and BackupDeploy's detection state (including
+    // BackupDeploy's own "fires at most once" latch -- see its reset()),
+    // resets AttitudeController, and closes/reopens the SD log so the next
+    // run gets its own file. Exists for repeated bench/HITL test flights --
+    // see main.cpp's handling for exactly what it touches. Deliberately
+    // does NOT reset PyroController's continuity reads (those are live,
+    // not latched) or anything HITL-specific (that's TeensyBridge/
+    // SensorManager's own concern, this only touches real flight-logic
+    // state that persists in RAM across a would-be flight).
+    RESET = 0x14,
 };
 
 #pragma pack(push, 1)
@@ -163,3 +176,70 @@ inline uint16_t packetChecksum(const uint8_t* data, size_t len) {
     for (size_t i = 0; i < len; ++i) s += data[i];
     return s;
 }
+
+// ===== HITL sensor injection (simulation -> rocket) =====
+// HITL_MODE builds only (see platformio.ini env:rocketpower_hitl). Carried on
+// SerialUSB1 -- a SECOND Teensy USB virtual serial port, separate from the
+// normal Serial -- so this protocol never contends with the existing command
+// RX / telemetry mirror on Serial, which stays fully functional (a real
+// GroundStation can watch a HITL run live over Serial at the same time the
+// simulation drives it over SerialUSB1).
+//
+// SensorManager::update() (HITL_MODE branch) blocks reading exactly one of
+// these per loop iteration -- that block IS this build's loop pacing, in
+// place of the real build's I2C reads. See SensorManager.cpp and
+// Simulation/hitl/TeensyBridge.m for the field-by-field derivation (notably:
+// lin_accel is gravity-COMPENSATED like the real BNO085 "linear acceleration"
+// report, highg is NOT -- raw specific force, reads ~1g at rest, like the
+// real ADXL375).
+#define HITL_SENSOR_MAGIC_0 0xC5
+#define HITL_SENSOR_MAGIC_1 0x17
+#define HITL_RESP_MAGIC_0   0xC6
+#define HITL_RESP_MAGIC_1   0x18
+
+#pragma pack(push, 1)
+struct SensorInjectPacket {
+    uint8_t  magic[2];   // HITL_SENSOR_MAGIC_0, HITL_SENSOR_MAGIC_1
+    uint32_t seq;         // bridge-side bookkeeping only -- not echoed back, this
+                           // link is strict single-outstanding-request lockstep
+
+    // IMU (BNO085-equivalent)
+    float quat_w, quat_x, quat_y, quat_z;
+    float gyro_x, gyro_y, gyro_z;                 // rad/s, body frame
+    float lin_accel_x, lin_accel_y, lin_accel_z;  // m/s^2, body frame, gravity-compensated
+
+    // High-g accelerometer (ADXL375-equivalent) -- RAW specific force,
+    // gravity included (reads ~1g magnitude at rest, same as the real part).
+    float highg_x, highg_y, highg_z;   // g, body frame
+
+    // Barometer-equivalent (BMP390)
+    float baro_alt_m;    // m, already pad-relative (bridge zeroes this, not the firmware)
+    float vert_vel_ms;   // m/s, positive = up, world frame
+
+    uint16_t checksum;   // simple sum of all preceding bytes
+};
+#pragma pack(pop)
+
+// ===== HITL response (rocket -> simulation) =====
+// Sent unconditionally once per loop by TelemetryManager::update()'s
+// HITL_MODE block, immediately after the real AttitudeController/
+// FinController have processed this loop's injected sample -- reports
+// exactly what the real flight code decided, so the simulation can apply the
+// real commanded fin deflections to its own actuator/aero model and close
+// the loop for real.
+#pragma pack(push, 1)
+struct HITLResponsePacket {
+    uint8_t  magic[2];   // HITL_RESP_MAGIC_0, HITL_RESP_MAGIC_1
+    uint32_t timestamp_ms;
+    uint8_t  state;       // FlightState
+
+    // Real, post-allocation, post-clamp commanded fin deflection (deg) per
+    // channel -- CH1=S, CH2=E, CH3=N, CH4=W (see AttitudeController.h). This
+    // is what actually got written to the servo this loop, clamp included.
+    float fin_deg[4];
+
+    uint8_t  attitude_status;   // see ATTITUDE_STATUS_* above
+
+    uint16_t checksum;
+};
+#pragma pack(pop)
