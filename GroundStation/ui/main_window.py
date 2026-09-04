@@ -34,6 +34,7 @@ from ui.widgets.sensor_panel     import SensorPanel
 from ui.widgets.command_panel    import CommandPanel
 from ui.widgets.event_log        import EventLog
 from ui.widgets.log_converter_panel import LogConverterPanel
+from ui.widgets.test_panel       import TestPanel
 
 _LOG_DIR = 'logs'
 
@@ -158,6 +159,7 @@ class MainWindow(QMainWindow):
         self._pages.setStyleSheet(f'background-color:{_BG};')
         self._pages.addWidget(self._build_page_overview())
         self._pages.addWidget(self._build_page_telemetry())
+        self._pages.addWidget(self._build_page_test())
         self._pages.addWidget(self._build_page_data_tools())
         body.addWidget(self._pages, stretch=1)
 
@@ -198,7 +200,7 @@ class MainWindow(QMainWindow):
 
         # Nav buttons (icon + label)
         self._nav_btns: list[_NavBtn] = []
-        for i, label in enumerate(['⊞  OVERVIEW', '↗  TELEMETRY', '⇄  DATA TOOLS']):
+        for i, label in enumerate(['⊞  OVERVIEW', '↗  TELEMETRY', '⚙  TEST', '⇄  DATA TOOLS']):
             btn = _NavBtn(label)
             btn.clicked.connect(lambda _, idx=i: self._switch_page(idx))
             self._nav_btns.append(btn)
@@ -502,7 +504,24 @@ class MainWindow(QMainWindow):
             self._event_log.log('Recording stopped.', level='warn')
             self._status_bar.showMessage('Recording stopped.')
 
-    # ── Page 2: Data Tools ───────────────────────────────────────────────────
+    # ── Page 2: Test (TEMPORARY -- bench axis-mapping calibration) ──────────
+    # Remove this page (and ui/widgets/test_panel.py) once config.h's
+    # ATTITUDE_*_RATE/ANGLE_ERR mapping is confirmed -- see that widget's
+    # module docstring.
+    def _build_page_test(self) -> QWidget:
+        page = QWidget()
+        page.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        page.setStyleSheet(f'background-color:{_BG};')
+
+        root = QVBoxLayout(page)
+        root.setContentsMargins(18, 18, 18, 18)
+        root.setSpacing(0)
+
+        self._test_panel = TestPanel()
+        root.addWidget(self._test_panel)
+        return page
+
+    # ── Page 3: Data Tools ───────────────────────────────────────────────────
     def _build_page_data_tools(self) -> QWidget:
         page = QWidget()
         page.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -597,6 +616,7 @@ class MainWindow(QMainWindow):
         self._sensor_panel.update_data(data)
         self._command_panel.update_data(data)
         self._event_log.update_data(data)
+        self._test_panel.update_data(data)
 
         # Retry any still-unacked commands, piggybacked on this packet --
         # receiving telemetry is concrete proof the rocket's radio just

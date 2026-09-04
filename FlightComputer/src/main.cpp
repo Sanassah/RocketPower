@@ -155,6 +155,66 @@ void loop() {
         attitude.update(d, fins);
     }
 
+    // ---- 2c. Raw gyro + absolute tilt + fin-response debug print, DEMO only ----
+    // Exists for exactly one purpose: the bench axis-mapping/allocation-sign
+    // calibration procedure in config.h/AttitudeController.h. gyro_x/y/z
+    // aren't in TelemetryPacket at all (kept out deliberately -- see its
+    // size comment), so there's otherwise no live way to see them.
+    //
+    // The angle terms are the same exact tilt-from-true-vertical computation
+    // AttitudeController::update() now uses for its own roll/pitch angle
+    // error (atan2/asin off the absolute quaternion via gravity -- no
+    // reference latch, see AttitudeController.cpp) -- computed fresh here
+    // too rather than read back from the controller, since this print needs
+    // to work even when it isn't the one driving the fins. Labeled by raw
+    // sensor axis (X/Y), not N/S/E/W or roll/pitch -- figuring out which raw
+    // axis IS which compass direction is exactly what hand-tilting the
+    // airframe toward each direction and watching these numbers move is for.
+    //
+    // Gated on demoEnabled() specifically (not wantAttitudeControl, which is
+    // also true during real controlEnabled() flight) so this never fires
+    // outside an explicit bench session, and rate-limited so it's readable
+    // at a glance while slowly rotating the airframe by hand, not a wall of
+    // scrolling text. The binary USB telemetry mirror self-suppresses while
+    // demoEnabled() (see TelemetryManager.cpp), so this prints clean in a
+    // plain serial monitor without any config.h change needed.
+    if (attitude.demoEnabled()) {
+        static uint32_t lastGyroPrintMs = 0;
+        uint32_t nowMs = millis();
+        if (nowMs - lastGyroPrintMs >= 200) {
+            lastGyroPrintMs = nowMs;
+
+            constexpr float kRadToDeg = 57.29577951308232f;
+            float qw = d.quat_w, qx = d.quat_x, qy = d.quat_y, qz = d.quat_z;
+            float sinTiltY = 2.0f * (qw * qy - qz * qx);
+            sinTiltY = sinTiltY > 1.0f ? 1.0f : (sinTiltY < -1.0f ? -1.0f : sinTiltY);
+            float tiltXdeg = atan2f(2.0f * (qw * qx + qy * qz), 1.0f - 2.0f * (qx * qx + qy * qy)) * kRadToDeg;
+            float tiltYdeg = asinf(sinTiltY) * kRadToDeg;
+            float spinZdeg = atan2f(2.0f * (qw * qz + qx * qy), 1.0f - 2.0f * (qy * qy + qz * qz)) * kRadToDeg;
+
+            Serial.print("[AXIS CAL] gyro rad/s  x=");
+            Serial.print(d.gyro_x, 3);
+            Serial.print("  y=");
+            Serial.print(d.gyro_y, 3);
+            Serial.print("  z=");
+            Serial.print(d.gyro_z, 3);
+            Serial.print("   |   tilt deg (absolute, from level)  X=");
+            Serial.print(tiltXdeg, 1);
+            Serial.print(" Y=");
+            Serial.print(tiltYdeg, 1);
+            Serial.print(" spin=");
+            Serial.print(spinZdeg, 1);
+            Serial.print("   |   fin deg  S=");
+            Serial.print(fins.liveCorrectionDeg(1), 1);
+            Serial.print(" E=");
+            Serial.print(fins.liveCorrectionDeg(2), 1);
+            Serial.print(" N=");
+            Serial.print(fins.liveCorrectionDeg(3), 1);
+            Serial.print(" W=");
+            Serial.println(fins.liveCorrectionDeg(4), 1);
+        }
+    }
+
     // ---- 3. Handle state transitions ----
     if (newState != prevState) {
         camera.onStateChange(prevState, newState);

@@ -1,7 +1,7 @@
 """
 Decodes binary TelemetryPacket from the flight computer.
 
-Packet layout (packed, little-endian, 52 bytes total). Deliberately compact --
+Packet layout (packed, little-endian, 66 bytes total). Deliberately compact --
 the LoRa link is stuck at a slow factory-default air data rate and packet size
 is the only remaining lever to reduce airtime per packet, so most fields are
 scaled fixed-point (int16) instead of float. Values are unscaled back to
@@ -39,7 +39,18 @@ ever sees the same TelemetryData fields/units as before this change.
                                           bit5 sd_present, bit6 sd_recording -- live, not boot-time)
   49      1     uint8     attitude_status (bit0 control_on, bit1 demo_on -- last ground-commanded
                                           attitude-control mode, not sensor health; see AttitudeController)
-  50      2     uint16    checksum      (sum of bytes 0..49)
+
+  -- TEMPORARY bench fields (Packet.h), remove alongside the TEST tab once
+     axis-mapping/allocation-sign calibration is done --
+  50      2     int16     gyro_x_mrs            /1000 -> rad/s
+  52      2     int16     gyro_y_mrs            /1000 -> rad/s
+  54      2     int16     gyro_z_mrs            /1000 -> rad/s
+  56      2     int16     fin_cdeg[0] (S)       /100  -> deg
+  58      2     int16     fin_cdeg[1] (E)       /100  -> deg
+  60      2     int16     fin_cdeg[2] (N)       /100  -> deg
+  62      2     int16     fin_cdeg[3] (W)       /100  -> deg
+
+  64      2     uint16    checksum      (sum of bytes 0..63)
 """
 
 import struct
@@ -66,9 +77,9 @@ SD_STATUS_RECORDING    = 1 << 6
 ATTITUDE_STATUS_CONTROL_ON = 1 << 0
 ATTITUDE_STATUS_DEMO_ON    = 1 << 1
 
-# 29 fields, 52 bytes total
-TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBBBBH'
-TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 52
+# 36 fields, 66 bytes total (+7 int16 TEMPORARY bench fields -- see docstring)
+TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBBBBhhhhhhhH'
+TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 66
 
 # AckPacket: magic0, magic1, cmdSeq, cmdType, checksum
 ACK_FORMAT = '<BBBBH'
@@ -125,6 +136,12 @@ class TelemetryData:
     cam_recording: int         # 1=recording, 0=stopped (FC's belief, no camera ack)
     system_status: int         # bitfield, see SENSOR_HEALTH_*_OK / SD_STATUS_* above
     attitude_status: int       # bitfield, see ATTITUDE_STATUS_* above
+    # TEMPORARY bench fields -- see Packet.h / this module's docstring. Remove
+    # alongside the TEST tab once axis-mapping/allocation-sign calibration is done.
+    gyro_x:       float        # rad/s
+    gyro_y:       float        # rad/s
+    gyro_z:       float        # rad/s
+    fin_deg:      tuple[float, float, float, float]   # (S, E, N, W)
     checksum:     int
     # Derived — populated by decode_packet()
     accel_mag_g:  float = 0.0
@@ -197,6 +214,31 @@ class TelemetryData:
     def attitude_demo_on(self) -> bool:
         return bool(self.attitude_status & ATTITUDE_STATUS_DEMO_ON)
 
+    # ---- TEMPORARY bench properties -- see this module's docstring ----
+    # Absolute tilt from level (gravity), computed fresh from the raw
+    # quaternion -- NOT AttitudeController's reference-latched small-angle
+    # error, and NOT rocket_visual.py's roll/pitch (that widget swaps/
+    # corrects axis names for its own render frame, a different convention).
+    # Same formula as main.cpp's [AXIS CAL] print, exactly so the TEST tab
+    # and the serial print always agree. Labeled by raw sensor axis (X/Y),
+    # not N/S/E/W or roll/pitch -- which raw axis is which compass direction
+    # is exactly what this bench test is for.
+    @property
+    def tilt_x_deg(self) -> float:
+        w, x, y, z = self.quat_w, self.quat_x, self.quat_y, self.quat_z
+        return math.degrees(math.atan2(2.0 * (w*x + y*z), 1.0 - 2.0 * (x*x + y*y)))
+
+    @property
+    def tilt_y_deg(self) -> float:
+        w, x, y, z = self.quat_w, self.quat_x, self.quat_y, self.quat_z
+        s = max(-1.0, min(1.0, 2.0 * (w*y - z*x)))
+        return math.degrees(math.asin(s))
+
+    @property
+    def spin_z_deg(self) -> float:
+        w, x, y, z = self.quat_w, self.quat_x, self.quat_y, self.quat_z
+        return math.degrees(math.atan2(2.0 * (w*z + x*y), 1.0 - 2.0 * (y*y + z*z)))
+
 
 def decode_packet(raw: bytes) -> Optional[TelemetryData]:
     """
@@ -229,7 +271,10 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
      quat_w_i16, quat_x_i16, quat_y_i16, quat_z_i16,
      voltage_cv, current_ma,
      rssi, pyro_cont_0, pyro_cont_1, pyro_cont_2, cam_recording,
-     system_status, attitude_status, checksum) = vals
+     system_status, attitude_status,
+     gyro_x_mrs, gyro_y_mrs, gyro_z_mrs,
+     fin_cdeg_0, fin_cdeg_1, fin_cdeg_2, fin_cdeg_3,
+     checksum) = vals
 
     # Unscale wire fixed-point values back to normal engineering units --
     # everything downstream of this function sees the same units as before.
@@ -254,6 +299,10 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
         cam_recording=cam_recording,
         system_status=system_status,
         attitude_status=attitude_status,
+        gyro_x=gyro_x_mrs / 1000.0,
+        gyro_y=gyro_y_mrs / 1000.0,
+        gyro_z=gyro_z_mrs / 1000.0,
+        fin_deg=(fin_cdeg_0 / 100.0, fin_cdeg_1 / 100.0, fin_cdeg_2 / 100.0, fin_cdeg_3 / 100.0),
         checksum=checksum,
     )
     data.accel_mag_g = math.sqrt(data.accel_x_g**2 + data.accel_y_g**2 + data.accel_z_g**2)
