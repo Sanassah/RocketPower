@@ -27,6 +27,21 @@ void StateMachine::onDisarm() {
     }
 }
 
+void StateMachine::reset() {
+    // Unconditional, unlike onDisarm() -- goes to IDLE from ANY state.
+    // _enterState() already clears _liftoffDetecting/_apogeeDetecting/
+    // _landedStableMs; the remaining timing/reference variables aren't
+    // touched by a normal state transition, so clear them explicitly too --
+    // otherwise a stale _prevVertVel or _landedRefAlt from the previous
+    // (reset) flight could feed a spurious detection on the very first loop
+    // of the next one.
+    _enterState(FlightState::IDLE, millis());
+    _liftoffFirstMs = 0;
+    _prevVertVel    = 0.0f;
+    _apogeeWindowMs = 0;
+    _landedRefAlt   = 0.0f;
+}
+
 void StateMachine::update(const FlightData& d) {
     uint32_t now = millis();
 

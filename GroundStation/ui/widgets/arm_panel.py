@@ -8,6 +8,7 @@ from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui  import QFont
 
 from core.packet_decoder import TelemetryData
+from ui.widgets.pill_toggle import PillSwitch
 
 _BG     = '#1A1A1B'
 _CARD2  = '#222224'
@@ -56,6 +57,8 @@ def _card_header(symbol: str, title: str) -> QHBoxLayout:
 class ArmPanel(QWidget):
     arm_requested    = pyqtSignal()
     disarm_requested = pyqtSignal()
+    attitude_control_enable_requested  = pyqtSignal()
+    attitude_control_disable_requested = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -65,6 +68,7 @@ class ArmPanel(QWidget):
         )
         self._state_name = 'IDLE'
         self._flash_on   = True
+        self._attitude_control_on = False
 
         self._flash_timer = QTimer(self)
         self._flash_timer.setInterval(500)
@@ -74,7 +78,32 @@ class ArmPanel(QWidget):
         root.setContentsMargins(20, 16, 20, 18)
         root.setSpacing(6)
 
-        root.addLayout(_card_header('[]', 'ARM / SAFETY STATUS'))
+        # Real (in-flight) attitude control -- REAL engages active fin
+        # correction during POWERED_ASCENT/COAST on the next flight, ground-
+        # commanded (not a compile-time flag -- see AttitudeController).
+        # Deliberately placed beside the arm status title, not buried in the
+        # TELEMETRY command panel, since it's a pre-flight safety decision on
+        # the same level as ARM itself. DEMO (bench hand-tilt test) stays in
+        # the TELEMETRY page's command panel -- it's a bench tool, not a
+        # flight-readiness switch.
+        hdr = _card_header('[]', 'ARM / SAFETY STATUS')
+        static_lbl = QLabel('STATIC')
+        static_lbl.setStyleSheet(f'font-size:11px;font-weight:800;letter-spacing:0.5px;background:transparent;border:none;')
+        self._att_switch = PillSwitch()
+        self._att_switch.setToolTip(
+            'OFF = Static (no active fin correction)\n'
+            'ON  = Active Stabilization (real in-flight fin control during POWERED_ASCENT/COAST)'
+        )
+        self._att_switch.clicked.connect(self._on_attitude_control_toggled)
+        active_lbl = QLabel('ACTIVE STAB.')
+        active_lbl.setStyleSheet(f'font-size:11px;font-weight:800;letter-spacing:0.5px;background:transparent;border:none;')
+        self._att_static_lbl = static_lbl
+        self._att_active_lbl = active_lbl
+        hdr.addWidget(static_lbl)
+        hdr.addWidget(self._att_switch)
+        hdr.addWidget(active_lbl)
+        root.addLayout(hdr)
+        self._update_attitude_labels()
 
         # Shield symbol + state
         centre = QVBoxLayout()
@@ -155,6 +184,14 @@ class ArmPanel(QWidget):
         root.addLayout(btn_row)
 
     def update_data(self, data: TelemetryData) -> None:
+        if data.attitude_control_on != self._attitude_control_on:
+            self._attitude_control_on = data.attitude_control_on
+            # Programmatic sync from telemetry, not a click -- PillSwitch's
+            # setChecked() is silent (never emits `clicked`), so this can't
+            # re-trigger the confirmation dialog below.
+            self._att_switch.setChecked(self._attitude_control_on)
+            self._update_attitude_labels()
+
         sn = data.state_name
         if sn == self._state_name:
             return
@@ -199,3 +236,36 @@ class ArmPanel(QWidget):
         )
         if reply == QMessageBox.StandardButton.Yes:
             self.arm_requested.emit()
+
+    def _update_attitude_labels(self) -> None:
+        on_color  = _RED
+        off_color = _MUTED
+        active_c  = on_color if self._attitude_control_on else off_color
+        static_c  = off_color if self._attitude_control_on else _TEXT
+        self._att_active_lbl.setStyleSheet(
+            f'color:{active_c};font-size:11px;font-weight:800;letter-spacing:0.5px;'
+            f'background:transparent;border:none;'
+        )
+        self._att_static_lbl.setStyleSheet(
+            f'color:{static_c};font-size:11px;font-weight:800;letter-spacing:0.5px;'
+            f'background:transparent;border:none;'
+        )
+
+    def _on_attitude_control_toggled(self, checked: bool) -> None:
+        if not checked:
+            self.attitude_control_disable_requested.emit()
+            return
+        reply = QMessageBox.warning(
+            self, 'Confirm Enable Active Stabilization',
+            'Enable REAL in-flight fin control?\n\n'
+            'This engages active fin correction during POWERED_ASCENT/COAST on the '
+            'next flight. Only do this once the gyro-axis mapping and gains have '
+            'been bench-validated (see config.h / the DEMO toggle in the TELEMETRY '
+            'page for that check).',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            self.attitude_control_enable_requested.emit()
+        else:
+            self._att_switch.setChecked(False)   # revert -- nothing was actually sent

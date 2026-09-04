@@ -23,10 +23,35 @@ void TelemetryManager::update(const FlightData& d) {
 
 #if USB_SERIAL_BINARY_MIRROR
     // USB: no airtime constraint, so this runs on its own, much faster clock
-    // instead of piggybacking on the LoRa cadence above.
+    // instead of piggybacking on the LoRa cadence above. Untouched by
+    // HITL_MODE -- still fully usable over the normal Serial/LoRa link at
+    // the same time a HITL run is driving the rocket over SerialUSB1 below,
+    // so a real GroundStation can watch it live.
     if (now - _lastUsbTxMs >= USB_TELEMETRY_INTERVAL_MS) {
         _lastUsbTxMs = now;
         _lora.sendUsbFast(_buildPacket(d));
+    }
+#endif
+
+#ifdef HITL_MODE
+    // Sent unconditionally, once per loop -- one HITLResponsePacket per
+    // SensorInjectPacket SensorManager blocked on this loop (see
+    // SensorManager.cpp), on the SAME SerialUSB1 link, so the bridge that's
+    // driving this run gets exactly what the real control code just decided.
+    {
+        HITLResponsePacket resp{};
+        resp.magic[0]     = HITL_RESP_MAGIC_0;
+        resp.magic[1]     = HITL_RESP_MAGIC_1;
+        resp.timestamp_ms = d.timestamp_ms;
+        resp.state        = static_cast<uint8_t>(d.state);
+        resp.fin_deg[0]   = _fins.liveCorrectionDeg(1);
+        resp.fin_deg[1]   = _fins.liveCorrectionDeg(2);
+        resp.fin_deg[2]   = _fins.liveCorrectionDeg(3);
+        resp.fin_deg[3]   = _fins.liveCorrectionDeg(4);
+        resp.attitude_status = (_attitude.controlEnabled() ? ATTITUDE_STATUS_CONTROL_ON : 0)
+                              | (_attitude.demoEnabled()    ? ATTITUDE_STATUS_DEMO_ON    : 0);
+        resp.checksum = packetChecksum(reinterpret_cast<const uint8_t*>(&resp), sizeof(resp) - 2);
+        SerialUSB1.write(reinterpret_cast<const uint8_t*>(&resp), sizeof(resp));
     }
 #endif
 
@@ -201,6 +226,11 @@ void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
         case CommandType::ATTITUDE_DEMO_DISABLE:
             Serial.println("[TELEM] CMD: ATTITUDE_DEMO_DISABLE");
             _attitude.setDemoEnabled(false);
+            break;
+
+        case CommandType::RESET:
+            Serial.println("[TELEM] CMD: RESET");
+            _resetRequested = true;
             break;
 
         case CommandType::PING:

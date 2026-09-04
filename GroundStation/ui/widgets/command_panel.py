@@ -82,10 +82,9 @@ class CommandPanel(QWidget):
     servo_preflight_requested = pyqtSignal()
     sd_start_requested        = pyqtSignal()
     sd_stop_requested         = pyqtSignal()
-    attitude_control_enable_requested  = pyqtSignal()
-    attitude_control_disable_requested = pyqtSignal()
     attitude_demo_enable_requested     = pyqtSignal()
     attitude_demo_disable_requested    = pyqtSignal()
+    reset_requested = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -96,7 +95,6 @@ class CommandPanel(QWidget):
         self._state       = 0
         self._sd_present  = False
         self._sd_recording = False
-        self._attitude_control_on = False
         self._attitude_demo_on    = False
 
         root = QVBoxLayout(self)
@@ -163,40 +161,19 @@ class CommandPanel(QWidget):
 
         col_a.addWidget(_divider())
 
-        # Attitude control -- runtime mode toggles, ground-commanded (not
-        # compile-time flags -- see AttitudeController). REAL engages fin
-        # correction during POWERED_ASCENT/COAST; DEMO does the same but only
-        # while ARMED, for hand-rotating the airframe on the bench and
-        # watching the fins react. Both default off at boot and reset off on
-        # DISARM. Live confirmed state shows in the sensor panel's STATUS
-        # section, not here -- these are just the action buttons.
-        col_a.addWidget(_section('ATTITUDE CONTROL'))
-
-        real_row = QHBoxLayout(); real_row.setSpacing(6)
-        real_lbl = QLabel('Real (in-flight)')
-        real_lbl.setFixedWidth(118)
-        real_lbl.setStyleSheet(f'color:{_MUTED};font-size:13px;border:none;background:transparent;')
-        self._att_ctrl_btn = QPushButton('OFF')
-        self._att_ctrl_btn.setFixedHeight(28)
-        self._att_ctrl_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
-        self._att_ctrl_btn.setCheckable(True)
-        self._att_ctrl_btn.clicked.connect(self._on_attitude_control_toggled)
-        self._att_ctrl_btn.setStyleSheet(f"""
-            QPushButton {{
-                background-color:{_CARD2};color:{_TEXT};
-                border:1px solid {_BORDER};border-radius:5px;padding:0;
-            }}
-            QPushButton:hover {{ background-color:#222436; }}
-            QPushButton:checked {{
-                background-color:#2A0A0A;color:{_RED};border:1px solid {_RED};
-            }}
-        """)
-        real_row.addWidget(real_lbl)
-        real_row.addWidget(self._att_ctrl_btn)
-        col_a.addLayout(real_row)
+        # Attitude control DEMO -- runtime mode toggle, ground-commanded (not
+        # a compile-time flag -- see AttitudeController). Engages the same
+        # control law as real flight while IDLE or ARMED -- deliberately
+        # doesn't require ARM (no need to arm pyro just to hand-rotate the
+        # airframe on the bench and watch the fins react). Defaults off at
+        # boot and resets off on DISARM. The REAL (in-flight) toggle lives
+        # on the OVERVIEW page's ArmPanel now, beside the arm status title --
+        # it's a pre-flight readiness decision on the same level as ARM
+        # itself, not a bench tool, so it doesn't belong buried in here.
+        col_a.addWidget(_section('ATTITUDE CONTROL  (DEMO)'))
 
         demo_row = QHBoxLayout(); demo_row.setSpacing(6)
-        demo_lbl = QLabel('Demo (armed only)')
+        demo_lbl = QLabel('Demo (no arm needed)')
         demo_lbl.setFixedWidth(118)
         demo_lbl.setStyleSheet(f'color:{_MUTED};font-size:13px;border:none;background:transparent;')
         self._att_demo_btn = QPushButton('OFF')
@@ -225,6 +202,27 @@ class CommandPanel(QWidget):
         calibrate_btn = _flat_btn('Calibrate')
         calibrate_btn.clicked.connect(self._on_calibrate)
         col_a.addWidget(calibrate_btn)
+
+        # Soft reset -- puts the FC back to a fresh-boot-equivalent IDLE
+        # (disarmed, all detection/backup-deploy state cleared, SD log
+        # closed and reopened fresh) WITHOUT an actual power cycle. Exists
+        # so repeated bench/HITL test flights don't each require physically
+        # rebooting the board -- see Packet.h's RESET for exactly what it
+        # touches. Deliberately distinct (amber, not the default gray) since
+        # it's a bigger action than Calibrate, but not as irreversible/
+        # dangerous as a pyro fire.
+        reset_btn = QPushButton('Reset  (back to IDLE)')
+        reset_btn.setFixedHeight(30)
+        reset_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
+        reset_btn.clicked.connect(self._on_reset)
+        reset_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color:{_CARD2};color:{_ORANGE};
+                border:1px solid {_ORANGE};border-radius:6px;font-weight:700;padding:0;
+            }}
+            QPushButton:hover {{ background-color:#2A1B00; }}
+        """)
+        col_a.addWidget(reset_btn)
         col_a.addWidget(_divider())
 
         # SD card -- the FC auto-starts logging at boot and auto-stops on
@@ -359,10 +357,8 @@ class CommandPanel(QWidget):
             self._sd_recording = data.sd_recording
             self._update_button_states()
 
-        if (data.attitude_control_on != self._attitude_control_on or
-                data.attitude_demo_on != self._attitude_demo_on):
-            self._attitude_control_on = data.attitude_control_on
-            self._attitude_demo_on    = data.attitude_demo_on
+        if data.attitude_demo_on != self._attitude_demo_on:
+            self._attitude_demo_on = data.attitude_demo_on
             self._update_button_states()
 
     def _update_button_states(self) -> None:
@@ -379,11 +375,9 @@ class CommandPanel(QWidget):
         self._sd_btn.setChecked(self._sd_recording)
         self._sd_btn.setText('Recording -- Tap to Stop' if self._sd_recording else 'Start Log')
 
-        # Toggle buttons stay clickable in both directions -- setChecked()
+        # Toggle button stays clickable in both directions -- setChecked()
         # here is a programmatic sync from telemetry, not a click, so it
-        # does not re-trigger the toggled handlers/confirmation dialogs.
-        self._att_ctrl_btn.setChecked(self._attitude_control_on)
-        self._att_ctrl_btn.setText('ON' if self._attitude_control_on else 'OFF')
+        # does not re-trigger the toggled handler.
         self._att_demo_btn.setChecked(self._attitude_demo_on)
         self._att_demo_btn.setText('ON' if self._attitude_demo_on else 'OFF')
 
@@ -404,24 +398,6 @@ class CommandPanel(QWidget):
         else:
             self._sd_btn.setChecked(True)   # revert -- still recording, nothing changed
 
-    def _on_attitude_control_toggled(self, checked: bool) -> None:
-        if not checked:
-            self.attitude_control_disable_requested.emit()
-            return
-        reply = QMessageBox.warning(
-            self, 'Confirm Enable Real Attitude Control',
-            'Enable REAL in-flight fin control?\n\n'
-            'This engages active fin correction during POWERED_ASCENT/COAST on the '
-            'next flight. Only do this once the gyro-axis mapping and gains have '
-            'been bench-validated (see config.h / ATTITUDE_DEMO for that check).',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
-        )
-        if reply == QMessageBox.StandardButton.Yes:
-            self.attitude_control_enable_requested.emit()
-        else:
-            self._att_ctrl_btn.setChecked(False)   # revert -- nothing was actually sent
-
     def _on_attitude_demo_toggled(self, checked: bool) -> None:
         if checked:
             self.attitude_demo_enable_requested.emit()
@@ -438,6 +414,20 @@ class CommandPanel(QWidget):
         )
         if reply == QMessageBox.StandardButton.Yes:
             self.calibrate_requested.emit()
+
+    def _on_reset(self) -> None:
+        reply = QMessageBox.question(
+            self, 'Confirm Reset',
+            'Soft-reset the flight computer back to IDLE?\n\n'
+            'Disarms, clears all flight/backup-deploy detection state, and '
+            'closes + reopens the SD log fresh -- equivalent to a power '
+            'cycle without actually power-cycling. Do this only when the '
+            'rocket is on the ground / between bench or HITL test flights.',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            self.reset_requested.emit()
 
     def _on_save_calibration(self) -> None:
         reply = QMessageBox.question(

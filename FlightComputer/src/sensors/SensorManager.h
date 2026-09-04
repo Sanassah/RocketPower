@@ -5,6 +5,9 @@
 #include "Accelerometer.h"
 #include "GPS.h"
 #include "PowerMonitor.h"
+#ifdef HITL_MODE
+#include "../telemetry/Packet.h"
+#endif
 
 // Unified snapshot of all sensor readings passed through the system
 struct FlightData {
@@ -85,4 +88,27 @@ private:
     uint32_t _lastAccelOkMs = 0;
     uint32_t _lastGpsOkMs   = 0;
     uint32_t _lastPowerOkMs = 0;
+
+#ifdef HITL_MODE
+    // Waits up to timeoutMs for one full, checksum-valid SensorInjectPacket,
+    // resyncing on its magic bytes if the stream is out of frame (same
+    // tolerant scan-and-discard pattern as the ground station's own decoder
+    // -- see packet_decoder.py). Returns false on timeout instead of
+    // blocking forever -- see the note on _lastHitlPkt below for why that
+    // matters: with no bridge connected yet, blocking forever here means
+    // the rest of loop() (telemetry included) never runs at all, which
+    // looks exactly like "nothing on the dashboard" over the NORMAL Serial
+    // port even though that port has nothing to do with this read.
+    bool _hitlReadPacket(SensorInjectPacket& out, uint32_t timeoutMs);
+
+    // Last successfully injected sample. Reused on a timeout above so the
+    // loop keeps running (and telemetry keeps flowing over the normal
+    // Serial port) at roughly its usual cadence even before a HITL bridge
+    // is actually connected -- rather than the whole build silently
+    // freezing at the first loop() call. Before the very first real packet
+    // ever arrives, this defaults to "resting on the pad": identity
+    // orientation, zero rates, ~1g on highg_z (see update()).
+    SensorInjectPacket _lastHitlPkt{};
+    bool _hasHitlPacket = false;
+#endif
 };

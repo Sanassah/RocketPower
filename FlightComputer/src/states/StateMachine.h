@@ -18,6 +18,13 @@ public:
     void onArm();
     void onDisarm();
 
+    // Ground-commanded soft reset (see Packet.h's RESET) -- unconditionally
+    // back to IDLE and clears every detection variable, regardless of
+    // current state. Unlike onDisarm(), which only transitions if currently
+    // ARMED, this always resets -- main.cpp calls it directly, not through
+    // PyroController/onDisarm's normal path.
+    void reset();
+
 private:
     FlightState   _state          = FlightState::IDLE;
     uint32_t      _stateEnteredMs = 0;

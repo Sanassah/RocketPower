@@ -88,6 +88,14 @@ class EventLog(QWidget):
             self._text.verticalScrollBar().maximum()
         )
 
+    def clear(self) -> None:
+        """Wipe the log -- used when RESET is sent, so the next test flight
+        starts from a clean slate instead of scrolling past a previous run's
+        history. Does not affect the flight computer's own SD log."""
+        self._text.clear()
+        self._line_count = 0
+        self._last_state = None   # forces the next state line to log again, even if unchanged
+
     def update_data(self, data: TelemetryData) -> None:
         if data.state != self._last_state:
             self._last_state = data.state
