@@ -27,6 +27,14 @@ void TelemetryManager::update(const FlightData& d) {
     // HITL_MODE -- still fully usable over the normal Serial/LoRa link at
     // the same time a HITL run is driving the rocket over SerialUSB1 below,
     // so a real GroundStation can watch it live.
+    //
+    // Kept flowing during demoEnabled() on purpose -- see TelemetryPacket's
+    // TEMPORARY bench fields (Packet.h) -- GroundStation's TEST tab reads
+    // gyro/tilt/fin numbers from THIS binary stream now, not the plain-text
+    // [AXIS CAL] serial print, so it can't go silent during the exact window
+    // that data is needed. That print can still interleave with this in a
+    // raw serial monitor if one's open alongside GroundStation -- harmless,
+    // just don't read both at once.
     if (now - _lastUsbTxMs >= USB_TELEMETRY_INTERVAL_MS) {
         _lastUsbTxMs = now;
         _lora.sendUsbFast(_buildPacket(d));
@@ -139,6 +147,15 @@ TelemetryPacket TelemetryManager::_buildPacket(const FlightData& d) const {
 
     pkt.attitude_status = (_attitude.controlEnabled() ? ATTITUDE_STATUS_CONTROL_ON : 0)
                          | (_attitude.demoEnabled()    ? ATTITUDE_STATUS_DEMO_ON    : 0);
+
+    // ---- TEMPORARY bench fields -- see Packet.h ----
+    pkt.gyro_x_mrs  = (int16_t)lroundf(d.gyro_x * 1000.0f);
+    pkt.gyro_y_mrs  = (int16_t)lroundf(d.gyro_y * 1000.0f);
+    pkt.gyro_z_mrs  = (int16_t)lroundf(d.gyro_z * 1000.0f);
+    pkt.fin_cdeg[0] = (int16_t)lroundf(_fins.liveCorrectionDeg(1) * 100.0f);
+    pkt.fin_cdeg[1] = (int16_t)lroundf(_fins.liveCorrectionDeg(2) * 100.0f);
+    pkt.fin_cdeg[2] = (int16_t)lroundf(_fins.liveCorrectionDeg(3) * 100.0f);
+    pkt.fin_cdeg[3] = (int16_t)lroundf(_fins.liveCorrectionDeg(4) * 100.0f);
 
     return pkt;
 }

@@ -131,16 +131,16 @@
 // ===== Active attitude control (fin-based PD attitude hold) =====
 // See AttitudeController.h for the full design writeup. Short version: a PD
 // controller per axis with two independent terms --
-//   ANGLE (position): how far the current orientation has drifted from a
-//     REFERENCE orientation, latched the instant control/demo starts
-//     actually running (see AttitudeController::update()). Drives that
-//     drift back toward zero -- this is what makes it hold an attitude
-//     instead of just resisting motion.
+//   ANGLE (position): roll/pitch drive back toward TRUE VERTICAL, computed
+//     fresh every update() straight from gravity (no latched reference --
+//     see AttitudeController::update()); yaw has no absolute target and
+//     currently runs rate-only (ATTITUDE_YAW_ANGLE_KP is 0 below). This is
+//     what makes it hold an attitude instead of just resisting motion.
 //   RATE (damping): sensed angular rate, same as before -- keeps the angle
 //     term from overshooting/oscillating on the way back.
 // A wrong RATE gain only ever under/over-damps. A wrong ANGLE gain is a
 // different, higher-stakes failure mode: it can actively steer AWAY from
-// the reference instead of toward it. Both need the same bench-verification
+// vertical instead of toward it. Both need the same bench-verification
 // discipline below, and the angle term needs it more.
 //
 // Whether it's actually ACTIVE is a runtime, ground-commanded thing now
@@ -163,9 +163,11 @@
 //   3. You're comfortable with a bench functional test via
 //      ATTITUDE_DEMO_ENABLE (works IDLE or ARMED -- no need to arm pyro
 //      just to watch the fins move): hand-tilt the airframe away from
-//      whatever orientation it was in when you hit Enable, HOLD it there,
-//      and confirm the fins hold a deflection that opposes the tilt (not
-//      just react while you're actively moving it).
+//      vertical, HOLD it there, and confirm the fins hold a deflection that
+//      opposes the tilt (not just react while you're actively moving it).
+//      Roll/pitch target true vertical directly now, not wherever it was
+//      pointed when you hit Enable -- so unlike before, it doesn't matter
+//      whether the airframe was level at that exact moment.
 
 // ===== Axis-naming convention =====
 // "roll"/"pitch"/"yaw" here follow Simulation/RocketPowerSim.slx's own
@@ -187,46 +189,68 @@
 // build_hitl_model.m's comment on it.
 
 // Which raw gyro_x/y/z channel corresponds to which physical rotation axis.
-// UNVERIFIED -- there is no documented BNO085-mounting-orientation
-// convention anywhere in this codebase (checked). The assignment below is
-// only a starting guess. To find the real mapping: rotate the airframe by
-// hand about its actual long axis (yaw, in THIS file's convention -- see
-// above) and watch which of gyro_x/gyro_y/gyro_z shows the large signal in
-// Serial/telemetry -- that's your real yaw axis. Repeat about the other
-// two physical (transverse) axes for roll/pitch. Update these three lines
-// (swap which field each reads, and negate if the sign opposes what you
-// observed) -- nothing else in AttitudeController needs to change.
-#define ATTITUDE_ROLL_RATE(d)   ((d).gyro_x)
-#define ATTITUDE_PITCH_RATE(d)  ((d).gyro_y)
+// BENCH-CONFIRMED (see the [AXIS CAL] debug print in main.cpp) against this
+// board's actual BNO085 mounting -- rotating about the physical long axis
+// (yaw, spin) reads on gyro_z; tilting toward the North fin (CH3, N/S axis
+// = "roll" in this file's convention) reads on gyro_y; tilting toward the
+// East fin (CH2, E/W axis = "pitch") reads on gyro_x. Channel identity only
+// -- the allocation SIGNS (whether a fin pushes back toward or away from a
+// tilt) are a separate, still-unverified check, done via the
+// ATTITUDE_DEMO_ENABLE hand-tilt procedure in AttitudeController.h, after
+// this mapping.
+#define ATTITUDE_ROLL_RATE(d)   ((d).gyro_y)
+#define ATTITUDE_PITCH_RATE(d)  ((d).gyro_x)
 #define ATTITUDE_YAW_RATE(d)    ((d).gyro_z)
 
-// Same idea, but for the ANGLE (position) term: which component of the
-// quaternion-error vector (ex, ey, ez -- see AttitudeController.cpp for how
-// that's computed from the current vs. latched-reference orientation) maps
-// to which physical rotation axis. These MIRROR the gyro mapping above on
-// purpose -- the quaternion and the raw gyro come from the same physical
-// sensor/frame, so whatever channel/sign you find correct for rate here
-// applies unchanged to angle, and vice versa. Verify once via the rate
-// mapping above (or this one, either order), then copy the same
-// channel/sign choice to both.
-#define ATTITUDE_ROLL_ANGLE_ERR(ex, ey, ez)   (ex)
-#define ATTITUDE_PITCH_ANGLE_ERR(ex, ey, ez)  (ey)
-#define ATTITUDE_YAW_ANGLE_ERR(ex, ey, ez)    (ez)
+// Same idea, but for the ANGLE (position) term. roll/pitch: which of the
+// two exact tilt-from-vertical terms (tiltX, tiltY -- atan2/asin off the
+// absolute quaternion via gravity, see AttitudeController.cpp) maps to
+// which physical rotation axis. BENCH-CONFIRMED via GroundStation's TEST
+// tab (tilt_x_deg/tilt_y_deg -- core/packet_decoder.py): tiltY tracks a N/S
+// hand-tilt, tiltX tracks E/W, matching the gyro mapping above one-for-one
+// (tiltX<->gyro_x, tiltY<->gyro_y) since both come from the same physical
+// sensor/frame. yaw: no absolute reference exists (see ATTITUDE_YAW_ANGLE_KP
+// below) -- still the small-angle quaternion-error component relative to
+// whatever heading got latched on engage, passed in pre-doubled.
+#define ATTITUDE_ROLL_ANGLE_ERR(tiltX, tiltY)   (tiltY)
+#define ATTITUDE_PITCH_ANGLE_ERR(tiltX, tiltY)  (tiltX)
+#define ATTITUDE_YAW_ANGLE_ERR(ez2)             (ez2)
 
 // Angle (position) gain: fin correction (deg) per radian of drift away from
-// the latched reference orientation. This is the term that makes the
-// controller actually HOLD an attitude instead of just resisting motion --
-// see the class comment in AttitudeController.h for why a wrong sign here
-// is worse than a wrong rate-gain sign (it can actively steer away from the
-// reference, not just fail to help). Starting at a small nonzero value (not
+// true vertical (roll/pitch) or the latched reference heading (yaw, dormant
+// while its gain is 0 below). This is the term that makes the controller
+// actually HOLD an attitude instead of just resisting motion -- see the
+// class comment in AttitudeController.h for why a wrong sign here is worse
+// than a wrong rate-gain sign (it can actively steer away from vertical,
+// not just fail to help). Starting at a small nonzero value (not
 // 0) specifically so demo mode is usable for its actual purpose -- checking
 // axis mapping/allocation signs by hand-tilting the airframe and watching
 // whether the fins pull it back or push it further. Provisional bench/demo
 // value, NOT simulation-validated -- see the checklist above before ever
 // using this for a real flight.
-#define ATTITUDE_ROLL_ANGLE_KP   10.0f
-#define ATTITUDE_PITCH_ANGLE_KP  10.0f
-#define ATTITUDE_YAW_ANGLE_KP    10.0f
+//
+// YAW is deliberately 0 here, unlike roll/pitch -- bench-confirmed (see
+// [AXIS CAL]) that a nonzero angle term makes yaw a POSITION hold: it
+// latches whatever spin angle the airframe was at on engage and actively
+// fights to spin back to that exact angle, not just damp rotation. Unlike
+// roll/pitch (which hold vertical -- a real physical reference), there's no
+// physically meaningful "correct" absolute spin angle about this airframe's
+// own longitudinal axis (no roll-locked payload like a camera or directional
+// antenna) -- what actually matters is not spinning, at any angle. Setting
+// this to 0 makes yaw's combine step below (see AttitudeController.cpp)
+// collapse to pure rate damping: fin correction = -(RATE_KP*yawRate), the
+// angle term drops out entirely regardless of ATTITUDE_YAW_ANGLE_ERR/the
+// latched reference. If a future payload ever needs roll-locked pointing,
+// this is the one line to change back to a nonzero value.
+// TEMPORARY, for bench visibility only -- bumped from 10.0f/10.0f so a
+// moderate hand-tilt is clearly visible on the real servos instead of a
+// couple of easy-to-miss degrees. Not a tuning change, not simulation-
+// validated at this value -- revert ROLL/PITCH back to 10.0f (and
+// ATTITUDE_MAX_AXIS_DEG back to 10.0f below) once done confirming
+// allocation-sign/orientation behavior by eye.
+#define ATTITUDE_ROLL_ANGLE_KP   25.0f
+#define ATTITUDE_PITCH_ANGLE_KP  25.0f
+#define ATTITUDE_YAW_ANGLE_KP    0.0f
 
 // Rate (damping) gain: fin correction (deg) per (rad/s) of sensed rate on
 // that axis. Keeps the angle term above from overshooting/oscillating on
@@ -252,12 +276,28 @@
 // the servos constantly chasing gyro noise around zero.
 #define ATTITUDE_RATE_DEADBAND_RADS  0.02f
 
+// NOTE: an ATTITUDE_ANGLE_DEADBAND_RADS was tried here to chase a servo
+// jitter-while-stationary bug and REMOVED -- ruled out by observing the
+// same jitter with ATTITUDE_DEMO/CONTROL both OFF, i.e. with
+// AttitudeController::update() not running at all (it returns on its first
+// line) and NOTHING writing to the servo after fins.begin() at boot. Not a
+// control-loop bug -- see FinController.cpp's "shared, unregulated servo
+// rail" comment and check the PWM line itself with a scope before adding
+// any more code-side "fixes" for this.
+
 // Per-axis correction authority limit (deg), clamped BEFORE allocating
 // across the 4 fins -- keeps one noisy or saturated axis from eating the
 // whole servo range at the expense of the other two. The per-fin total
 // (after allocation) is still hard-clamped again by FinController to
 // SERVO_MIN_US/SERVO_MAX_US regardless, as a second, independent backstop.
-#define ATTITUDE_MAX_AXIS_DEG   10.0f
+// TEMPORARY, for bench visibility only -- bumped from 10.0f alongside the
+// ROLL/PITCH_ANGLE_KP bump above, same reason. Still well inside
+// SERVO_MAX_ANGLE_DEG (25 deg physical travel each side) even in the worst
+// case (yaw + one transverse term both near this ceiling at the same fin),
+// and FinController's own SERVO_MIN_US/MAX_US clamp is still there as an
+// independent hard backstop regardless. Revert to 10.0f alongside the gains
+// above once done.
+#define ATTITUDE_MAX_AXIS_DEG   20.0f
 
 // ===== Flight Constants =====
 #define LIFTOFF_ACCEL_THRESHOLD    2.5f   // g — triggers POWERED_ASCENT
