@@ -58,17 +58,24 @@ GroundStation/logs/*.log
 
 # KiCad-generated noise: autosave/backup files, lock files (indicate a file
 # is open -- committing these can cause false "already open" warnings for
-# teammates), and the local per-machine project-settings cache
-*.kicad_sch-bak
-*.kicad_pcb-bak
+# teammates), and the local per-machine project-settings cache. Two backup
+# suffix styles show up in this repo: "name.bak" (dot) for library/footprint
+# files and "name.kicad_sch-bak" (dash, no dot before "bak") for sheet
+# autosaves -- *-bak covers the latter generically.
+*.bak
+*-bak
 ~*.lck
 fp-info-cache
 *.kicad_prl
 
 # KiCad plugin/manual backup archives -- these are local safety nets, not
-# releases; git history is already the real version control for the design
+# releases; git history is already the real version control for the design.
+# No leading slash and no internal slash on *-backups/ and _restore_backup/
+# so they match at any depth; production/backups/ has an internal slash
+# (anchors it to the .gitignore's own directory otherwise), so it needs the
+# explicit **/ to match at PCB/main/production/backups/ too.
 *-backups/
-production/backups/
+**/production/backups/
 _restore_backup/
 
 # PlatformIO build output (FlightComputer already has its own .pio rule;
