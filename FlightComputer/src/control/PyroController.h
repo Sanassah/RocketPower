@@ -13,6 +13,16 @@ public:
     void arm();      // enable pyro logic (software arm)
     void disarm();   // disable pyro logic
 
+    // Call once per main loop iteration (unconditionally, every state) --
+    // turns a channel's pin back LOW once PYRO_FIRE_DURATION_MS has elapsed
+    // since fire()/fireBackupUnconditional() set it HIGH. Non-blocking on
+    // purpose: fire()/fireBackupUnconditional() used to hold the whole
+    // flight computer loop frozen for that entire duration with a plain
+    // delay() call -- sensors, state machine, telemetry, logging, all
+    // stalled at the exact moment of deployment. Bounded and one-time per
+    // flight, so not urgent, but free to remove, so removed.
+    void update();
+
     // Fire a channel for PYRO_FIRE_DURATION_MS ms.
     // Refuses to fire if not armed or continuity check fails.
     bool fire(uint8_t channel);
@@ -39,6 +49,10 @@ private:
 
     static const uint8_t _firePins[3];
     static const uint8_t _contPins[3];
+
+    // Non-blocking fire timer state, one slot per channel -- see update().
+    bool     _firing[3]      = {false, false, false};
+    uint32_t _fireStartMs[3] = {0, 0, 0};
 
     bool _safetyCheck(uint8_t ch) const;
 };

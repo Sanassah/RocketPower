@@ -26,15 +26,19 @@ bool LoRaRadio::send(const TelemetryPacket& pkt) {
     Serial.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));
 #endif
 
-    // Human-readable summary for terminal debugging (pure ASCII, won't confuse the binary parser)
-    // Wire fields are scaled fixed-point (see Packet.h) -- unscale for display.
-    Serial.print("[TELEM] seq="); Serial.print(out.seq);
-    Serial.print(" alt=");        Serial.print(out.baro_alt_dm / 10.0f, 1); Serial.print("m");
-    Serial.print(" vel=");        Serial.print(out.vert_vel_cms / 100.0f, 1); Serial.print("m/s");
-    Serial.print(" accel=");      Serial.print(out.accel_x_cg / 100.0f, 2); Serial.print("g");
-    Serial.print(" v=");          Serial.print(out.voltage_cv / 100.0f, 2); Serial.print("V");
-    Serial.print(" sats=");       Serial.print(out.gps_sats);
-    Serial.println();
+    // Human-readable summary for bench convenience. Pure ASCII so it can't
+    // desync GroundStation's binary parser on Serial (0xAA can't appear in
+    // text), but it WOULD visually interleave with the raw binary mirror
+    // above if both went to the same port -- exactly the garbled-serial-
+    // monitor problem this whole DEBUG_SERIAL split was for (see config.h).
+    // Goes to DEBUG_SERIAL, not Serial, same as every other bench print.
+    DEBUG_SERIAL.print("[TELEM] seq="); DEBUG_SERIAL.print(out.seq);
+    DEBUG_SERIAL.print(" alt=");        DEBUG_SERIAL.print(out.baro_alt_dm / 10.0f, 1); DEBUG_SERIAL.print("m");
+    DEBUG_SERIAL.print(" vel=");        DEBUG_SERIAL.print(out.vert_vel_cms / 100.0f, 1); DEBUG_SERIAL.print("m/s");
+    DEBUG_SERIAL.print(" accel=");      DEBUG_SERIAL.print(out.accel_x_cg / 100.0f, 2); DEBUG_SERIAL.print("g");
+    DEBUG_SERIAL.print(" v=");          DEBUG_SERIAL.print(out.voltage_cv / 100.0f, 2); DEBUG_SERIAL.print("V");
+    DEBUG_SERIAL.print(" sats=");       DEBUG_SERIAL.print(out.gps_sats);
+    DEBUG_SERIAL.println();
 
     return (written == sizeof(out));
 }

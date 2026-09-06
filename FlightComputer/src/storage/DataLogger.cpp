@@ -56,7 +56,7 @@ bool DataLogger::open() {
     _isOpen      = true;
     _recordCount = 0;
     _consecutiveWriteFails = 0;
-    Serial.print("[LOG] Opened "); Serial.println(name);
+    DEBUG_SERIAL.print("[LOG] Opened "); DEBUG_SERIAL.println(name);
     return true;
 }
 
@@ -73,14 +73,23 @@ void DataLogger::update(const FlightData& d) {
     if (now - _lastLogMs < LOG_INTERVAL_MS) return;
     _lastLogMs = now;
 
+    // TEMPORARY diagnostic (RocketPower bench investigation) -- split
+    // "write" and "flush" timing so a bench run shows which one is actually
+    // producing the ~28-64us spikes seen in [LOOP BREAKDOWN]'s log= figure:
+    // the per-record write (every call) or the periodic flush (every 100th
+    // call, forces a real physical commit + FAT metadata update, so
+    // expected to be the pricier one). Remove once the source is confirmed.
+    uint32_t _dbg_t0 = micros();
     size_t written = _file.write(reinterpret_cast<const uint8_t*>(&d), sizeof(FlightData));
+    uint32_t _dbg_writeUs = micros() - _dbg_t0;
+
     if (written != sizeof(FlightData)) {
         _consecutiveWriteFails++;
         if (_consecutiveWriteFails < _MAX_CONSECUTIVE_WRITE_FAILS) return;   // could be a one-off blip
 
         // Several writes in a row failed -- card pulled, or a genuine fault.
         // Stop instead of hammering a dead card every loop.
-        Serial.println("[LOG] WARNING: repeated write failures -- card removed? Closing log.");
+        DEBUG_SERIAL.println("[LOG] WARNING: repeated write failures -- card removed? Closing log.");
         _cardPresent = false;
         close();
         return;
@@ -90,7 +99,30 @@ void DataLogger::update(const FlightData& d) {
     _recordCount++;
 
     // Flush every 100 records to bound data loss on power failure
-    if (_recordCount % 100 == 0) _file.flush();
+    uint32_t _dbg_flushUs = 0;
+    bool _dbg_didFlush = false;
+    if (_recordCount % 100 == 0) {
+        uint32_t _dbg_tf0 = micros();
+        _file.flush();
+        _dbg_flushUs = micros() - _dbg_tf0;
+        _dbg_didFlush = true;
+    }
+
+    // TEMPORARY diagnostic -- see comment above.
+    {
+        static uint32_t _dbg_maxWrite = 0, _dbg_maxFlush = 0;
+        static uint32_t _dbg_lastPrintMs = 0;
+        if (_dbg_writeUs > _dbg_maxWrite) _dbg_maxWrite = _dbg_writeUs;
+        if (_dbg_didFlush && _dbg_flushUs > _dbg_maxFlush) _dbg_maxFlush = _dbg_flushUs;
+        if (millis() - _dbg_lastPrintMs >= 5000) {
+            _dbg_lastPrintMs = millis();
+            // ms, 3 decimals -- full us precision, just relabeled (see main.cpp).
+            DEBUG_SERIAL.print("[LOG BREAKDOWN] write="); DEBUG_SERIAL.print(_dbg_maxWrite / 1000.0f, 3);
+            DEBUG_SERIAL.print("ms flush="); DEBUG_SERIAL.print(_dbg_maxFlush / 1000.0f, 3);
+            DEBUG_SERIAL.println("ms  (each is a max over the same 5s window)");
+            _dbg_maxWrite = _dbg_maxFlush = 0;
+        }
+    }
 }
 
 void DataLogger::flush() {
@@ -102,6 +134,6 @@ void DataLogger::close() {
         _file.flush();
         _file.close();
         _isOpen = false;
-        Serial.print("[LOG] Closed. Records: "); Serial.println(_recordCount);
+        DEBUG_SERIAL.print("[LOG] Closed. Records: "); DEBUG_SERIAL.println(_recordCount);
     }
 }

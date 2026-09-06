@@ -9,11 +9,10 @@ Camera: az=0 deg, el=20 deg so Z projects straight up on screen.
 import math
 import os
 import struct
-import time
 import numpy as np
 
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtCore    import Qt, QPointF
+from PyQt6.QtCore    import Qt, QPointF, QTimer
 from PyQt6.QtGui     import (
     QPainter, QColor, QPen, QBrush, QPolygonF, QFont
 )
@@ -98,6 +97,74 @@ def _quat_from_euler_deg(roll_deg: float, pitch_deg: float, yaw_deg: float) -> t
 def _flip_roll_sign(q: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
     roll, pitch, yaw = _euler_deg_from_quat(*q)
     return _quat_from_euler_deg(-roll, pitch, yaw)
+
+
+def _qnorm(q: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+    w, x, y, z = q
+    n = math.sqrt(w*w + x*x + y*y + z*z)
+    if n < 1e-9:
+        return (1.0, 0.0, 0.0, 0.0)
+    return (w/n, x/n, y/n, z/n)
+
+
+# Cheap nlerp (linear-interpolate-then-normalize), not a true slerp -- fine
+# here since RocketVisual only ever steps this a small fraction of the way
+# toward a target each repaint tick (see _SMOOTH_ALPHA), where nlerp and
+# slerp are visually indistinguishable and nlerp skips the trig. Flips one
+# quaternion's sign first if needed so it interpolates the SHORT way around
+# -- q and -q represent the same rotation, but lerping between "opposite-
+# signed" representations of nearby rotations takes the long way around and
+# visibly overshoots.
+def _qnlerp(q0: tuple[float, float, float, float],
+            q1: tuple[float, float, float, float], t: float) -> tuple[float, float, float, float]:
+    w0, x0, y0, z0 = q0
+    w1, x1, y1, z1 = q1
+    if w0*w1 + x0*x1 + y0*y1 + z0*z1 < 0.0:
+        w1, x1, y1, z1 = -w1, -x1, -y1, -z1
+    return _qnorm((w0 + (w1-w0)*t, x0 + (x1-x0)*t, y0 + (y1-y0)*t, z0 + (z1-z0)*t))
+
+
+# The firmware sends the BNO085's fully-fused SH2_ROTATION_VECTOR (see
+# IMU.cpp), which folds its magnetometer-derived heading estimate into the
+# reported quaternion -- and mag heading on a PCB-mounted chip next to
+# servos/motor/battery is the least trustworthy part of that fusion, with no
+# calibration-quality field even in the telemetry packet to flag it.
+# Rendering the raw quaternion directly (as this widget used to) means a bad
+# heading reading doesn't just mislabel a "yaw" number: a quaternion doesn't
+# separate those concerns, so it rotates the WHOLE displayed pose about
+# vertical, and the tilt direction seen on screen (which fin appears to be
+# leading a lean) ends up only as good as that heading estimate.
+#
+# The fix is the same one AttitudeController.cpp already uses for the real
+# control loop: work from GRAVITY, not the fused heading. Rotating world-up
+# (0,0,1) into body coordinates via R(q)^T gives "which way is down, in
+# body/fin-relative terms" -- and that vector is PROVABLY invariant to a
+# heading error, because such an error is itself an extra rotation about the
+# world-vertical axis composed onto q, and world-up is that axis, so
+# rotating it about itself leaves it fixed (checked in R(q_err @ q_true)^T @
+# z == R(q_true)^T @ z symbolically, and confirmed numerically against this
+# function for several q_err before landing on this). This function then
+# rebuilds the shortest-arc rotation that carries reference-up to that
+# gravity-in-body vector, which is exactly the "tilt magnitude + which-fin
+# direction" information with the heading (and any spin/twist about the nose
+# axis) discarded -- an earlier version of this function tried to isolate
+# that same information via a swing-twist split about the body's own Z axis
+# instead; that's the wrong axis whenever there's real tilt (it only equals
+# the magnetically-ambiguous axis when the nose happens to be vertical), and
+# testing it the same way (composing an arbitrary extra heading rotation and
+# checking the output stayed put) showed the tilt AZIMUTH still rotating
+# with heading, which is what this replacement fixes.
+#
+# NOTE: which body-relative direction (e.g. toward which fin) a given
+# gravity-in-body vector should be *drawn* as leaning toward is a sign/axis
+# convention, same category as _correct_quat()/_flip_roll_sign()'s bench
+# checks above -- not yet bench-confirmed for this function specifically.
+def _swing_from_quat(w: float, x: float, y: float, z: float) -> tuple[float, float, float, float]:
+    gx, gy, gz = _qrot(*_qnorm((w, x, y, z))).T @ np.array([0.0, 0.0, 1.0])
+    if gz < -1.0 + 1e-6:
+        return (0.0, 1.0, 0.0, 0.0)   # 180 deg tilt -- axis choice is arbitrary here, any perpendicular works
+    # Shortest-arc quaternion from (0,0,1) to (gx,gy,gz): axis = (0,0,1) x (gx,gy,gz), w = 1 + dot.
+    return _qnorm((1.0 + gz, -gy, gx, 0.0))
 
 
 # ── Palette ───────────────────────────────────────────────────────────────────
@@ -447,78 +514,81 @@ def _transform_batch(faces_tris: np.ndarray, base_rgb: np.ndarray, R: np.ndarray
 
 # ── Widget ────────────────────────────────────────────────────────────────────
 class RocketVisual(QWidget):
-    # Caps actual redraws, independent of how often update_data() is called.
-    # Telemetry can now arrive at up to 20Hz over a direct USB link (see
-    # USB_TELEMETRY_INTERVAL_MS in the firmware) -- but this is the one
-    # widget in the app redrawing a full CAD mesh (tens of thousands of
-    # triangles) via plain QPainter, not GPU-accelerated. 15fps is well past
-    # what's visually distinguishable on an attitude indicator anyway, and
-    # decoupling it here means a fast feed can't stutter the rest of the UI.
-    # The latest orientation is still stored on every call, so nothing is
-    # lost -- only how often it's actually painted is capped.
+    # Redraw cadence, on a steady QTimer instead of reactively per
+    # update_data() call -- this is the one widget in the app redrawing a
+    # full CAD mesh (tens of thousands of triangles) via plain QPainter, not
+    # GPU-accelerated, so this stays capped rather than matching the telemetry
+    # rate 1:1 (up to 20Hz over direct USB -- see USB_TELEMETRY_INTERVAL_MS in
+    # the firmware) to keep a fast feed from stuttering the rest of the UI.
+    #
+    # A raw sample-to-sample snap at this rate looks jittery/stepped whenever
+    # the rocket is rotating fast enough that consecutive samples are a
+    # visibly large angle apart -- each repaint tick used to jump straight to
+    # whatever update_data() last set. self._w/x/y/z is now instead nlerp'd
+    # a fraction of the way toward the latest sample (self._target_*) on
+    # every tick (see _tick()/_SMOOTH_ALPHA), so motion reads as continuous
+    # regardless of the raw sample rate, at the cost of ~1-2 ticks of visual
+    # lag behind the true live orientation -- for a human-watched display,
+    # not the flight controller, that trade is the right one.
     _MIN_REPAINT_INTERVAL_S = 1.0 / 15.0
+
+    # Fraction of the remaining distance to the target closed per tick --
+    # smaller = smoother but laggier, larger = snappier but jumpier. 0.35
+    # settles to a new target in ~4-5 ticks (~300ms at the 15Hz rate above),
+    # which reads as smooth follow-through rather than a visible drift.
+    # Tune by feel if flight-speed rotation still looks off.
+    _SMOOTH_ALPHA = 0.35
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMinimumSize(200, 240)
         self._w, self._x, self._y, self._z = 1.0, 0.0, 0.0, 0.0
+        self._target_w, self._target_x, self._target_y, self._target_z = 1.0, 0.0, 0.0, 0.0
         self._state = 0
-        self._last_repaint = 0.0
 
-        # Session-only YAW-FRAME reference, rebuilt by zero_yaw() -- NOT a
-        # scalar number offset, and NOT a full-pose latch. This is a PURE
-        # yaw rotation quaternion (zero pitch/roll content by construction),
-        # so subtracting it via proper quaternion math can only ever
-        # RE-ORIENT which raw axis reads as pitch vs roll to match the
-        # current heading -- it can never cancel real tilt, because there's
-        # no tilt in the reference to cancel with. That's the key difference
-        # from a full-pose latch: a genuinely tilted rocket still reads a
-        # genuinely nonzero pitch/roll after this, exactly as before, but
-        # (unlike a naive scalar yaw-number offset, which only changes the
-        # YAW NUMBER and does nothing about which physical direction gets
-        # called "pitch" vs "roll") it actually fixes cross-axis coupling
-        # caused by the IMU being mounted at some arbitrary HEADING relative
-        # to the airframe's intended forward direction. Identity = no
-        # calibration done yet this session.
-        self._yaw_ref_quat = (1.0, 0.0, 0.0, 0.0)
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._tick)
+        self._timer.start(int(self._MIN_REPAINT_INTERVAL_S * 1000))
 
-        # The _correct_quat()-corrected reading from the most recent
-        # update_data() call -- kept separately so zero_yaw() can extract
-        # yaw from it (i.e. from the pre-yaw-frame-correction layer).
-        self._last_corrected_quat = (1.0, 0.0, 0.0, 0.0)
+    def _tick(self) -> None:
+        self._w, self._x, self._y, self._z = _qnlerp(
+            (self._w, self._x, self._y, self._z),
+            (self._target_w, self._target_x, self._target_y, self._target_z),
+            self._SMOOTH_ALPHA,
+        )
+        self.update()
 
-    def zero_yaw(self) -> None:
-        """Re-orient the pitch/roll axes to match the CURRENT heading --
-        see the comment on _yaw_ref_quat above for why this is neither a
-        simple number offset nor a full-pose latch, and what each of those
-        alternatives gets wrong. The sensor's own gravity reference already
-        tells it whether it's truly vertical, so there's nothing else to
-        verify or calibrate here -- this is the only orientation calibration
-        this widget needs."""
-        w, x, y, z = self._last_corrected_quat
-        yaw_rad = math.atan2(2.0*(w*z+x*y), 1.0-2.0*(y*y+z*z))
-        self._yaw_ref_quat = (math.cos(yaw_rad/2), 0.0, 0.0, math.sin(yaw_rad/2))
-
-    def _current_euler_deg(self) -> tuple[float, float, float]:
-        return _euler_deg_from_quat(self._w, self._x, self._y, self._z)
+    def _current_tilt_deg(self) -> tuple[float, float]:
+        """Readout numbers derived from the swing-only quaternion currently
+        in self._w/x/y/z (see _swing_from_quat()): rotate the reference nose
+        vector (0,0,1) by it to get where the nose actually points, then
+        read that off as two small signed tilt angles (toward +X / toward
+        +Y, body-relative -- e.g. toward a specific fin). Unlike the old
+        ROLL/PITCH/YAW Euler readout, neither depends on the BNO085's
+        magnetic heading estimate -- see _swing_from_quat() for why."""
+        nx, ny, _ = _qrot(self._w, self._x, self._y, self._z) @ np.array([0.0, 0.0, 1.0])
+        tilt_x = math.degrees(math.asin(max(-1.0, min(1.0, nx))))
+        tilt_y = math.degrees(math.asin(max(-1.0, min(1.0, ny))))
+        return tilt_x, tilt_y
 
     def update_data(self, data: TelemetryData) -> None:
-        self._last_corrected_quat = _correct_quat(
-            data.quat_w, data.quat_x, data.quat_y, data.quat_z
-        )
-        # Session yaw-frame correction (identity until zero_yaw() has been
-        # run this session) -- see _yaw_ref_quat's comment for why this is a
-        # quaternion-frame rotation, not a scalar number offset.
-        yaw_corrected = _qmul(_qconj(self._yaw_ref_quat), self._last_corrected_quat)
+        corrected = _correct_quat(data.quat_w, data.quat_x, data.quat_y, data.quat_z)
         # Roll-sign fix -- see _flip_roll_sign() for why this has to be a
         # decompose/negate/recompose instead of a quaternion-component tweak.
-        self._w, self._x, self._y, self._z = _flip_roll_sign(yaw_corrected)
+        roll_fixed = _flip_roll_sign(corrected)
+        # Drop the magnetic-heading component entirely -- see
+        # _swing_from_quat() for why that's what actually makes the
+        # displayed lean direction trustworthy regardless of BNO085
+        # mag-calibration quality, replacing the old manual zero_yaw()
+        # (session-only, one-shot) with something that holds every frame.
+        #
+        # This only updates the TARGET -- self._w/x/y/z (what's actually
+        # rendered) is smoothed toward it on the steady _tick() timer instead
+        # of snapping here, so a fast telemetry burst can't skip repaints and
+        # can't make the mesh visibly jump between raw samples either. See
+        # the class comment above _SMOOTH_ALPHA.
+        self._target_w, self._target_x, self._target_y, self._target_z = _swing_from_quat(*roll_fixed)
         self._state = data.state
-
-        now = time.monotonic()
-        if now - self._last_repaint >= self._MIN_REPAINT_INTERVAL_S:
-            self._last_repaint = now
-            self.update()
 
     # ── Paint ─────────────────────────────────────────────────────────────────
     def paintEvent(self, _event) -> None:
@@ -615,14 +685,12 @@ class RocketVisual(QWidget):
     # ── Angle readout panel ───────────────────────────────────────────────────
     def _draw_readout(self, p: QPainter, rx: float, ry: float,
                       rw: float, rh: float) -> None:
-        # Already baked into self._w/x/y/z via _yaw_ref_quat (see
-        # update_data()/zero_yaw()) -- no separate offset/wrap needed here.
-        roll, pitch, yaw = self._current_euler_deg()
+        tilt_x, tilt_y = self._current_tilt_deg()
 
         p.setPen(QPen(QColor(30, 31, 42), 1))
         p.drawLine(QPointF(rx, ry), QPointF(rx, ry + rh))
 
-        labels = [('ROLL', roll), ('PITCH', pitch), ('YAW', yaw)]
+        labels = [('TILT X', tilt_x), ('TILT Y', tilt_y)]
         spacing = rh / (len(labels) + 1)
 
         for i, (label, val) in enumerate(labels):

@@ -36,17 +36,25 @@ uint32_t      loopCount    = 0;
 uint32_t      loopMaxUs    = 0;
 FlightState   prevState    = FlightState::IDLE;
 
+// TEMPORARY diagnostic -- per-stage breakdown of loopMaxUs above, so a
+// bench run pinpoints WHICH stage is stalling instead of just confirming
+// that something is. See SensorManager::update()'s own breakdown for a
+// further split of the sensors stage specifically (I2C reads across 5
+// sensors on 3 Wire buses, one of which -- Wire1 -- is shared by baro/gps/
+// power). Remove once the actual stall source is found and fixed.
+uint32_t maxSensorsUs = 0, maxControlUs = 0, maxLogUs = 0, maxTelemUs = 0;
+
 // ===== Helpers =====
 static void printSensorReport(bool sdOk) {
     const FlightData& d = sensors.data();
-    Serial.println("--- Sensor init report ---");
-    Serial.print("  IMU   (BNO085 Wire  0x4A): "); Serial.println(d.imu_ok   ? "OK" : "FAIL");
-    Serial.print("  Baro  (BMP390 Wire1 0x77): "); Serial.println(d.baro_ok  ? "OK" : "FAIL");
-    Serial.print("  Accel (ADXL375 Wire2 0x1D): "); Serial.println(d.accel_ok ? "OK" : "FAIL");
-    Serial.print("  GPS   (ZOEM8  Wire1 0x42): "); Serial.println(d.gps_ok   ? "OK" : "FAIL");
-    Serial.print("  Power (INA260 Wire1 0x40): "); Serial.println(d.power_ok  ? "OK" : "FAIL");
-    Serial.print("  SD    (BUILTIN_SDCARD):    "); Serial.println(sdOk ? "OK" : "FAIL");
-    Serial.println("--------------------------");
+    DEBUG_SERIAL.println("--- Sensor init report ---");
+    DEBUG_SERIAL.print("  IMU   (BNO085 Wire  0x4A): "); DEBUG_SERIAL.println(d.imu_ok   ? "OK" : "FAIL");
+    DEBUG_SERIAL.print("  Baro  (BMP390 Wire1 0x77): "); DEBUG_SERIAL.println(d.baro_ok  ? "OK" : "FAIL");
+    DEBUG_SERIAL.print("  Accel (ADXL375 Wire2 0x1D): "); DEBUG_SERIAL.println(d.accel_ok ? "OK" : "FAIL");
+    DEBUG_SERIAL.print("  GPS   (ZOEM8  Wire1 0x42): "); DEBUG_SERIAL.println(d.gps_ok   ? "OK" : "FAIL");
+    DEBUG_SERIAL.print("  Power (INA260 Wire1 0x40): "); DEBUG_SERIAL.println(d.power_ok  ? "OK" : "FAIL");
+    DEBUG_SERIAL.print("  SD    (BUILTIN_SDCARD):    "); DEBUG_SERIAL.println(sdOk ? "OK" : "FAIL");
+    DEBUG_SERIAL.println("--------------------------");
 }
 
 // =================================================================
@@ -54,60 +62,60 @@ void setup() {
     Serial.begin(115200);
     while (!Serial && millis() < 5000);
 
-    Serial.println("\n=================================");
-    Serial.println(" RocketFlightComputer v0.1");
-    Serial.println(" Custom MIMXRT1062 / Teensy 4.1");
-    Serial.println("=================================\n");
+    DEBUG_SERIAL.println("\n=================================");
+    DEBUG_SERIAL.println(" RocketFlightComputer v0.1");
+    DEBUG_SERIAL.println(" Custom MIMXRT1062 / Teensy 4.1");
+    DEBUG_SERIAL.println("=================================\n");
 
     // ---- Status LEDs ----
     statusLed.begin();
 
     // ---- Sensors ----
-    Serial.println("[INIT] Sensors...");
+    DEBUG_SERIAL.println("[INIT] Sensors...");
     bool sensorsOk = sensors.begin();
 
     // ---- SD card ---- (before the report below, so it reflects the real attempt --
     // logger.open() is self-contained and probes the card itself)
-    Serial.println("[INIT] SD card...");
+    DEBUG_SERIAL.println("[INIT] SD card...");
     if (!logger.open()) {
-        Serial.println("[INIT] WARNING: SD card failed. Logging disabled.");
+        DEBUG_SERIAL.println("[INIT] WARNING: SD card failed. Logging disabled.");
     }
 
     printSensorReport(logger.cardPresent());
     statusLed.update(sensors.data());
     if (!sensorsOk) {
-        Serial.println("[INIT] CRITICAL: IMU or barometer failed. Halting.");
+        DEBUG_SERIAL.println("[INIT] CRITICAL: IMU or barometer failed. Halting.");
         while (true) { statusLed.update(sensors.data()); delay(50); }
     }
 
     // ---- Calibrate barometer at launch site ----
-    Serial.println("[INIT] Calibrating barometer (2s)...");
+    DEBUG_SERIAL.println("[INIT] Calibrating barometer (2s)...");
     sensors.calibrateBaro();
-    Serial.println("[INIT] Baro calibrated.");
+    DEBUG_SERIAL.println("[INIT] Baro calibrated.");
 
     // ---- Pyro ----
-    Serial.println("[INIT] Pyro channels...");
+    DEBUG_SERIAL.println("[INIT] Pyro channels...");
     pyro.begin();
     for (int ch = 1; ch <= PYRO_NUM_CHANNELS; ch++) {
-        Serial.print("  CH"); Serial.print(ch);
-        Serial.print(" continuity: ");
-        Serial.println(pyro.continuityOk(ch) ? "OK" : "OPEN (no ematch?)");
+        DEBUG_SERIAL.print("  CH"); DEBUG_SERIAL.print(ch);
+        DEBUG_SERIAL.print(" continuity: ");
+        DEBUG_SERIAL.println(pyro.continuityOk(ch) ? "OK" : "OPEN (no ematch?)");
     }
 
     // ---- LoRa / Telemetry ----
-    Serial.println("[INIT] LoRa radio...");
+    DEBUG_SERIAL.println("[INIT] LoRa radio...");
     if (!telem.begin()) {
-        Serial.println("[INIT] WARNING: LoRa init failed.");
+        DEBUG_SERIAL.println("[INIT] WARNING: LoRa init failed.");
     }
 
     // ---- Camera ----
     camera.begin();
 
     // ---- Fin servos ----
-    Serial.println("[INIT] Fin servos...");
+    DEBUG_SERIAL.println("[INIT] Fin servos...");
     fins.begin();
 
-    Serial.println("\n[INIT] Boot complete. State: IDLE\n");
+    DEBUG_SERIAL.println("\n[INIT] Boot complete. State: IDLE\n");
     loopTimer = 0;
 }
 
@@ -120,6 +128,8 @@ void loop() {
     sensors.setState(fsm.state());   // stamp this loop's state onto the snapshot for logging/telemetry
     const FlightData& d = sensors.data();
     statusLed.update(d);
+    pyro.update();   // non-blocking fire-pin timeout -- see PyroController.h
+    uint32_t tSensors = micros();   // TEMPORARY diagnostic, see maxSensorsUs above
 
     // ---- 2. Update state machine ----
     fsm.update(d);
@@ -225,9 +235,9 @@ void loop() {
             pyro.arm();
             // Re-calibrate baro at the actual launch site, not wherever the FCC booted.
             // The rocket should be stationary on the pad when ARM is sent.
-            Serial.println("[CALIB] Re-calibrating baro at launch site...");
+            DEBUG_SERIAL.println("[CALIB] Re-calibrating baro at launch site...");
             sensors.calibrateBaro();
-            Serial.println("[CALIB] Done.");
+            DEBUG_SERIAL.println("[CALIB] Done.");
         }
         if (newState == FlightState::IDLE || newState == FlightState::LANDED) {
             pyro.disarm();
@@ -239,18 +249,21 @@ void loop() {
 
         prevState = newState;
     }
+    uint32_t tControl = micros();   // TEMPORARY diagnostic, see maxSensorsUs above
 
     // ---- 4. Log data ----
     logger.update(d);
+    uint32_t tLog = micros();   // TEMPORARY diagnostic, see maxSensorsUs above
 
     // ---- 5. Telemetry (send + receive commands) ----
     telem.update(d);
+    uint32_t tTelem = micros();   // TEMPORARY diagnostic, see maxSensorsUs above
 
     // ---- 5b. Execute calibration if requested by ground station ----
     if (telem.calibrateRequested()) {
-        Serial.println("[CALIB] Calibrating barometer...");
+        DEBUG_SERIAL.println("[CALIB] Calibrating barometer...");
         sensors.calibrateBaro();
-        Serial.println("[CALIB] Done.");
+        DEBUG_SERIAL.println("[CALIB] Done.");
     }
 
     // ---- 5c. Soft reset if requested by ground station ----
@@ -260,7 +273,7 @@ void loop() {
     // file itself owns references to; TelemetryManager only flags the
     // request since it doesn't hold a BackupDeploy reference.
     if (telem.resetRequested()) {
-        Serial.println("[RESET] Soft reset requested -- clearing all flight/detection state.");
+        DEBUG_SERIAL.println("[RESET] Soft reset requested -- clearing all flight/detection state.");
         fsm.reset();
         pyro.disarm();
         attitude.reset();
@@ -269,7 +282,7 @@ void loop() {
         logger.close();
         if (logger.cardPresent()) logger.open();   // fresh log file for the next run, same as a real reboot would get
         prevState = FlightState::IDLE;             // keep this loop's own change-detection var in sync with fsm's new state
-        Serial.println("[RESET] Done. State: IDLE");
+        DEBUG_SERIAL.println("[RESET] Done. State: IDLE");
     }
 
     // ---- 6. Loop timing diagnostics ----
@@ -277,16 +290,34 @@ void loop() {
     if (elapsed > loopMaxUs) loopMaxUs = elapsed;
     loopCount++;
 
+    // TEMPORARY diagnostic -- see maxSensorsUs above.
+    uint32_t sensorsUs = tSensors - loopStart;
+    uint32_t controlUs = tControl - tSensors;
+    uint32_t logUs     = tLog     - tControl;
+    uint32_t telemUs    = tTelem   - tLog;
+    if (sensorsUs > maxSensorsUs) maxSensorsUs = sensorsUs;
+    if (controlUs > maxControlUs) maxControlUs = controlUs;
+    if (logUs     > maxLogUs)     maxLogUs     = logUs;
+    if (telemUs   > maxTelemUs)   maxTelemUs   = telemUs;
+
     // Print loop stats every 5 seconds
     static uint32_t lastStatMs = 0;
     if (millis() - lastStatMs >= 5000) {
         lastStatMs = millis();
         float hz = loopCount / 5.0f;
-        Serial.print("[LOOP] "); Serial.print(hz, 1); Serial.print(" Hz | ");
-        Serial.print("max="); Serial.print(loopMaxUs); Serial.print("us | ");
-        Serial.print("state="); Serial.println(flightStateName(fsm.state()));
+        // Printed in ms (3 decimals = full microsecond precision, just
+        // relabeled -- e.g. 6952us prints as 6.952ms) rather than raw us.
+        DEBUG_SERIAL.print("[LOOP] "); DEBUG_SERIAL.print(hz, 1); DEBUG_SERIAL.print(" Hz | ");
+        DEBUG_SERIAL.print("max="); DEBUG_SERIAL.print(loopMaxUs / 1000.0f, 3); DEBUG_SERIAL.print("ms | ");
+        DEBUG_SERIAL.print("state="); DEBUG_SERIAL.println(flightStateName(fsm.state()));
+        DEBUG_SERIAL.print("[LOOP BREAKDOWN] sensors="); DEBUG_SERIAL.print(maxSensorsUs / 1000.0f, 3);
+        DEBUG_SERIAL.print("ms control="); DEBUG_SERIAL.print(maxControlUs / 1000.0f, 3);
+        DEBUG_SERIAL.print("ms log="); DEBUG_SERIAL.print(maxLogUs / 1000.0f, 3);
+        DEBUG_SERIAL.print("ms telem="); DEBUG_SERIAL.print(maxTelemUs / 1000.0f, 3);
+        DEBUG_SERIAL.println("ms  (each is a max over the same 5s window)");
         loopCount  = 0;
         loopMaxUs  = 0;
+        maxSensorsUs = maxControlUs = maxLogUs = maxTelemUs = 0;
 
         sensors.gps().printDebug();
     }

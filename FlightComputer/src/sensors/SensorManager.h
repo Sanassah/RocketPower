@@ -89,6 +89,13 @@ private:
     uint32_t _lastGpsOkMs   = 0;
     uint32_t _lastPowerOkMs = 0;
 
+    // Rate-limits how often _gps.update() itself runs -- see
+    // GPS_POLL_INTERVAL_MS (config.h) for why: a single GPS I2C read costs
+    // ~7ms (u-blox DDC clock-stretching), and the module only produces new
+    // data ~1Hz, so polling it every loop iteration wastes that cost on
+    // reads that can't possibly find anything new.
+    uint32_t _lastGpsPollMs = 0;
+
 #ifdef HITL_MODE
     // Waits up to timeoutMs for one full, checksum-valid SensorInjectPacket,
     // resyncing on its magic bytes if the stream is out of frame (same
