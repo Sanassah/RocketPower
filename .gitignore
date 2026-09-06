@@ -45,7 +45,32 @@ __pycache__/
 
 # GroundStation bench-test session logs -- regenerated every run, not source
 GroundStation/logs/*.csv
+GroundStation/logs/*.log
 
 # Claude Code local settings -- machine-specific, not shared project config
 # (matches at any depth, e.g. both ./.claude and FlightComputer/src/.claude)
 .claude/
+
+# VSCode Local History extension -- per-save snapshots of every file ever
+# edited, not project content (found ~57MB of these across Documentation/
+# and PCB/, matches at any depth)
+.history/
+
+# KiCad-generated noise: autosave/backup files, lock files (indicate a file
+# is open -- committing these can cause false "already open" warnings for
+# teammates), and the local per-machine project-settings cache
+*.kicad_sch-bak
+*.kicad_pcb-bak
+~*.lck
+fp-info-cache
+*.kicad_prl
+
+# KiCad plugin/manual backup archives -- these are local safety nets, not
+# releases; git history is already the real version control for the design
+*-backups/
+production/backups/
+_restore_backup/
+
+# PlatformIO build output (FlightComputer already has its own .pio rule;
+# this covers any other PlatformIO project added later)
+.pio/
