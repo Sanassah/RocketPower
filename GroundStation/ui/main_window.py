@@ -35,6 +35,7 @@ from ui.widgets.command_panel    import CommandPanel
 from ui.widgets.event_log        import EventLog
 from ui.widgets.log_converter_panel import LogConverterPanel
 from ui.widgets.test_panel       import TestPanel
+from ui.widgets.debug_log_panel  import DebugLogPanel
 
 _LOG_DIR = 'logs'
 
@@ -515,10 +516,20 @@ class MainWindow(QMainWindow):
 
         root = QVBoxLayout(page)
         root.setContentsMargins(18, 18, 18, 18)
-        root.setSpacing(0)
+        root.setSpacing(18)
+
+        split = QSplitter(Qt.Orientation.Vertical)
+        split.setChildrenCollapsible(False)
+        split.setHandleWidth(18)
+        split.setStyleSheet(f'QSplitter::handle{{background:{_BG};}}')
 
         self._test_panel = TestPanel()
-        root.addWidget(self._test_panel)
+        self._debug_log_panel = DebugLogPanel()
+        split.addWidget(self._test_panel)
+        split.addWidget(self._debug_log_panel)
+        split.setSizes([320, 420])
+
+        root.addWidget(split)
         return page
 
     # ── Page 3: Data Tools ───────────────────────────────────────────────────
@@ -717,14 +728,6 @@ class MainWindow(QMainWindow):
 
     def _send_calibrate(self) -> None:
         self._send_tracked(encode_calibrate, label='CALIBRATE')
-        # Bench-test convenience, ground-station-only: also re-zero the YAW
-        # readout to whatever heading it's currently facing. Deliberately
-        # yaw-only, not roll/pitch -- those have a real physical zero from
-        # gravity and must keep showing true tilt, not whatever pose the
-        # rocket happened to be in when this was pressed. Doesn't touch the
-        # firmware, telemetry, or AttitudeController's own (separately
-        # latched) reference -- see RocketVisual.zero_yaw().
-        self._rocket_vis.zero_yaw()
 
     def _send_servo_test(self, channel: int) -> None:
         self._send_tracked(encode_servo_test, channel, label=f'SERVO TEST CH{channel}')
@@ -778,4 +781,5 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event) -> None:
         self._stop_serial()
+        self._debug_log_panel.shutdown()
         super().closeEvent(event)

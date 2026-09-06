@@ -33,8 +33,20 @@ void PyroController::disarm() {
     _armed = false;
     for (int i = 0; i < PYRO_NUM_CHANNELS; i++) {
         digitalWrite(_firePins[i], LOW);
+        _firing[i] = false;   // cancel any in-progress non-blocking fire timer too
     }
     Serial.println("[PYRO] Disarmed");
+}
+
+void PyroController::update() {
+    uint32_t now = millis();
+    for (uint8_t i = 0; i < PYRO_NUM_CHANNELS; i++) {
+        if (_firing[i] && (now - _fireStartMs[i] >= PYRO_FIRE_DURATION_MS)) {
+            digitalWrite(_firePins[i], LOW);
+            _firing[i] = false;
+            Serial.print("[PYRO] ch"); Serial.print(i + 1); Serial.println(" complete");
+        }
+    }
 }
 
 bool PyroController::continuityOk(uint8_t channel) const {
@@ -46,27 +58,23 @@ bool PyroController::continuityOk(uint8_t channel) const {
 bool PyroController::fire(uint8_t channel) {
     if (!_safetyCheck(channel)) return false;
 
-    uint8_t pin = _firePins[channel - 1];
+    uint8_t idx = channel - 1;
     Serial.print("[PYRO] Firing ch"); Serial.println(channel);
 
-    digitalWrite(pin, HIGH);
-    delay(PYRO_FIRE_DURATION_MS);
-    digitalWrite(pin, LOW);
-
-    Serial.print("[PYRO] ch"); Serial.print(channel); Serial.println(" complete");
+    digitalWrite(_firePins[idx], HIGH);
+    _firing[idx]      = true;
+    _fireStartMs[idx] = millis();   // update() turns it back off once PYRO_FIRE_DURATION_MS elapses
     return true;
 }
 
 bool PyroController::fireBackupUnconditional() {
     const uint8_t channel = PYRO_BACKUP;
-    uint8_t pin = _firePins[channel - 1];
+    uint8_t idx = channel - 1;
     Serial.println("[PYRO] BACKUP AUTO-FIRE ch3 -- independent apogee evidence, bypassing arm check");
 
-    digitalWrite(pin, HIGH);
-    delay(PYRO_FIRE_DURATION_MS);
-    digitalWrite(pin, LOW);
-
-    Serial.println("[PYRO] backup ch3 auto-fire complete");
+    digitalWrite(_firePins[idx], HIGH);
+    _firing[idx]      = true;
+    _fireStartMs[idx] = millis();   // update() turns it back off once PYRO_FIRE_DURATION_MS elapses
     return true;
 }
 

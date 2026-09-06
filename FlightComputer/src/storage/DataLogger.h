@@ -48,10 +48,20 @@ private:
     uint32_t _recordCount   = 0;
 
     // A single short write() isn't necessarily a lost card -- require a run
-    // of consecutive failures before closing, so one transient hiccup can't
-    // silently end a flight recording early.
+    // of consecutive failures before closing, so one transient hiccup (e.g.
+    // in-flight vibration momentarily interrupting contact) can't silently
+    // end a flight recording early. Kept at 2, not 1, for exactly that
+    // reason -- but no higher: each failed write() can itself block for up
+    // to ~1-3s (SdFat's internal SDIO busy-wait timeout, BUSY_TIMEOUT_MICROS
+    // in the vendored SdioTeensy.cpp, is a hardcoded 1s per bus wait and a
+    // single write() can chain a few of these -- not something this project
+    // overrides, see bench investigation). So worst case before giving up on
+    // a genuinely pulled card is ~2x that, roughly 2-6s of frozen loop
+    // instead of the previous 5x (~5-15s) -- bounded, but still real; a
+    // future fix would shrink BUSY_TIMEOUT_MICROS itself, which requires
+    // forking all of SdFat (declined for now -- too large a fork for this).
     uint8_t  _consecutiveWriteFails = 0;
-    static constexpr uint8_t _MAX_CONSECUTIVE_WRITE_FAILS = 5;
+    static constexpr uint8_t _MAX_CONSECUTIVE_WRITE_FAILS = 2;
 
     void _writeCsvHeader();
     String _nextFilename();

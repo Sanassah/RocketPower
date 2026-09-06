@@ -7,6 +7,26 @@
 // Teensy 4.1 toolchain/bootloader -- not a Teensy dev board.
 // =============================================================
 
+// ===== Debug/diagnostic text output =====
+// Bench diagnostic prints (loop/sensor/GPS/SD timing breakdowns) used to
+// share the normal `Serial` USB port with the binary telemetry mirror,
+// which is exactly why bench serial-monitor captures came out full of
+// garbled control characters -- human text and raw binary packets
+// interleaved on the same byte stream, and neither a plain terminal nor
+// GroundStation's own packet parser can tell them apart mid-stream.
+// SerialUSB1 (Teensy's second USB CDC port, enabled via -DUSB_DUAL_SERIAL
+// in platformio.ini) carries ONLY this plain text instead, so `Serial`
+// stays purely binary telemetry + command RX, and GroundStation's Test tab
+// can show this stream directly without fighting the packet decoder for it.
+// HITL_MODE already claims SerialUSB1 for the actual sensor-injection
+// protocol (see platformio.ini's [env:rocketpower_hitl] comment) -- debug
+// text falls back to plain Serial there instead, same as before this change.
+#ifdef HITL_MODE
+    #define DEBUG_SERIAL Serial
+#else
+    #define DEBUG_SERIAL SerialUSB1
+#endif
+
 // ===== I2C Bus Assignments =====
 // Wire  (LPI2C1, pins 18 SDA / 19 SCL): sensors with no bus-number suffix
 // Wire1 (LPI2C3, pins 17 SDA / 16 SCL): sensors labelled _SDA1 / _SCL1
@@ -20,6 +40,44 @@
 
 #define ZOEM8_I2C_BUS    Wire1
 #define ZOEM8_I2C_ADDR   0x42   // fixed u-blox DDC address (ZOEM8_SCL1/SDA1)
+
+// ===== IMU mounting-offset calibration =====
+// BENCH-CONFIRMED (2026-09): the BNO085's rotation vector reports a fixed
+// ~8 deg tilt even with the airframe verified vertical (level/plumb-line
+// checked, not just eyeballed), stable across power cycles, different
+// headings, and both low- and high-confidence sensor-hub states (rvStatus
+// in [IMU RAW] -- see IMU.cpp) -- ruling out sensor noise, calibration
+// convergence, and LoRa rail coupling in turn. This is a real, constant
+// mechanical misalignment between the BNO085's sensing axes and the
+// airframe's true centerline (breakout-to-PCB mount or chip-package
+// tolerance -- exact source doesn't matter, only that it's fixed).
+//
+// This matters beyond the tilt readout: AttitudeController's roll/pitch
+// angle error is computed directly off the SAME uncorrected quaternion
+// (see its "targets true vertical directly" comment) -- left uncorrected,
+// a straight-flying rocket would get a constant, wrong fin correction the
+// entire powered-ascent/coast phase.
+//
+// IMU_MOUNT_CAL_QUAT_* is the RAW quaternion (w,x,y,z) read from [IMU RAW]
+// with the airframe verified vertical and steady -- pick a sample with
+// rvStatus=3 if possible. IMU::_applyEvent() rotates every subsequent
+// rotation-vector reading by this quaternion's inverse, so a reading
+// identical to this reference collapses to tilt=0/yaw=0 exactly, while a
+// real dynamic tilt during flight still measures correctly against true
+// vertical (this is a FIXED hardware calibration constant, not a per-arm
+// re-latch -- unlike AttitudeController's yaw reference, which
+// intentionally IS re-latched at engage since heading has no absolute
+// reference to begin with).
+//
+// TO RECALIBRATE (mount changed, or drifted with time/vibration): verify
+// the airframe is truly vertical (level/plumb-line against the airframe,
+// not the breakout board), reflash with these 4 values left at their old
+// setting first, capture one fresh still [IMU RAW] q=(...) line (ideally
+// one tagged rvStatus=3), and paste its 4 numbers in below.
+#define IMU_MOUNT_CAL_QUAT_W   0.9841f
+#define IMU_MOUNT_CAL_QUAT_X  -0.0215f
+#define IMU_MOUNT_CAL_QUAT_Y   0.0665f
+#define IMU_MOUNT_CAL_QUAT_Z   0.1631f
 
 // Echo raw NMEA sentences to Serial as they're read (verbose — GPS bring-up only)
 #define GPS_DEBUG_RAW_NMEA 0
@@ -356,13 +414,28 @@
 // The 1Hz LoRa rate is a hard airtime limit (see the comment on that
 // constant) -- a direct USB link has no such ceiling, so throttling it to
 // match the radio would just be leaving USB performance on the table for no
-// reason. 50ms/20Hz is comfortably inside what Teensy's native USB serial
-// can move (a 51-byte packet is nothing) and well past what's visually
-// distinguishable on the ground station's attitude display; SensorManager
-// itself only refreshes at the ~100Hz loop rate, so this is not the
-// bottleneck. Lower it further if useful, there's plenty of headroom.
-#define USB_TELEMETRY_INTERVAL_MS  50     // 20 Hz
+// reason. Was 50ms/20Hz -- bumped to 10ms/100Hz as a bench experiment (see
+// GroundStation's own [LOOP] Hz bench investigation): this was already the
+// bottleneck for what GroundStation could show once the main loop got fast
+// enough (bench-measured ~68-69Hz after fixing baro/GPS I2C stalls, up from
+// ~14-23Hz), since it's an independent send-rate gate, not tied to the
+// loop's actual rate. This 100Hz setting is itself now faster than the loop
+// can actually feed it, so real throughput will land wherever the loop's
+// own rate does, not exactly 100Hz -- that's the point of this experiment.
+#define USB_TELEMETRY_INTERVAL_MS  10     // 100 Hz (bench experiment; loop is the real ceiling)
 #define LOG_INTERVAL_MS            10     // 100 Hz SD logging
+
+// BENCH-MEASURED (see SensorManager.cpp's [GPS BREAKDOWN] diagnostic): a
+// single GPS I2C read costs ~7ms, traced to the u-blox module's DDC (I2C)
+// interface clock-stretching while it feeds bytes out of its internal UART
+// buffer -- a real characteristic of that interface, not fixable by chunk
+// size or parsing changes (both measured negligible). The module itself
+// only produces a fresh burst of NMEA sentences ~1Hz, so polling it on
+// every ~16ms loop iteration (the loop's own rate, not this sensor's) buys
+// nothing but pays that ~7ms tax every time. 100ms/10Hz keeps a comfortable
+// 10x margin over the module's real ~1Hz update rate while cutting GPS's
+// contribution to average loop time roughly 6x.
+#define GPS_POLL_INTERVAL_MS      100    // 10 Hz
 
 // A sensor is reported "down" in telemetry/logging if it hasn't produced a
 // successful reading within this window. Loose enough to absorb a sensor's

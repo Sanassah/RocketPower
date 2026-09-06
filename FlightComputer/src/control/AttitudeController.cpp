@@ -114,9 +114,10 @@ void AttitudeController::update(const FlightData& d, FinController& fins) {
     // servos (a N/S tilt visibly moved the E/W fins, not N/S -- deflecting a
     // fin pushes sideways, tangentially, not fore-aft, so that's actually
     // where the corrective moment for a transverse tilt comes from). The +/-
-    // SIGNS below (which direction of differential is "positive") are still
-    // unverified -- exactly as unverified as the axis mappings in config.h,
-    // and need the same bench/demo-mode check before this is ever trusted.
+    // SIGNS below (which direction of differential is "positive") are also
+    // now BENCH-CONFIRMED, same hand-tilt/demo-mode procedure as the mapping
+    // above: tilting toward the north fin correctly moves the east/west
+    // fins in the right direction (and so on for the other axes/directions).
     //
     // yawCmd (spin, in this file's Simulation-matching convention -- see
     // config.h's axis-naming note) is uniform across all 4 fins; rollCmd

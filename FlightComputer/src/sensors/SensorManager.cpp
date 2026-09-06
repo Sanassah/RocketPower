@@ -108,6 +108,23 @@ bool SensorManager::begin() {
     Wire1.begin();
     Wire2.begin();
 
+    // Bench-measured (see [SENSOR BREAKDOWN] diagnostic above): every sensor
+    // read was taking multiple milliseconds, with no clock speed ever set on
+    // any of these three buses -- meaning all of them were running at
+    // Teensy's 100kHz I2C default. Every device here (BNO085, BMP390,
+    // INA260, ZOE-M8Q) supports 400kHz Fast Mode per its datasheet, but
+    // BENCH-CONFIRMED: Wire (BNO085 only) does NOT tolerate 400kHz on this
+    // board -- boot failed with "I2C address not found" / imu FAIL as soon
+    // as this was added, while Wire1 (baro+gps+power, 3 devices) and Wire2
+    // (accel) both verified clean at 400kHz. Likely a pull-up/trace-length
+    // limit specific to that one connection, not a device-datasheet issue --
+    // left at the 100kHz default until a slower intermediate speed (e.g.
+    // 250kHz) is bench-verified to boot clean. Wire1/Wire2 keep the 4x
+    // speedup, which was most of the win anyway (baro+gps+power's combined
+    // cost was comparable to the IMU's alone).
+    Wire1.setClock(400000);
+    Wire2.setClock(400000);
+
     bool ok = true;
 
     _data.imu_ok   = _imu.begin();
@@ -142,13 +159,92 @@ void SensorManager::update() {
     // its value updates -- exactly what shows up as "the fins react late."
     // Drain everything actually queued each call instead, bounded so a
     // pathological flood can't stall the rest of the loop.
+    //
+    // BENCH-MEASURED (see main.cpp's [LOOP BREAKDOWN]/[SENSOR BREAKDOWN]
+    // diagnostics), full trace below:
+    //  1. Cutting this cap 10->6 barely moved imu='s max (~40ms -> ~35-42ms)
+    //     -- unlike the same kind of cap added for GPS below (~24ms->~7ms,
+    //     a real cut matching its byte-budget cut), meaning the cost here
+    //     ISN'T N calls x a roughly-constant per-call cost.
+    //  2. Dropping the cap to 1 (single call, no draining) STILL showed
+    //     15ms on that one call alone -- confirmed the cost lives inside a
+    //     single _imu.update() call, not from iterating multiple times.
+    //  3. Traced into the vendor driver: _imu.update() -> getSensorEvent()
+    //     -> sh2_service() -> shtp_service() -> i2chal_read()
+    //     (Adafruit_BNO08x.cpp) reads a 4-byte SHTP header for the queued
+    //     packet's size, then drains it in chunks capped at
+    //     i2c_dev->maxBufferSize() -- hard-coded to 32 bytes for Teensy in
+    //     Adafruit_I2CDevice.cpp (no Teensy-specific case, unlike SAMD/ESP32).
+    //     A bigger queued packet just means more 32-byte I2C transactions
+    //     back to back, each with its own transaction overhead.
+    //  4. Root cause of WHY the packet gets big: IMU.cpp had all three
+    //     BNO085 reports (rotation vector, linear accel, gyro) scheduled on
+    //     the identical 10000us tick, so the hub tends to have all three
+    //     queued at once when polled. Fixed there -- linear accel detuned to
+    //     20000us (50Hz, off-tick from the other two; it only feeds the
+    //     already-filtered vertical-velocity estimate, unlike rotation
+    //     vector/gyro which AttitudeController reads directly).
+    // Cap restored to 6 (from a 1-call diagnostic-only test used for #2
+    // above) now that a real fix is in for the root cause in IMU.cpp, not
+    // just this drain-side symptom.
+    uint32_t t0 = micros();
     bool imuGotData = false;
-    for (uint8_t i = 0; i < 10 && _imu.update(); i++) imuGotData = true;
+    uint8_t imuCalls = 0;
+    uint32_t imuSingleMaxUs = 0;
+    for (uint8_t i = 0; i < 6; i++) {
+        uint32_t cs = micros();
+        bool got = _imu.update();
+        uint32_t ce = micros();
+        if (ce - cs > imuSingleMaxUs) imuSingleMaxUs = ce - cs;
+        imuCalls++;
+        if (!got) break;
+        imuGotData = true;
+    }
     if (imuGotData) _lastImuOkMs = now;
+    uint32_t t1 = micros();
     if (_baro.update())  _lastBaroOkMs  = now;
+    uint32_t t2 = micros();
     if (_accel.update()) _lastAccelOkMs = now;
-    if (_gps.update())   _lastGpsOkMs   = now;
+    uint32_t t3 = micros();
+    // Rate-limited -- see GPS_POLL_INTERVAL_MS (config.h) for why: a single
+    // GPS I2C read costs ~7ms regardless of chunk size (u-blox DDC clock-
+    // stretching), and the module only produces new data ~1Hz, so most loop
+    // iterations skip this entirely rather than pay that cost for nothing.
+    if (now - _lastGpsPollMs >= GPS_POLL_INTERVAL_MS) {
+        _lastGpsPollMs = now;
+        if (_gps.update()) _lastGpsOkMs = now;
+    }
+    uint32_t t4 = micros();
     if (_power.update()) _lastPowerOkMs = now;
+    uint32_t t5 = micros();
+
+    static uint32_t maxImuUs = 0, maxBaroUs = 0, maxAccelUs = 0, maxGpsUs = 0, maxPowerUs = 0;
+    static uint32_t maxImuSingleUs = 0;
+    static uint8_t  maxImuCalls = 0;
+    if (t1-t0 > maxImuUs)   maxImuUs   = t1-t0;
+    if (t2-t1 > maxBaroUs)  maxBaroUs  = t2-t1;
+    if (t3-t2 > maxAccelUs) maxAccelUs = t3-t2;
+    if (t4-t3 > maxGpsUs)   maxGpsUs   = t4-t3;
+    if (t5-t4 > maxPowerUs) maxPowerUs = t5-t4;
+    if (imuSingleMaxUs > maxImuSingleUs) maxImuSingleUs = imuSingleMaxUs;
+    if (imuCalls > maxImuCalls) maxImuCalls = imuCalls;
+
+    static uint32_t lastSensorStatMs = 0;
+    if (millis() - lastSensorStatMs >= 5000) {
+        lastSensorStatMs = millis();
+        // ms, 3 decimals -- full us precision, just relabeled (see main.cpp).
+        DEBUG_SERIAL.print("[SENSOR BREAKDOWN] imu="); DEBUG_SERIAL.print(maxImuUs / 1000.0f, 3);
+        DEBUG_SERIAL.print("ms (singleCallMax="); DEBUG_SERIAL.print(maxImuSingleUs / 1000.0f, 3);
+        DEBUG_SERIAL.print("ms calls="); DEBUG_SERIAL.print(maxImuCalls);
+        DEBUG_SERIAL.print(") baro="); DEBUG_SERIAL.print(maxBaroUs / 1000.0f, 3);
+        DEBUG_SERIAL.print("ms accel="); DEBUG_SERIAL.print(maxAccelUs / 1000.0f, 3);
+        DEBUG_SERIAL.print("ms gps="); DEBUG_SERIAL.print(maxGpsUs / 1000.0f, 3);
+        DEBUG_SERIAL.print("ms power="); DEBUG_SERIAL.print(maxPowerUs / 1000.0f, 3);
+        DEBUG_SERIAL.println("ms  (each is a max over the same 5s window)");
+        maxImuUs = maxBaroUs = maxAccelUs = maxGpsUs = maxPowerUs = 0;
+        maxImuSingleUs = 0;
+        maxImuCalls = 0;
+    }
 
     // "OK" means a successful read within the last SENSOR_HEALTH_TIMEOUT_MS,
     // not just that the sensor passed its boot check.

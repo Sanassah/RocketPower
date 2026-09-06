@@ -19,5 +19,19 @@ bool Accelerometer::update() {
     _data.magnitude_g = sqrtf(_data.x_g * _data.x_g +
                                _data.y_g * _data.y_g +
                                _data.z_g * _data.z_g);
+
+    // Bench diagnostic (DEBUG_SERIAL only -- separate USB port from LoRa
+    // telemetry, see config.h's DEBUG_SERIAL macro -- never costs airtime).
+    {
+        static uint32_t lastPrintMs = 0;
+        if (millis() - lastPrintMs >= 300) {
+            lastPrintMs = millis();
+            DEBUG_SERIAL.print("[ACCEL RAW] x_g="); DEBUG_SERIAL.print(_data.x_g, 3);
+            DEBUG_SERIAL.print(" y_g="); DEBUG_SERIAL.print(_data.y_g, 3);
+            DEBUG_SERIAL.print(" z_g="); DEBUG_SERIAL.print(_data.z_g, 3);
+            DEBUG_SERIAL.print(" mag_g="); DEBUG_SERIAL.println(_data.magnitude_g, 3);
+        }
+    }
+
     return true;
 }

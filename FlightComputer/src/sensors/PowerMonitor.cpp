@@ -17,5 +17,18 @@ bool PowerMonitor::update() {
     _data.voltage_v  = _ina.readBusVoltage() / 1000.0f;   // mV → V
     _data.current_ma = _ina.readCurrent();                 // already mA
     _data.power_mw   = _ina.readPower();                   // already mW
+
+    // Bench diagnostic (DEBUG_SERIAL only -- separate USB port from LoRa
+    // telemetry, see config.h's DEBUG_SERIAL macro -- never costs airtime).
+    {
+        static uint32_t lastPrintMs = 0;
+        if (millis() - lastPrintMs >= 300) {
+            lastPrintMs = millis();
+            DEBUG_SERIAL.print("[POWER RAW] voltage_v="); DEBUG_SERIAL.print(_data.voltage_v, 3);
+            DEBUG_SERIAL.print(" current_ma="); DEBUG_SERIAL.print(_data.current_ma, 1);
+            DEBUG_SERIAL.print(" power_mw="); DEBUG_SERIAL.println(_data.power_mw, 1);
+        }
+    }
+
     return true;
 }
