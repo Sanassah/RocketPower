@@ -447,8 +447,28 @@
 #define SENSOR_HEALTH_TIMEOUT_MS   500
 
 // Complementary filter weight for fused vertical velocity (SensorManager).
-// 0.98 = IMU integration dominates above ~0.5 Hz, baro corrects drift below that.
-#define VERT_VEL_ALPHA  0.98f
+// BENCH-MEASURED (2026-09, [VELFUSE] diagnostic, IMU.cpp/SensorManager.cpp):
+// this is a RECURSIVE filter getting a fresh baro correction on nearly every
+// cycle, not a one-shot blend -- so its noise rejection is NOT "(1-ALPHA) of
+// one sample's magnitude", it's steady-state noise ~= sqrt(beta/2)*sigma
+// (beta=1-ALPHA, sigma=baroVel's own std dev). Measured baroVel std dev
+// ~6.9 m/s (from the RF-coupled barometer noise, see Barometer.cpp) gave
+// ~0.69 m/s of residual noise in fusedVel at the old 0.98 -- enough to
+// visibly swing across zero at rest. 0.999 brings that down to ~0.15 m/s
+// (longer correction time constant, ~15s vs ~0.75s, but that only slows
+// how fast real long-term IMU drift gets corrected -- irrelevant for
+// distinguishing noise from a real multi-second climb/descent trend).
+#define VERT_VEL_ALPHA  0.999f
+
+// Hard sanity gate on a single baro-derived velocity sample -- rejects it
+// entirely (treated as if no fresh baro data arrived that cycle) rather
+// than blending it in at all, no matter how small VERT_VEL_ALPHA's weight
+// is. Catches a genuinely extreme single-sample RF glitch that VERT_VEL_ALPHA
+// alone can't distinguish from real data by weighting. 350 m/s is well
+// above the highest maxvelocity across every saved OpenRocket simulation in
+// this repo (288.4 m/s, RocketPower_V1.ork) -- generously wide on purpose,
+// this only needs to catch nonsense, never a real (even fast) flight.
+#define MAX_PLAUSIBLE_VERT_SPEED_MS 350.0f
 
 // ===== Sea-level pressure for altitude reference =====
 #define SEA_LEVEL_HPA 1013.25f

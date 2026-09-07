@@ -75,7 +75,6 @@ private:
 
     // Complementary filter state for fused vertical velocity
     float    _fusedVel_ms     = 0.0f;
-    float    _prevBaroAlt_m   = 0.0f;
     uint32_t _prevFuseTime_ms = 0;
 
     // Timestamp of each sensor's last successful read. A sensor's _ok flag is

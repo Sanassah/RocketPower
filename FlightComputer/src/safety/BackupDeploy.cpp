@@ -36,23 +36,28 @@ void BackupDeploy::update(const FlightData& d, PyroController& pyro) {
             }
             break;
 
-        // ---- Same zero-crossing logic as StateMachine's COAST case,
-        // independently tracked. ----
+        // ---- Same sustained-non-positive-velocity logic as StateMachine's
+        // COAST case, independently tracked -- see its comment for why this
+        // can't just latch on the first non-positive sample: vert_vel_ms is
+        // confirmed noisy enough (RF-coupled baro, see [VELFUSE]) to dip
+        // below zero on a single glitch mid-ascent, so this requires it to
+        // STAY non-positive continuously for the full window, cancelling
+        // immediately if it goes positive again before that. ----
         case _Stage::WAITING_FOR_APOGEE: {
-            bool zeroCross = (_prevVertVel > 0.0f && d.vert_vel_ms <= 0.0f);
-            if (zeroCross && !_apogeeDetecting) {
-                _apogeeDetecting = true;
-                _apogeeWindowMs  = now;
+            bool nonPositive = (d.vert_vel_ms <= 0.0f);
+            if (nonPositive) {
+                if (!_apogeeDetecting) {
+                    _apogeeDetecting = true;
+                    _apogeeWindowMs  = now;
+                }
+                if (now - _apogeeWindowMs >= APOGEE_DETECTION_WINDOW_MS) {
+                    _apogeeConfirmedMs = now;
+                    _stage = _Stage::ARMED_TO_FIRE;
+                    Serial.println("[BACKUP] Apogee confirmed -- firing backup after delay");
+                }
+            } else {
+                _apogeeDetecting = false;   // still climbing -- cancel, not a real apogee
             }
-            if (_apogeeDetecting && (now - _apogeeWindowMs >= APOGEE_DETECTION_WINDOW_MS)) {
-                _apogeeConfirmedMs = now;
-                _stage = _Stage::ARMED_TO_FIRE;
-                Serial.println("[BACKUP] Apogee confirmed -- firing backup after delay");
-            }
-            if (!zeroCross && !_apogeeDetecting) {
-                _apogeeWindowMs = now;   // keep sliding window until velocity goes negative
-            }
-            _prevVertVel = d.vert_vel_ms;
             break;
         }
 
@@ -77,7 +82,6 @@ void BackupDeploy::reset() {
     _boostFirstMs    = 0;
     _boostDetecting  = false;
     _refAltAtBoost   = 0.0f;
-    _prevVertVel     = 0.0f;
     _apogeeWindowMs  = 0;
     _apogeeDetecting = false;
     _apogeeConfirmedMs = 0;

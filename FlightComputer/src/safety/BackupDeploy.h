@@ -72,9 +72,8 @@ private:
 
     float    _refAltAtBoost  = 0.0f;
 
-    // Mirrors StateMachine's apogee zero-crossing logic (see
-    // APOGEE_DETECTION_WINDOW_MS in config.h), independently tracked.
-    float    _prevVertVel     = 0.0f;
+    // Mirrors StateMachine's apogee sustained-non-positive-velocity logic
+    // (see APOGEE_DETECTION_WINDOW_MS in config.h), independently tracked.
     uint32_t _apogeeWindowMs  = 0;
     bool     _apogeeDetecting = false;
 

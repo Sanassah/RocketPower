@@ -32,12 +32,11 @@ void StateMachine::reset() {
     // _enterState() already clears _liftoffDetecting/_apogeeDetecting/
     // _landedStableMs; the remaining timing/reference variables aren't
     // touched by a normal state transition, so clear them explicitly too --
-    // otherwise a stale _prevVertVel or _landedRefAlt from the previous
+    // otherwise a stale _apogeeWindowMs or _landedRefAlt from the previous
     // (reset) flight could feed a spurious detection on the very first loop
     // of the next one.
     _enterState(FlightState::IDLE, millis());
     _liftoffFirstMs = 0;
-    _prevVertVel    = 0.0f;
     _apogeeWindowMs = 0;
     _landedRefAlt   = 0.0f;
 }
@@ -73,20 +72,30 @@ void StateMachine::update(const FlightData& d) {
             }
             break;
 
-        // ---- COAST: detect apogee via vertical velocity zero-crossing ----
+        // ---- COAST: detect apogee via SUSTAINED non-positive vertical velocity ----
+        // BUG FIX (2026-09): this used to latch _apogeeDetecting permanently
+        // on the first now-confirmed-noisy sample where vert_vel_ms dipped
+        // to/below zero (see SensorManager.cpp's [VELFUSE] diagnostic --
+        // fusedVel genuinely crosses zero on baro RF-coupling noise alone,
+        // not just at real apogee), then fired APOGEE 200ms later
+        // regardless of what velocity did in between -- a live path to
+        // firing the main parachute during POWERED ASCENT from noise, not a
+        // real apogee. Fixed: require vert_vel_ms to stay <= 0
+        // CONTINUOUSLY for the full window, cancelling immediately (not
+        // just failing to arm) the moment it goes positive again.
         case FlightState::COAST: {
-            bool zeroCross = (_prevVertVel > 0.0f && d.vert_vel_ms <= 0.0f);
-            if (zeroCross && !_apogeeDetecting) {
-                _apogeeDetecting = true;
-                _apogeeWindowMs  = now;
+            bool nonPositive = (d.vert_vel_ms <= 0.0f);
+            if (nonPositive) {
+                if (!_apogeeDetecting) {
+                    _apogeeDetecting = true;
+                    _apogeeWindowMs  = now;
+                }
+                if (now - _apogeeWindowMs >= APOGEE_DETECTION_WINDOW_MS) {
+                    _enterState(FlightState::APOGEE, now);
+                }
+            } else {
+                _apogeeDetecting = false;   // still climbing -- cancel, not a real apogee
             }
-            if (_apogeeDetecting && (now - _apogeeWindowMs >= APOGEE_DETECTION_WINDOW_MS)) {
-                _enterState(FlightState::APOGEE, now);
-            }
-            if (!zeroCross && !_apogeeDetecting) {
-                _apogeeWindowMs = now;   // keep sliding window until velocity goes negative
-            }
-            _prevVertVel = d.vert_vel_ms;
             break;
         }
 
