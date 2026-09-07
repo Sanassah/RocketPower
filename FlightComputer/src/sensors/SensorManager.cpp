@@ -202,7 +202,8 @@ void SensorManager::update() {
     }
     if (imuGotData) _lastImuOkMs = now;
     uint32_t t1 = micros();
-    if (_baro.update())  _lastBaroOkMs  = now;
+    bool baroGotData = _baro.update();
+    if (baroGotData) _lastBaroOkMs = now;
     uint32_t t2 = micros();
     if (_accel.update()) _lastAccelOkMs = now;
     uint32_t t3 = micros();
@@ -300,6 +301,22 @@ void SensorManager::update() {
     // Fused vertical velocity: complementary filter combining IMU and barometer.
     // The IMU gives fast, low-noise dynamics; the baro corrects long-term drift.
     // Falls back to barometer-only (already in _data.vert_vel_ms) if IMU is absent.
+    //
+    // BUG FIX (2026-09): this used to re-differentiate baro_alt_m itself every
+    // loop cycle using THIS loop's dt (~10ms @ 100Hz), but the barometer only
+    // actually produces a fresh sample at its own 50Hz ODR -- every other
+    // cycle saw an unchanged altitude (baro_vel=0), and the next saw the
+    // FULL two-cycle pressure change divided by only one cycle's dt, roughly
+    // doubling the apparent rate. Worse, that meant even sub-noise-floor
+    // pressure jitter (a fraction of an hPa) was being divided by a ~10ms
+    // window into multi-m/s velocity spikes, injected fresh every cycle --
+    // completely swamping VERT_VEL_ALPHA's supposed 98% trust in the IMU
+    // term (bench-reported: fused velocity "super reactive to barometer").
+    // Fix: reuse Barometer::vert_vel_ms, which Barometer.cpp already
+    // differentiates correctly (its own dt is only ever the real elapsed
+    // time between two ACTUAL successful reads -- see its update()), and
+    // only blend it in on the cycle baroGotData is true, instead of
+    // recomputing a differentiator against a stale/fresh-mismatched dt.
     if (_data.imu_ok && _prevFuseTime_ms > 0) {
         float dt = (_data.timestamp_ms - _prevFuseTime_ms) * 0.001f;
         if (dt > 0.0f && dt < 0.1f) {
@@ -311,13 +328,39 @@ void SensorManager::update() {
                              + 2.0f*(qy*qz + qw*qx) * _data.lin_accel_y
                              + (1.0f - 2.0f*(qx*qx + qy*qy)) * _data.lin_accel_z;
 
-            float baro_vel = (_data.baro_alt_m - _prevBaroAlt_m) / dt;
-            _fusedVel_ms   = VERT_VEL_ALPHA * (_fusedVel_ms + accel_vert * dt)
-                           + (1.0f - VERT_VEL_ALPHA) * baro_vel;
+            _fusedVel_ms += accel_vert * dt;   // predict every cycle (100Hz)
+            // Correct only when baro actually refreshed (~50Hz) AND the
+            // sample is physically plausible -- see MAX_PLAUSIBLE_VERT_SPEED_MS.
+            if (baroGotData && fabsf(baro.vert_vel_ms) <= MAX_PLAUSIBLE_VERT_SPEED_MS) {
+                _fusedVel_ms = VERT_VEL_ALPHA * _fusedVel_ms
+                             + (1.0f - VERT_VEL_ALPHA) * baro.vert_vel_ms;
+            }
             _data.vert_vel_ms = _fusedVel_ms;
+
+            // Bench diagnostic (DEBUG_SERIAL only, see config.h's DEBUG_SERIAL
+            // macro) -- isolates the two inputs feeding the fused output so
+            // it's visible which one is actually driving a given swing:
+            // accelVert*dt is the per-cycle IMU-integration step (should be
+            // small/smooth at rest), baroVel is Barometer's own correctly-
+            // timed differentiator (only meaningful on lines where
+            // baroFresh=1 -- printed every cycle regardless so the timing
+            // relationship between the two is visible), fusedVel is what
+            // actually reaches _data.vert_vel_ms/telemetry/apogee detection.
+            {
+                static uint32_t lastPrintMs = 0;
+                if (millis() - lastPrintMs >= 300) {
+                    lastPrintMs = millis();
+                    DEBUG_SERIAL.print("[VELFUSE] dt="); DEBUG_SERIAL.print(dt, 4);
+                    DEBUG_SERIAL.print(" accelVert="); DEBUG_SERIAL.print(accel_vert, 3);
+                    DEBUG_SERIAL.print(" accelStep="); DEBUG_SERIAL.print(accel_vert * dt, 4);
+                    DEBUG_SERIAL.print(" baroFresh="); DEBUG_SERIAL.print(baroGotData ? 1 : 0);
+                    DEBUG_SERIAL.print(" baroVel="); DEBUG_SERIAL.print(baro.vert_vel_ms, 3);
+                    DEBUG_SERIAL.print(" baroAlt="); DEBUG_SERIAL.print(_data.baro_alt_m, 3);
+                    DEBUG_SERIAL.print(" fusedVel="); DEBUG_SERIAL.println(_fusedVel_ms, 3);
+                }
+            }
         }
     }
-    _prevBaroAlt_m   = _data.baro_alt_m;
     _prevFuseTime_ms = _data.timestamp_ms;
 }
 

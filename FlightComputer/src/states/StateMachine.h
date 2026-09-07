@@ -33,8 +33,7 @@ private:
     uint32_t _liftoffFirstMs   = 0;
     bool     _liftoffDetecting = false;
 
-    // Apogee detection: track sign change in vertical velocity
-    float    _prevVertVel      = 0.0f;
+    // Apogee detection: sustained non-positive vertical velocity
     uint32_t _apogeeWindowMs   = 0;
     bool     _apogeeDetecting  = false;
 
