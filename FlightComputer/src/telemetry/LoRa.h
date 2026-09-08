@@ -27,13 +27,10 @@ private:
     // sendUsbFast() so both draw from the same seq space.
     TelemetryPacket _finalize(const TelemetryPacket& pkt);
 
-    // Resyncing receive buffers, one per stream so USB and LoRa command
-    // reception never interleave. LoRa is a noisier link than a wired USB
-    // connection -- a single stray/corrupted byte can permanently misalign a
-    // naive fixed-size read that never re-searches for the magic bytes
-    // within already-buffered data, so this scans for the magic pair and
-    // only discards one byte at a time on a bad frame instead of the whole
-    // window.
+    // Resyncing buffers, one per stream (USB/LoRa never interleave). Scans
+    // for the magic pair and discards one byte at a time on a bad frame --
+    // LoRa is noisy enough that a naive fixed-size read would permanently
+    // misalign on a single corrupted byte.
     static const uint8_t _CMD_BUF_CAP = 32;
     uint8_t _usbBuf[_CMD_BUF_CAP];
     uint8_t _usbBufLen = 0;

@@ -33,6 +33,16 @@ private:
     uint32_t _liftoffFirstMs   = 0;
     bool     _liftoffDetecting = false;
 
+    // Burnout detection: must hold below threshold for BURNOUT_CONFIRM_MS
+    uint32_t _burnoutFirstMs   = 0;
+    bool     _burnoutDetecting = false;
+
+    // Burnout cross-check via vertical velocity (motor-agnostic fallback,
+    // independent of the accelerometer) -- see POWERED_ASCENT_VELOCITY_DROP_MS
+    float    _peakAscentVertVel = 0.0f;
+    uint32_t _decelFirstMs      = 0;
+    bool     _decelDetecting    = false;
+
     // Apogee detection: sustained non-positive vertical velocity
     uint32_t _apogeeWindowMs   = 0;
     bool     _apogeeDetecting  = false;

@@ -1,10 +1,11 @@
 #pragma once
 #include <stdint.h>
 
-// Controls the 3 pyro channels on the custom MIMXRT1062 board.
-// From schematic (HighCurrentComponents.kicad_sch):
-//   CH1 (ignition):  fire=pin2, continuity=pin40
-//   CH2 (parachute): fire=pin3, continuity=pin41
+// Controls the 3 pyro channels on the custom MIMXRT1062 board. Motor
+// ignition is handled by an external launcher system, not this flight
+// computer. From schematic (HighCurrentComponents.kicad_sch):
+//   CH1 (parachute): fire=pin2, continuity=pin40
+//   CH2 (reserved, e.g. future booster/2nd stage): fire=pin3, continuity=pin41
 //   CH3 (backup):    fire=pin4, continuity=pin39
 class PyroController {
 public:
@@ -23,8 +24,10 @@ public:
     // flight, so not urgent, but free to remove, so removed.
     void update();
 
-    // Fire a channel for PYRO_FIRE_DURATION_MS ms.
-    // Refuses to fire if not armed or continuity check fails.
+    // Fire a channel for PYRO_FIRE_DURATION_MS ms. Refuses to fire if not
+    // armed or the channel number is invalid -- does NOT check continuity;
+    // that's surfaced to the ground operator (continuityOk()/telemetry) as
+    // a go/no-go decision instead of an automatic firmware block.
     bool fire(uint8_t channel);
 
     // Fires CH3 (backup) UNCONDITIONALLY -- deliberately bypasses the

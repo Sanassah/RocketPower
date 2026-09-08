@@ -4,8 +4,8 @@
 
 // From schematic: PyroCHx_N labels give MCU pin N for each channel
 const uint8_t PyroController::_firePins[3] = {
-    PYRO_CH1_FIRE_PIN,   // pin 2  — ignition
-    PYRO_CH2_FIRE_PIN,   // pin 3  — parachute
+    PYRO_CH1_FIRE_PIN,   // pin 2  — parachute
+    PYRO_CH2_FIRE_PIN,   // pin 3  — reserved (future booster/2nd stage)
     PYRO_CH3_FIRE_PIN,   // pin 4  — backup
 };
 const uint8_t PyroController::_contPins[3] = {
@@ -26,7 +26,7 @@ bool PyroController::begin() {
 
 void PyroController::arm() {
     _armed = true;
-    Serial.println("[PYRO] Armed");
+    DEBUG_SERIAL.println("[PYRO] Armed");
 }
 
 void PyroController::disarm() {
@@ -35,7 +35,7 @@ void PyroController::disarm() {
         digitalWrite(_firePins[i], LOW);
         _firing[i] = false;   // cancel any in-progress non-blocking fire timer too
     }
-    Serial.println("[PYRO] Disarmed");
+    DEBUG_SERIAL.println("[PYRO] Disarmed");
 }
 
 void PyroController::update() {
@@ -44,7 +44,7 @@ void PyroController::update() {
         if (_firing[i] && (now - _fireStartMs[i] >= PYRO_FIRE_DURATION_MS)) {
             digitalWrite(_firePins[i], LOW);
             _firing[i] = false;
-            Serial.print("[PYRO] ch"); Serial.print(i + 1); Serial.println(" complete");
+            DEBUG_SERIAL.print("[PYRO] ch"); DEBUG_SERIAL.print(i + 1); DEBUG_SERIAL.println(" complete");
         }
     }
 }
@@ -59,7 +59,7 @@ bool PyroController::fire(uint8_t channel) {
     if (!_safetyCheck(channel)) return false;
 
     uint8_t idx = channel - 1;
-    Serial.print("[PYRO] Firing ch"); Serial.println(channel);
+    DEBUG_SERIAL.print("[PYRO] Firing ch"); DEBUG_SERIAL.println(channel);
 
     digitalWrite(_firePins[idx], HIGH);
     _firing[idx]      = true;
@@ -70,7 +70,7 @@ bool PyroController::fire(uint8_t channel) {
 bool PyroController::fireBackupUnconditional() {
     const uint8_t channel = PYRO_BACKUP;
     uint8_t idx = channel - 1;
-    Serial.println("[PYRO] BACKUP AUTO-FIRE ch3 -- independent apogee evidence, bypassing arm check");
+    DEBUG_SERIAL.println("[PYRO] BACKUP AUTO-FIRE ch3 -- independent apogee evidence, bypassing arm check");
 
     digitalWrite(_firePins[idx], HIGH);
     _firing[idx]      = true;
@@ -80,11 +80,11 @@ bool PyroController::fireBackupUnconditional() {
 
 bool PyroController::_safetyCheck(uint8_t ch) const {
     if (!_armed) {
-        Serial.println("[PYRO] SAFETY: not armed");
+        DEBUG_SERIAL.println("[PYRO] SAFETY: not armed");
         return false;
     }
     if (ch < 1 || ch > PYRO_NUM_CHANNELS) {
-        Serial.println("[PYRO] SAFETY: invalid channel");
+        DEBUG_SERIAL.println("[PYRO] SAFETY: invalid channel");
         return false;
     }
     return true;

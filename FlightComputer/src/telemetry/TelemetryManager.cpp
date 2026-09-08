@@ -22,19 +22,10 @@ void TelemetryManager::update(const FlightData& d) {
     }
 
 #if USB_SERIAL_BINARY_MIRROR
-    // USB: no airtime constraint, so this runs on its own, much faster clock
-    // instead of piggybacking on the LoRa cadence above. Untouched by
-    // HITL_MODE -- still fully usable over the normal Serial/LoRa link at
-    // the same time a HITL run is driving the rocket over SerialUSB1 below,
-    // so a real GroundStation can watch it live.
-    //
-    // Kept flowing during demoEnabled() on purpose -- see TelemetryPacket's
-    // TEMPORARY bench fields (Packet.h) -- GroundStation's TEST tab reads
-    // gyro/tilt/fin numbers from THIS binary stream now, not the plain-text
-    // [AXIS CAL] serial print, so it can't go silent during the exact window
-    // that data is needed. That print can still interleave with this in a
-    // raw serial monitor if one's open alongside GroundStation -- harmless,
-    // just don't read both at once.
+    // USB: no airtime constraint, runs on its own much faster clock instead
+    // of piggybacking on the LoRa cadence above. Untouched by HITL_MODE --
+    // still usable over Serial/LoRa while a HITL run drives the rocket over
+    // SerialUSB1, so a real GroundStation can watch it live.
     if (now - _lastUsbTxMs >= USB_TELEMETRY_INTERVAL_MS) {
         _lastUsbTxMs = now;
         _lora.sendUsbFast(_buildPacket(d));
@@ -67,7 +58,7 @@ void TelemetryManager::update(const FlightData& d) {
     CommandPacket cmd;
     bool gotCmd = false;
     if ((bool)Serial && _lora.receiveCommandFrom(Serial, cmd)) {
-        Serial.println("[TELEM] CMD source: USB");
+        DEBUG_SERIAL.println("[TELEM] CMD source: USB");
         gotCmd = true;
     } else if (_lora.receiveCommand(cmd)) {
         gotCmd = true;
@@ -85,10 +76,10 @@ void TelemetryManager::update(const FlightData& d) {
 
         // Single-line, always-printed record of every command RX -- easy to
         // scan/grep for exactly what arrived and whether it actually ran.
-        Serial.print("[CMD RX] seq="); Serial.print(cmd.seq);
-        Serial.print(" type=0x"); Serial.print(typeIdx, HEX);
-        Serial.print(" param="); Serial.print(cmd.param);
-        Serial.println(isDuplicate ? "  -> DUPLICATE (re-acked only, not re-run)" : "  -> NEW (executing)");
+        DEBUG_SERIAL.print("[CMD RX] seq="); DEBUG_SERIAL.print(cmd.seq);
+        DEBUG_SERIAL.print(" type=0x"); DEBUG_SERIAL.print(typeIdx, HEX);
+        DEBUG_SERIAL.print(" param="); DEBUG_SERIAL.print(cmd.param);
+        DEBUG_SERIAL.println(isDuplicate ? "  -> DUPLICATE (re-acked only, not re-run)" : "  -> NEW (executing)");
 
         if (!isDuplicate) {
             if (typeIdx < _CMD_TYPE_SLOTS) _lastProcessedSeqByType[typeIdx] = cmd.seq;
@@ -106,6 +97,10 @@ void TelemetryManager::_sendAck(const CommandPacket& cmd) {
     _lora.sendAck(ack);
 }
 
+// TEMPORARY: converts the BNO085's gravity-removed linear acceleration
+// (m/s²) into the packet's accel_x/y/z_cg fields (centi-g) -- see Packet.h.
+static constexpr float STANDARD_GRAVITY_MS2 = 9.80665f;
+
 TelemetryPacket TelemetryManager::_buildPacket(const FlightData& d) const {
     TelemetryPacket pkt{};
     pkt.magic[0]      = TELEM_MAGIC_0;
@@ -119,9 +114,9 @@ TelemetryPacket TelemetryManager::_buildPacket(const FlightData& d) const {
     pkt.gps_fix       = d.gps_fix ? 1 : 0;
     pkt.baro_alt_dm   = (int16_t)lroundf(d.baro_alt_m * 10.0f);
     pkt.vert_vel_cms  = (int16_t)lroundf(d.vert_vel_ms * 100.0f);
-    pkt.accel_x_cg    = (int16_t)lroundf(d.highg_x_g * 100.0f);
-    pkt.accel_y_cg    = (int16_t)lroundf(d.highg_y_g * 100.0f);
-    pkt.accel_z_cg    = (int16_t)lroundf(d.highg_z_g * 100.0f);
+    pkt.accel_x_cg    = (int16_t)lroundf(d.lin_accel_x / STANDARD_GRAVITY_MS2 * 100.0f);
+    pkt.accel_y_cg    = (int16_t)lroundf(d.lin_accel_y / STANDARD_GRAVITY_MS2 * 100.0f);
+    pkt.accel_z_cg    = (int16_t)lroundf(d.lin_accel_z / STANDARD_GRAVITY_MS2 * 100.0f);
     pkt.quat_w_i16    = (int16_t)lroundf(d.quat_w * 32767.0f);
     pkt.quat_x_i16    = (int16_t)lroundf(d.quat_x * 32767.0f);
     pkt.quat_y_i16    = (int16_t)lroundf(d.quat_y * 32767.0f);
@@ -148,47 +143,38 @@ TelemetryPacket TelemetryManager::_buildPacket(const FlightData& d) const {
     pkt.attitude_status = (_attitude.controlEnabled() ? ATTITUDE_STATUS_CONTROL_ON : 0)
                          | (_attitude.demoEnabled()    ? ATTITUDE_STATUS_DEMO_ON    : 0);
 
-    // ---- TEMPORARY bench fields -- see Packet.h ----
-    pkt.gyro_x_mrs  = (int16_t)lroundf(d.gyro_x * 1000.0f);
-    pkt.gyro_y_mrs  = (int16_t)lroundf(d.gyro_y * 1000.0f);
-    pkt.gyro_z_mrs  = (int16_t)lroundf(d.gyro_z * 1000.0f);
-    pkt.fin_cdeg[0] = (int16_t)lroundf(_fins.liveCorrectionDeg(1) * 100.0f);
-    pkt.fin_cdeg[1] = (int16_t)lroundf(_fins.liveCorrectionDeg(2) * 100.0f);
-    pkt.fin_cdeg[2] = (int16_t)lroundf(_fins.liveCorrectionDeg(3) * 100.0f);
-    pkt.fin_cdeg[3] = (int16_t)lroundf(_fins.liveCorrectionDeg(4) * 100.0f);
-
     return pkt;
 }
 
 void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
     switch (cmd.type) {
         case CommandType::ARM:
-            Serial.println("[TELEM] CMD: ARM");
+            DEBUG_SERIAL.println("[TELEM] CMD: ARM");
             _sm.onArm();
             break;
 
         case CommandType::DISARM:
-            Serial.println("[TELEM] CMD: DISARM");
+            DEBUG_SERIAL.println("[TELEM] CMD: DISARM");
             _sm.onDisarm();
             break;
 
         case CommandType::FIRE_PYRO:
-            Serial.print("[TELEM] CMD: FIRE_PYRO ch="); Serial.println(cmd.param);
+            DEBUG_SERIAL.print("[TELEM] CMD: FIRE_PYRO ch="); DEBUG_SERIAL.println(cmd.param);
             _pyro.fire(cmd.param);   // PyroController enforces armed + continuity checks
             break;
 
         case CommandType::CALIBRATE_BARO:
-            Serial.println("[TELEM] CMD: CALIBRATE_BARO");
+            DEBUG_SERIAL.println("[TELEM] CMD: CALIBRATE_BARO");
             _calibrateRequested = true;
             break;
 
         case CommandType::SERVO_TEST:
-            Serial.print("[TELEM] CMD: SERVO_TEST ch="); Serial.println(cmd.param);
+            DEBUG_SERIAL.print("[TELEM] CMD: SERVO_TEST ch="); DEBUG_SERIAL.println(cmd.param);
             _fins.testSweep(cmd.param);
             break;
 
         case CommandType::CAM_TOGGLE:
-            Serial.println("[TELEM] CMD: CAM_TOGGLE");
+            DEBUG_SERIAL.println("[TELEM] CMD: CAM_TOGGLE");
             _camera.toggleRecording();
             break;
 
@@ -201,52 +187,52 @@ void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
             break;
 
         case CommandType::SERVO_SAVE_CAL:
-            Serial.println("[TELEM] CMD: SERVO_SAVE_CAL");
+            DEBUG_SERIAL.println("[TELEM] CMD: SERVO_SAVE_CAL");
             _fins.saveCalibration();
             break;
 
         case CommandType::SERVO_CENTER_ALL:
-            Serial.println("[TELEM] CMD: SERVO_CENTER_ALL");
+            DEBUG_SERIAL.println("[TELEM] CMD: SERVO_CENTER_ALL");
             _fins.centerAll();
             break;
 
         case CommandType::SERVO_PREFLIGHT:
-            Serial.println("[TELEM] CMD: SERVO_PREFLIGHT");
+            DEBUG_SERIAL.println("[TELEM] CMD: SERVO_PREFLIGHT");
             _fins.preflightSequence();
             break;
 
         case CommandType::SD_START_RECORDING:
-            Serial.println("[TELEM] CMD: SD_START_RECORDING");
-            if (!_logger.open()) Serial.println("[TELEM] SD_START_RECORDING failed -- no card?");
+            DEBUG_SERIAL.println("[TELEM] CMD: SD_START_RECORDING");
+            if (!_logger.open()) DEBUG_SERIAL.println("[TELEM] SD_START_RECORDING failed -- no card?");
             break;
 
         case CommandType::SD_STOP_RECORDING:
-            Serial.println("[TELEM] CMD: SD_STOP_RECORDING");
+            DEBUG_SERIAL.println("[TELEM] CMD: SD_STOP_RECORDING");
             _logger.close();
             break;
 
         case CommandType::ATTITUDE_CONTROL_ENABLE:
-            Serial.println("[TELEM] CMD: ATTITUDE_CONTROL_ENABLE");
+            DEBUG_SERIAL.println("[TELEM] CMD: ATTITUDE_CONTROL_ENABLE");
             _attitude.setControlEnabled(true);
             break;
 
         case CommandType::ATTITUDE_CONTROL_DISABLE:
-            Serial.println("[TELEM] CMD: ATTITUDE_CONTROL_DISABLE");
+            DEBUG_SERIAL.println("[TELEM] CMD: ATTITUDE_CONTROL_DISABLE");
             _attitude.setControlEnabled(false);
             break;
 
         case CommandType::ATTITUDE_DEMO_ENABLE:
-            Serial.println("[TELEM] CMD: ATTITUDE_DEMO_ENABLE");
+            DEBUG_SERIAL.println("[TELEM] CMD: ATTITUDE_DEMO_ENABLE");
             _attitude.setDemoEnabled(true);
             break;
 
         case CommandType::ATTITUDE_DEMO_DISABLE:
-            Serial.println("[TELEM] CMD: ATTITUDE_DEMO_DISABLE");
+            DEBUG_SERIAL.println("[TELEM] CMD: ATTITUDE_DEMO_DISABLE");
             _attitude.setDemoEnabled(false);
             break;
 
         case CommandType::RESET:
-            Serial.println("[TELEM] CMD: RESET");
+            DEBUG_SERIAL.println("[TELEM] CMD: RESET");
             _resetRequested = true;
             break;
 
@@ -255,7 +241,7 @@ void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
             break;
 
         default:
-            Serial.println("[TELEM] CMD: unknown");
+            DEBUG_SERIAL.println("[TELEM] CMD: unknown");
             break;
     }
 }

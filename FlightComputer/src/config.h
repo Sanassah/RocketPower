@@ -41,6 +41,12 @@
 #define ZOEM8_I2C_BUS    Wire1
 #define ZOEM8_I2C_ADDR   0x42   // fixed u-blox DDC address (ZOEM8_SCL1/SDA1)
 
+#define INA260_I2C_BUS   Wire1
+#define INA260_I2C_ADDR  0x40   // A0=A1=GND (INA260_SCL1/SDA1)
+
+#define ADXL375_I2C_BUS  Wire2
+#define ADXL375_I2C_ADDR 0x1D   // CS tied HIGH, ADDR tied HIGH (ADXL375_SCL2/SDA2)
+
 // ===== IMU mounting-offset calibration =====
 // BENCH-CONFIRMED (2026-09): the BNO085's rotation vector reports a fixed
 // ~8 deg tilt even with the airframe verified vertical (level/plumb-line
@@ -79,14 +85,8 @@
 #define IMU_MOUNT_CAL_QUAT_Y   0.0665f
 #define IMU_MOUNT_CAL_QUAT_Z   0.1631f
 
-// Echo raw NMEA sentences to Serial as they're read (verbose — GPS bring-up only)
+// Echo raw NMEA sentences to DEBUG_SERIAL as they're read (verbose — GPS bring-up only)
 #define GPS_DEBUG_RAW_NMEA 0
-
-#define INA260_I2C_BUS   Wire1
-#define INA260_I2C_ADDR  0x40   // A0=A1=GND (INA260_SCL1/SDA1)
-
-#define ADXL375_I2C_BUS  Wire2
-#define ADXL375_I2C_ADDR 0x1D   // CS tied HIGH, ADDR tied HIGH (ADXL375_SCL2/SDA2)
 
 // ===== UART Assignments =====
 // From schematic text annotations: "0 (RX1)", "1 (TX1)", "RX 28", "TX 29"
@@ -119,8 +119,8 @@
 // From HighCurrentComponents.kicad_sch hierarchical labels
 // PyroCHx_N  → low-side MOSFET gate, MCU pin N (active HIGH to fire)
 // Pyrox_Test_N → continuity sense (analog input), MCU pin N
-#define PYRO_CH1_FIRE_PIN   2     // PyroCH1_2  — ignition
-#define PYRO_CH2_FIRE_PIN   3     // PyroCH2_3  — parachute
+#define PYRO_CH1_FIRE_PIN   2     // PyroCH1_2  — parachute
+#define PYRO_CH2_FIRE_PIN   3     // PyroCH2_3  — reserved (future booster/2nd stage), unused
 #define PYRO_CH3_FIRE_PIN   4     // PyroCH3_4  — backup
 
 #define PYRO_CH1_CONT_PIN   40    // Pyro1_Test_40
@@ -132,8 +132,11 @@
 #define PYRO_CONT_THRESHOLD    512     // ADC counts — above = continuity OK
 
 // ===== Pyro channel aliases =====
-#define PYRO_IGNITION   1   // CH1 — motor igniter, fired by ground command
-#define PYRO_PARACHUTE  2   // CH2 — recovery parachute, fired at apogee
+// Motor ignition is handled by an external launcher system, not this flight
+// computer -- CH1 carries the recovery parachute instead (moved off CH2,
+// which is now free for a future second stage/booster).
+#define PYRO_PARACHUTE  1   // CH1 — recovery parachute, fired at apogee
+#define PYRO_CH2_RESERVED 2 // CH2 — reserved, unused for now
 #define PYRO_BACKUP     3   // CH3 — backup charge: fireable manually by ground
                             // command at any time, AND auto-fired by
                             // BackupDeploy on independent apogee evidence
@@ -358,9 +361,42 @@
 #define ATTITUDE_MAX_AXIS_DEG   20.0f
 
 // ===== Flight Constants =====
-#define LIFTOFF_ACCEL_THRESHOLD    2.5f   // g — triggers POWERED_ASCENT
+#define LIFTOFF_ACCEL_THRESHOLD    2.5f   // g — triggers POWERED_ASCENT (ADXL375, NOT currently used -- see below)
 #define LIFTOFF_CONFIRM_MS         100    // must hold for this long
-#define BURNOUT_ACCEL_THRESHOLD    1.0f   // g — drop below = COAST
+#define BURNOUT_ACCEL_THRESHOLD    1.0f   // g — drop below = COAST (ADXL375, NOT currently used -- see below)
+#define BURNOUT_CONFIRM_MS         100    // must hold below threshold this long (accel/thrust
+                                           // noise can dip briefly without a real burnout)
+
+// TEMPORARY: liftoff/burnout gating switched from the ADXL375 (highg_mag_g,
+// LIFTOFF/BURNOUT_ACCEL_THRESHOLD above) to the BNO085 (accel_mag_ms2)
+// while the ADXL375 hardware fault (2026-09 bench investigation) is being
+// tracked down -- confirmed non-physical sample-to-sample instability (up
+// to several g at rest) independent of I2C clock, ODR/bandwidth (swept
+// 1.56Hz-3200Hz), self-test, RF, and torn reads, pointing at a hardware
+// fault in this specific unit/board rather than anything fixable in
+// software. highg_mag_g is still read/logged/telemetried every loop, just
+// no longer trusted for flight-critical gating. REVERT StateMachine.cpp's
+// and BackupDeploy.cpp's threshold checks back to highg_mag_g/
+// LIFTOFF_ACCEL_THRESHOLD/BURNOUT_ACCEL_THRESHOLD once resolved (solder
+// rework or sensor swap).
+//
+// SH2_LINEAR_ACCELERATION already has gravity subtracted (unlike the ADXL,
+// which reads ~1g at rest from gravity alone), so its magnitude is directly
+// "how hard is something other than gravity pushing this" -- no g-offset
+// math needed. LIFTOFF_ACCEL_THRESHOLD (2.5g of TOTAL specific force,
+// gravity included) implied ~1.5g of real thrust acceleration once
+// gravity's 1g is subtracted out -- 15.0 m/s² here matches that.
+// BURNOUT_ACCEL_THRESHOLD (drops below 1.0g total, i.e. net thrust accel
+// near zero) maps to the magnitude dropping near the noise floor -- 2.0
+// m/s² here.
+#define IMU_LIFTOFF_ACCEL_THRESHOLD_MS2   15.0f
+#define IMU_BURNOUT_ACCEL_THRESHOLD_MS2    2.0f
+// Burnout fallback if the accelerometer sticks/fails -- cross-checked via
+// baro vertical velocity instead of a fixed motor-burn-time guess (works for
+// any motor). Peak-so-far velocity stalling by this much = no longer
+// thrusting. 2 m/s clears fusion noise (~0.15m/s) but is tiny next to real
+// powered-flight accel, so it can't fire while genuinely still thrusting.
+#define POWERED_ASCENT_VELOCITY_DROP_MS 2.0f
 #define APOGEE_DETECTION_WINDOW_MS 200    // vertical-velocity zero-crossing window
 #define LANDED_STABLE_MS           10000  // altitude stable for this long = LANDED
 #define LANDED_ALT_TOLERANCE_M     2.0f   // ±m to count as "stable"
@@ -389,6 +425,20 @@
                                         // ground operator) every chance to
                                         // act first; a redundant fire into
                                         // an already-open bay is harmless
+
+// Fallback for BackupDeploy's WAITING_FOR_ALTITUDE stage -- without this, a
+// single bad/stuck baro reading (RF-coupled noise, see Barometer.cpp) at or
+// after boost could leave that stage waiting for BACKUP_MIN_ALT_GAIN_M
+// forever, silently disabling the entire backup-deploy safety net for the
+// rest of the flight with no fallback of its own -- the same single-point-
+// of-failure shape POWERED_ASCENT_VELOCITY_DROP_MS was added to close for
+// burnout detection. Generously long (real flights reach apogee in ~9s per
+// the OpenRocket sim) so a genuine flight always clears the altitude gain
+// well before this fires. On timeout, re-arms WAITING_FOR_BOOST instead of
+// forcing the apogee watch open -- a still-climbing flight just gets a
+// fresh altitude reference to try again, and a false bench trigger
+// correctly stays inert.
+#define BACKUP_ALTITUDE_TIMEOUT_MS 45000
 
 // Requesting 200ms (5Hz) outran what the LoRa link could actually clear over
 // the air, leaving the radio almost continuously transmitting -- observed
@@ -469,9 +519,6 @@
 // this repo (288.4 m/s, RocketPower_V1.ork) -- generously wide on purpose,
 // this only needs to catch nonsense, never a real (even fast) flight.
 #define MAX_PLAUSIBLE_VERT_SPEED_MS 350.0f
-
-// ===== Sea-level pressure for altitude reference =====
-#define SEA_LEVEL_HPA 1013.25f
 
 // ===== Status LEDs =====
 // From main.kicad_sch: D3 "GPS LED", D4 "Altimeter LED", D5 "200G ACC LED",

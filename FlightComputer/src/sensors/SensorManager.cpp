@@ -1,5 +1,6 @@
 #include "SensorManager.h"
 #include "../config.h"
+#include "../DebugPrint.h"
 #include <Wire.h>
 #include <math.h>
 #include <string.h>
@@ -82,12 +83,15 @@ void SensorManager::update() {
     _data.lin_accel_x = src.lin_accel_x;
     _data.lin_accel_y = src.lin_accel_y;
     _data.lin_accel_z = src.lin_accel_z;
+    _data.accel_mag_ms2 = sqrtf(src.lin_accel_x * src.lin_accel_x +
+                                 src.lin_accel_y * src.lin_accel_y +
+                                 src.lin_accel_z * src.lin_accel_z);
 
     _data.highg_x_g = src.highg_x; _data.highg_y_g = src.highg_y; _data.highg_z_g = src.highg_z;
     _data.highg_mag_g = sqrtf(src.highg_x * src.highg_x + src.highg_y * src.highg_y + src.highg_z * src.highg_z);
 
     _data.baro_alt_m  = src.baro_alt_m;
-    _data.vert_vel_ms = src.vert_vel_ms;   // sim ground truth -- bypasses the complementary filter below entirely
+    _data.vert_vel_ms = src.vert_vel_ms;   // sim ground truth -- the real build's complementary filter isn't compiled into this path at all
 
     // Not modeled by the HITL bridge -- zeroed, harmless (see begin()'s note
     // on gps_ok/power_ok; nothing flight-critical reads these otherwise).
@@ -108,30 +112,23 @@ bool SensorManager::begin() {
     Wire1.begin();
     Wire2.begin();
 
-    // Bench-measured (see [SENSOR BREAKDOWN] diagnostic above): every sensor
-    // read was taking multiple milliseconds, with no clock speed ever set on
-    // any of these three buses -- meaning all of them were running at
-    // Teensy's 100kHz I2C default. Every device here (BNO085, BMP390,
-    // INA260, ZOE-M8Q) supports 400kHz Fast Mode per its datasheet, but
-    // BENCH-CONFIRMED: Wire (BNO085 only) does NOT tolerate 400kHz on this
-    // board -- boot failed with "I2C address not found" / imu FAIL as soon
-    // as this was added, while Wire1 (baro+gps+power, 3 devices) and Wire2
-    // (accel) both verified clean at 400kHz. Likely a pull-up/trace-length
-    // limit specific to that one connection, not a device-datasheet issue --
-    // left at the 100kHz default until a slower intermediate speed (e.g.
-    // 250kHz) is bench-verified to boot clean. Wire1/Wire2 keep the 4x
-    // speedup, which was most of the win anyway (baro+gps+power's combined
-    // cost was comparable to the IMU's alone).
-    Wire1.setClock(400000);
-    Wire2.setClock(400000);
-
-    bool ok = true;
-
     _data.imu_ok   = _imu.begin();
     _data.baro_ok  = _baro.begin();
     _data.accel_ok = _accel.begin();
     _data.gps_ok   = _gps.begin();
     _data.power_ok = _power.begin();
+
+    // Must run AFTER every begin() above, not before: Adafruit_I2CDevice
+    // (BMP3XX/ADXL375/BNO08x's I2C base) calls wire->begin() again inside
+    // ITS OWN begin(), which resets a Teensy bus's clock back to 100kHz --
+    // setting it earlier meant baro/power silently undid it with nothing to
+    // reapply after. BNO085 (Wire) doesn't tolerate 400kHz on this board
+    // (bench-confirmed boot failure); Wire1/Wire2 clean at 400kHz --
+    // 400kHz was RULED OUT as the cause of the ADXL375 noise investigated
+    // 2026-09 (reverting Wire2 to 100kHz didn't fix it either; root cause
+    // was Accelerometer.cpp's torn-read bug instead, see there).
+    Wire1.setClock(400000);
+    Wire2.setClock(400000);
 
     // Seed each sensor's "last known good" clock so update() has a baseline
     // to measure staleness from. A sensor that failed begin() keeps its
@@ -144,49 +141,19 @@ bool SensorManager::begin() {
     if (_data.power_ok) _lastPowerOkMs = now;
 
     // IMU and barometer are critical — flight is unsafe without them
-    ok = _data.imu_ok && _data.baro_ok;
-    return ok;
+    return _data.imu_ok && _data.baro_ok;
 }
 
 void SensorManager::update() {
     uint32_t now = millis();
 
-    // The BNO085 streams 3 report types (rotation vector, linear accel,
-    // gyro) at 100Hz each -- up to 300 events/s -- but this loop only runs
-    // at 100Hz itself. Pulling just one event per call can't keep up (it
-    // drains at most 1/3 of what's arriving), so the FIFO backs up and
-    // whichever report type loses the round-robin sees a growing lag before
-    // its value updates -- exactly what shows up as "the fins react late."
-    // Drain everything actually queued each call instead, bounded so a
-    // pathological flood can't stall the rest of the loop.
-    //
-    // BENCH-MEASURED (see main.cpp's [LOOP BREAKDOWN]/[SENSOR BREAKDOWN]
-    // diagnostics), full trace below:
-    //  1. Cutting this cap 10->6 barely moved imu='s max (~40ms -> ~35-42ms)
-    //     -- unlike the same kind of cap added for GPS below (~24ms->~7ms,
-    //     a real cut matching its byte-budget cut), meaning the cost here
-    //     ISN'T N calls x a roughly-constant per-call cost.
-    //  2. Dropping the cap to 1 (single call, no draining) STILL showed
-    //     15ms on that one call alone -- confirmed the cost lives inside a
-    //     single _imu.update() call, not from iterating multiple times.
-    //  3. Traced into the vendor driver: _imu.update() -> getSensorEvent()
-    //     -> sh2_service() -> shtp_service() -> i2chal_read()
-    //     (Adafruit_BNO08x.cpp) reads a 4-byte SHTP header for the queued
-    //     packet's size, then drains it in chunks capped at
-    //     i2c_dev->maxBufferSize() -- hard-coded to 32 bytes for Teensy in
-    //     Adafruit_I2CDevice.cpp (no Teensy-specific case, unlike SAMD/ESP32).
-    //     A bigger queued packet just means more 32-byte I2C transactions
-    //     back to back, each with its own transaction overhead.
-    //  4. Root cause of WHY the packet gets big: IMU.cpp had all three
-    //     BNO085 reports (rotation vector, linear accel, gyro) scheduled on
-    //     the identical 10000us tick, so the hub tends to have all three
-    //     queued at once when polled. Fixed there -- linear accel detuned to
-    //     20000us (50Hz, off-tick from the other two; it only feeds the
-    //     already-filtered vertical-velocity estimate, unlike rotation
-    //     vector/gyro which AttitudeController reads directly).
-    // Cap restored to 6 (from a 1-call diagnostic-only test used for #2
-    // above) now that a real fix is in for the root cause in IMU.cpp, not
-    // just this drain-side symptom.
+    // BNO085 streams 3 reports at 100Hz each (300 events/s) into a loop that
+    // only runs at 100Hz -- one event/call can't keep up, FIFO backs up.
+    // Drain everything queued each call, capped so a flood can't stall the
+    // loop. Cost lives inside a single _imu.update() call (I2C chunked at
+    // 32B/transaction, Adafruit_I2CDevice), not from calling it N times --
+    // real fix was detuning linear accel off-tick in IMU.cpp so the hub
+    // stops queuing all 3 reports together; this cap just bounds the drain.
     uint32_t t0 = micros();
     bool imuGotData = false;
     uint8_t imuCalls = 0;
@@ -231,8 +198,7 @@ void SensorManager::update() {
     if (imuCalls > maxImuCalls) maxImuCalls = imuCalls;
 
     static uint32_t lastSensorStatMs = 0;
-    if (millis() - lastSensorStatMs >= 5000) {
-        lastSensorStatMs = millis();
+    if (debugPrintReady(lastSensorStatMs, 5000)) {
         // ms, 3 decimals -- full us precision, just relabeled (see main.cpp).
         DEBUG_SERIAL.print("[SENSOR BREAKDOWN] imu="); DEBUG_SERIAL.print(maxImuUs / 1000.0f, 3);
         DEBUG_SERIAL.print("ms (singleCallMax="); DEBUG_SERIAL.print(maxImuSingleUs / 1000.0f, 3);
@@ -269,6 +235,9 @@ void SensorManager::update() {
     _data.gyro_x       = imu.gyro_x;
     _data.gyro_y       = imu.gyro_y;
     _data.gyro_z       = imu.gyro_z;
+    _data.accel_mag_ms2 = sqrtf(imu.lin_accel_x * imu.lin_accel_x +
+                                 imu.lin_accel_y * imu.lin_accel_y +
+                                 imu.lin_accel_z * imu.lin_accel_z);
 
     // Barometer
     const auto& baro = _baro.data();
@@ -298,25 +267,26 @@ void SensorManager::update() {
     _data.current_ma = pwr.current_ma;
     _data.power_mw   = pwr.power_mw;
 
-    // Fused vertical velocity: complementary filter combining IMU and barometer.
-    // The IMU gives fast, low-noise dynamics; the baro corrects long-term drift.
-    // Falls back to barometer-only (already in _data.vert_vel_ms) if IMU is absent.
+    // Fused vertical velocity: complementary filter, IMU integration
+    // predicts every cycle, baro corrects on its own refresh (~50Hz). Falls
+    // back to barometer-only (already in _data.vert_vel_ms) if IMU is down.
+    // Uses Barometer::vert_vel_ms (correctly-timed there, see its update())
+    // rather than re-differentiating baro_alt_m against this loop's own
+    // dt -- doing that used to alias against the barometer's slower ODR and
+    // amplify noise into multi-m/s spikes (bench-reported "super reactive
+    // to barometer").
     //
-    // BUG FIX (2026-09): this used to re-differentiate baro_alt_m itself every
-    // loop cycle using THIS loop's dt (~10ms @ 100Hz), but the barometer only
-    // actually produces a fresh sample at its own 50Hz ODR -- every other
-    // cycle saw an unchanged altitude (baro_vel=0), and the next saw the
-    // FULL two-cycle pressure change divided by only one cycle's dt, roughly
-    // doubling the apparent rate. Worse, that meant even sub-noise-floor
-    // pressure jitter (a fraction of an hPa) was being divided by a ~10ms
-    // window into multi-m/s velocity spikes, injected fresh every cycle --
-    // completely swamping VERT_VEL_ALPHA's supposed 98% trust in the IMU
-    // term (bench-reported: fused velocity "super reactive to barometer").
-    // Fix: reuse Barometer::vert_vel_ms, which Barometer.cpp already
-    // differentiates correctly (its own dt is only ever the real elapsed
-    // time between two ACTUAL successful reads -- see its update()), and
-    // only blend it in on the cycle baroGotData is true, instead of
-    // recomputing a differentiator against a stale/fresh-mismatched dt.
+    // Resync on IMU recovery: VERT_VEL_ALPHA's ~15s time constant (tuned to
+    // reject baro noise) is longer than most of this rocket's flights -- if
+    // _fusedVel_ms were left frozen through an IMU dropout, resuming with a
+    // slow blend back toward reality could mean it never catches up before
+    // the flight ends. Snap straight to the current baro reading instead the
+    // moment IMU comes back, rather than crawling toward it.
+    if (_data.imu_ok && !_imuWasOk) {
+        _fusedVel_ms = baro.vert_vel_ms;
+    }
+    _imuWasOk = _data.imu_ok;
+
     if (_data.imu_ok && _prevFuseTime_ms > 0) {
         float dt = (_data.timestamp_ms - _prevFuseTime_ms) * 0.001f;
         if (dt > 0.0f && dt < 0.1f) {
@@ -337,19 +307,12 @@ void SensorManager::update() {
             }
             _data.vert_vel_ms = _fusedVel_ms;
 
-            // Bench diagnostic (DEBUG_SERIAL only, see config.h's DEBUG_SERIAL
-            // macro) -- isolates the two inputs feeding the fused output so
-            // it's visible which one is actually driving a given swing:
-            // accelVert*dt is the per-cycle IMU-integration step (should be
-            // small/smooth at rest), baroVel is Barometer's own correctly-
-            // timed differentiator (only meaningful on lines where
-            // baroFresh=1 -- printed every cycle regardless so the timing
-            // relationship between the two is visible), fusedVel is what
-            // actually reaches _data.vert_vel_ms/telemetry/apogee detection.
+            // Bench diagnostic -- isolates IMU-integration (accelStep) from
+            // the baro correction (baroVel, only meaningful if baroFresh=1)
+            // so it's visible which one drives a given swing in fusedVel.
             {
                 static uint32_t lastPrintMs = 0;
-                if (millis() - lastPrintMs >= 300) {
-                    lastPrintMs = millis();
+                if (debugPrintReady(lastPrintMs)) {
                     DEBUG_SERIAL.print("[VELFUSE] dt="); DEBUG_SERIAL.print(dt, 4);
                     DEBUG_SERIAL.print(" accelVert="); DEBUG_SERIAL.print(accel_vert, 3);
                     DEBUG_SERIAL.print(" accelStep="); DEBUG_SERIAL.print(accel_vert * dt, 4);

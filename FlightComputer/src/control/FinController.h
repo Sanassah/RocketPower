@@ -1,20 +1,16 @@
 #pragma once
 #include <Servo.h>
 #include <stdint.h>
+#include "../config.h"
 
-// Drives the 4 fin-actuation RC servos (Servo1_PWM..Servo4_PWM on the schematic,
-// HighCurrentComponents.kicad_sch) via the Arduino Servo library. A custom
-// FlexPWM/analogWrite implementation was tried here to chase a chatter issue
-// (wrongly blamed on the Servo library's 50Hz rate -- the real cause was the
-// wrong pulse-width center/range, since fixed via the BMS-101HV datasheet
-// below) and it introduced a worse bug where only one of the four channels
-// would actually respond after boot. Confirmed via an isolated single-purpose
-// test project (ServoTest/, plain Servo library, nothing else running) that
-// all 4 channels work correctly on this hardware -- so back to the Servo
-// library here too. Each channel has a persisted trim (an offset from
-// SERVO_CENTER_US in microseconds) set via the ground-station nudge buttons
-// against a printed alignment jig, then saved to flash so the fins return to the
-// calibrated zero on every boot -- no hand-turning or horn removal required.
+// Drives the 4 fin-actuation RC servos (Servo1_PWM..Servo4_PWM,
+// HighCurrentComponents.kicad_sch) via the Arduino Servo library -- a custom
+// FlexPWM/analogWrite implementation was dropped (bench-confirmed: only 1 of
+// 4 channels responded after boot; see ServoTest/ for the isolated re-test
+// that cleared the Servo library instead). Each channel's trim (offset from
+// SERVO_CENTER_US) is set via ground-station nudge buttons against a printed
+// alignment jig and persisted to flash, so fins return to calibrated zero on
+// every boot.
 class FinController {
 public:
     bool begin();    // load trim from EEPROM, attach all 4 servos, drive to trimmed center
@@ -65,10 +61,10 @@ public:
     float liveCorrectionDeg(uint8_t channel) const;
 
 private:
-    static const uint8_t _pins[4];
-    Servo    _servos[4];
-    int16_t  _trimUs[4] = {0, 0, 0, 0};   // offset from SERVO_CENTER_US, persisted
-    uint16_t _liveUs[4] = {0, 0, 0, 0};   // currently commanded pulse width per channel
+    static const uint8_t _pins[SERVO_NUM_CHANNELS];
+    Servo    _servos[SERVO_NUM_CHANNELS];
+    int16_t  _trimUs[SERVO_NUM_CHANNELS] = {};   // offset from SERVO_CENTER_US, persisted
+    uint16_t _liveUs[SERVO_NUM_CHANNELS] = {};   // currently commanded pulse width per channel
 
     void _loadCalibration();
     void _writeUs(uint8_t idx, int32_t us);
@@ -76,5 +72,5 @@ private:
     // Cosmetic ramps (linear, stepped) so choreography looks like intentional
     // motion instead of instant snaps. Purely visual -- no functional need.
     void _rampTo(uint8_t idx, int32_t targetUs, uint32_t durationMs);
-    void _rampAllTo(const int32_t targets[4], uint32_t durationMs);
+    void _rampAllTo(const int32_t targets[SERVO_NUM_CHANNELS], uint32_t durationMs);
 };

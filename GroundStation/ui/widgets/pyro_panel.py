@@ -15,7 +15,7 @@ _GREEN  = '#22C55E'
 _ORANGE = '#F59E0B'
 _RED    = '#EF4444'
 
-_PYRO_NAMES = {1: 'Ignition', 2: 'Parachute', 3: 'Backup'}
+_PYRO_NAMES = {1: 'Parachute', 2: 'Reserved', 3: 'Backup'}
 PYRO_CHANNELS = 3
 
 _IDLE  = ('IDLE',  '#94A3B8', '#222226', '#3A3A3E')
@@ -49,7 +49,7 @@ class _ChannelRow(QWidget):
             f'border:none;background:transparent;min-width:60px;'
         )
 
-        # Function name ("Ignition" / "Parachute" / "Backup")
+        # Function name ("Parachute" / "Reserved" / "Backup")
         name_lbl = QLabel(_PYRO_NAMES[ch])
         name_lbl.setFont(QFont('Segoe UI', 15))
         name_lbl.setStyleSheet(
@@ -149,10 +149,15 @@ class PyroPanel(QWidget):
             else:
                 row.set_status('IDLE')
 
-        if data.state >= 2 and 1 not in self._fired:
+        # CH1 (parachute) fires transitioning into DESCENT (i.e. APOGEE just
+        # happened -- see StateMachine.cpp). Motor ignition is external now,
+        # not a pyro channel this flight computer controls, so there's no
+        # equivalent auto-detection for a POWERED_ASCENT trigger any more.
+        # CH2 (reserved) and CH3 (backup) only ever get marked FIRED via an
+        # explicit ground command (mark_fired()) -- BackupDeploy's own
+        # autonomous fire isn't currently reflected here.
+        if data.state >= 5 and 1 not in self._fired:
             self._fired.add(1)
-        if data.state >= 5 and 2 not in self._fired:
-            self._fired.add(2)
         if data.state == 0:
             self._fired.clear()
 

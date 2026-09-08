@@ -14,8 +14,8 @@ _GREEN  = '#22C55E'
 _RED    = '#EF4444'
 
 _CH_NAMES = [
-    ('PYRO 1', 'IGNITION'),
-    ('PYRO 2', 'PARACHUTE'),
+    ('PYRO 1', 'PARACHUTE'),
+    ('PYRO 2', 'RESERVED'),
     ('PYRO 3', 'BACKUP'),
 ]
 
@@ -45,7 +45,7 @@ class _CircuitRow(QWidget):
             f'border:none;background:transparent;min-width:58px;'
         )
 
-        # Function name ("IGNITION")
+        # Function name ("PARACHUTE")
         fn_lbl = QLabel(func_label)
         fn_lbl.setFont(QFont('Segoe UI', 15))
         fn_lbl.setStyleSheet(

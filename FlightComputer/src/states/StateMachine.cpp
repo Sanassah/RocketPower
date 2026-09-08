@@ -1,18 +1,22 @@
 #include "StateMachine.h"
 #include "../config.h"
 #include "../control/PyroController.h"
+#include "../DebugPrint.h"
 
 void StateMachine::_enterState(FlightState next, uint32_t now) {
     _state          = next;
     _stateEnteredMs = now;
 
     // Reset per-state detection variables
-    _liftoffDetecting = false;
-    _apogeeDetecting  = false;
-    _landedStableMs   = 0;
+    _liftoffDetecting   = false;
+    _burnoutDetecting   = false;
+    _decelDetecting     = false;
+    _peakAscentVertVel  = 0.0f;   // fresh peak-tracker every (re-)entry to POWERED_ASCENT
+    _apogeeDetecting    = false;
+    _landedStableMs     = 0;
 
-    Serial.print("[FSM] → ");
-    Serial.println(flightStateName(next));
+    DEBUG_SERIAL.print("[FSM] → ");
+    DEBUG_SERIAL.println(flightStateName(next));
 }
 
 void StateMachine::onArm() {
@@ -28,15 +32,13 @@ void StateMachine::onDisarm() {
 }
 
 void StateMachine::reset() {
-    // Unconditional, unlike onDisarm() -- goes to IDLE from ANY state.
-    // _enterState() already clears _liftoffDetecting/_apogeeDetecting/
-    // _landedStableMs; the remaining timing/reference variables aren't
-    // touched by a normal state transition, so clear them explicitly too --
-    // otherwise a stale _apogeeWindowMs or _landedRefAlt from the previous
-    // (reset) flight could feed a spurious detection on the very first loop
-    // of the next one.
+    // Unconditional, unlike onDisarm() -- goes to IDLE from ANY state. Also
+    // clears timing/reference vars _enterState() doesn't touch, so nothing
+    // stale leaks into the next (reset) flight's first loop.
     _enterState(FlightState::IDLE, millis());
     _liftoffFirstMs = 0;
+    _burnoutFirstMs = 0;
+    _decelFirstMs   = 0;
     _apogeeWindowMs = 0;
     _landedRefAlt   = 0.0f;
 }
@@ -52,7 +54,17 @@ void StateMachine::update(const FlightData& d) {
 
         // ---- ARMED: detect liftoff ----
         case FlightState::ARMED: {
-            bool highG = (d.highg_mag_g > LIFTOFF_ACCEL_THRESHOLD);
+            // TEMPORARY: accel_mag_ms2 (BNO085) instead of highg_mag_g
+            // (ADXL375) -- see IMU_LIFTOFF_ACCEL_THRESHOLD_MS2 in config.h.
+            bool highG = (d.accel_mag_ms2 > IMU_LIFTOFF_ACCEL_THRESHOLD_MS2);
+            {
+                static uint32_t lastMs = 0;
+                if (debugPrintReady(lastMs)) {
+                    DEBUG_SERIAL.print("[LIFTOFF CHECK] accelMag_ms2=");
+                    DEBUG_SERIAL.print(d.accel_mag_ms2, 3);
+                    DEBUG_SERIAL.print(" threshold="); DEBUG_SERIAL.println(IMU_LIFTOFF_ACCEL_THRESHOLD_MS2);
+                }
+            }
             if (highG && !_liftoffDetecting) {
                 _liftoffDetecting = true;
                 _liftoffFirstMs   = now;
@@ -65,24 +77,48 @@ void StateMachine::update(const FlightData& d) {
             break;
         }
 
-        // ---- POWERED_ASCENT: detect burnout ----
-        case FlightState::POWERED_ASCENT:
-            if (d.highg_mag_g < BURNOUT_ACCEL_THRESHOLD) {
-                _enterState(FlightState::COAST, now);
+        // ---- POWERED_ASCENT: detect SUSTAINED burnout (accel + velocity cross-check) ----
+        case FlightState::POWERED_ASCENT: {
+            // TEMPORARY: accel_mag_ms2 (BNO085) instead of highg_mag_g
+            // (ADXL375) -- see IMU_BURNOUT_ACCEL_THRESHOLD_MS2 in config.h.
+            bool lowG = (d.accel_mag_ms2 < IMU_BURNOUT_ACCEL_THRESHOLD_MS2);
+            if (lowG) {
+                if (!_burnoutDetecting) {
+                    _burnoutDetecting = true;
+                    _burnoutFirstMs   = now;
+                }
+                if (now - _burnoutFirstMs >= BURNOUT_CONFIRM_MS) {
+                    _enterState(FlightState::COAST, now);
+                }
+            } else {
+                _burnoutDetecting = false;   // still thrusting -- cancel, not a real burnout
+            }
+
+            // Fallback: catches a stuck/failed accelerometer -- see
+            // POWERED_ASCENT_VELOCITY_DROP_MS.
+            if (_state == FlightState::POWERED_ASCENT) {
+                if (d.vert_vel_ms > _peakAscentVertVel) _peakAscentVertVel = d.vert_vel_ms;
+                bool decelerating = (d.vert_vel_ms < _peakAscentVertVel - POWERED_ASCENT_VELOCITY_DROP_MS);
+                if (decelerating) {
+                    if (!_decelDetecting) {
+                        _decelDetecting = true;
+                        _decelFirstMs   = now;
+                    }
+                    if (now - _decelFirstMs >= BURNOUT_CONFIRM_MS) {
+                        _enterState(FlightState::COAST, now);
+                    }
+                } else {
+                    _decelDetecting = false;   // still climbing at/near peak rate -- cancel
+                }
             }
             break;
+        }
 
         // ---- COAST: detect apogee via SUSTAINED non-positive vertical velocity ----
-        // BUG FIX (2026-09): this used to latch _apogeeDetecting permanently
-        // on the first now-confirmed-noisy sample where vert_vel_ms dipped
-        // to/below zero (see SensorManager.cpp's [VELFUSE] diagnostic --
-        // fusedVel genuinely crosses zero on baro RF-coupling noise alone,
-        // not just at real apogee), then fired APOGEE 200ms later
-        // regardless of what velocity did in between -- a live path to
-        // firing the main parachute during POWERED ASCENT from noise, not a
-        // real apogee. Fixed: require vert_vel_ms to stay <= 0
-        // CONTINUOUSLY for the full window, cancelling immediately (not
-        // just failing to arm) the moment it goes positive again.
+        // Must stay <=0 continuously for the full window, cancelling
+        // immediately if it goes positive again -- vert_vel_ms can cross
+        // zero on baro noise alone (see [VELFUSE]), not just at real apogee,
+        // so a single sample can't be allowed to fire the main parachute.
         case FlightState::COAST: {
             bool nonPositive = (d.vert_vel_ms <= 0.0f);
             if (nonPositive) {

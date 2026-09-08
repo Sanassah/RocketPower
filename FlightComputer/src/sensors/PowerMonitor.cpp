@@ -1,5 +1,6 @@
 #include "PowerMonitor.h"
 #include "../config.h"
+#include "../DebugPrint.h"
 
 bool PowerMonitor::begin() {
     if (!_ina.begin(INA260_I2C_ADDR, &INA260_I2C_BUS)) return false;
@@ -22,8 +23,7 @@ bool PowerMonitor::update() {
     // telemetry, see config.h's DEBUG_SERIAL macro -- never costs airtime).
     {
         static uint32_t lastPrintMs = 0;
-        if (millis() - lastPrintMs >= 300) {
-            lastPrintMs = millis();
+        if (debugPrintReady(lastPrintMs)) {
             DEBUG_SERIAL.print("[POWER RAW] voltage_v="); DEBUG_SERIAL.print(_data.voltage_v, 3);
             DEBUG_SERIAL.print(" current_ma="); DEBUG_SERIAL.print(_data.current_ma, 1);
             DEBUG_SERIAL.print(" power_mw="); DEBUG_SERIAL.println(_data.power_mw, 1);

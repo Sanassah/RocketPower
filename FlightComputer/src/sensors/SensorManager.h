@@ -18,6 +18,12 @@ struct FlightData {
     float quat_w, quat_x, quat_y, quat_z;
     float lin_accel_x, lin_accel_y, lin_accel_z;  // m/s²
     float gyro_x, gyro_y, gyro_z;                 // rad/s
+    // TEMPORARY: magnitude of lin_accel_* -- gravity-removed, so this is
+    // "how hard is something other than gravity pushing this," no g-offset
+    // needed. Stands in for the ADXL375's highg_mag_g in flight-critical
+    // liftoff/burnout gating -- see IMU_LIFTOFF_ACCEL_THRESHOLD_MS2 in
+    // config.h for why.
+    float accel_mag_ms2;
 
     // Barometer (BMP390 — Wire1)
     float pressure_hpa;
@@ -76,6 +82,7 @@ private:
     // Complementary filter state for fused vertical velocity
     float    _fusedVel_ms     = 0.0f;
     uint32_t _prevFuseTime_ms = 0;
+    bool     _imuWasOk        = false;   // detects a dropout->recovery edge, see update()
 
     // Timestamp of each sensor's last successful read. A sensor's _ok flag is
     // (now - this) < SENSOR_HEALTH_TIMEOUT_MS. Left at 0 if the sensor never

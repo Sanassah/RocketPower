@@ -135,6 +135,16 @@ class ArmPanel(QWidget):
         centre.addStretch()
         root.addLayout(centre)
 
+        # Launch-readiness badge: every sensor alive right now AND the
+        # parachute channel (CH1) has continuity -- see TelemetryData.
+        # launch_ready. Informational only, doesn't gate the ARM button.
+        self._ready_lbl = QLabel('CHECKING...')
+        self._ready_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._ready_lbl.setFixedHeight(28)
+        self._ready_lbl.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
+        self._set_ready_style(_MUTED)
+        root.addWidget(self._ready_lbl)
+
         # ARM button (full width, slide-to-arm style)
         self._arm_btn = QPushButton('ARM ROCKET   >')
         self._arm_btn.setFixedHeight(44)
@@ -183,7 +193,22 @@ class ArmPanel(QWidget):
         btn_row.addWidget(self._disarm_btn)
         root.addLayout(btn_row)
 
+    def _set_ready_style(self, color: str) -> None:
+        self._ready_lbl.setStyleSheet(
+            f'color:{color};background:transparent;border:1px solid {color};'
+            f'border-radius:6px;letter-spacing:1px;'
+        )
+
     def update_data(self, data: TelemetryData) -> None:
+        # Every packet, regardless of whether flight state changed below --
+        # sensor health or continuity can flicker while state stays put.
+        if data.launch_ready:
+            self._ready_lbl.setText('LAUNCH READY')
+            self._set_ready_style(_GREEN)
+        else:
+            self._ready_lbl.setText('NOT READY: ' + ', '.join(data.launch_not_ready_reasons))
+            self._set_ready_style(_RED)
+
         if data.attitude_control_on != self._attitude_control_on:
             self._attitude_control_on = data.attitude_control_on
             # Programmatic sync from telemetry, not a click -- PillSwitch's

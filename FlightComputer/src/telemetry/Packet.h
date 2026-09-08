@@ -34,17 +34,13 @@
 #define ATTITUDE_STATUS_DEMO_ON     (1 << 1)
 
 // ===== Rocket → Ground telemetry =====
-// Deliberately compact (51 bytes, was 81) -- the LoRa link is stuck at a slow
+// Deliberately compact (52 bytes) -- the LoRa link is stuck at a slow
 // factory-default air data rate (2.4kbps) and reconfiguring the radios is off
 // the table for now, so packet size is the only remaining lever to reduce
 // airtime per packet. Most fields are scaled fixed-point instead of float:
 // GPS accuracy is only ~2-5m, so lat/lon as float (not double) already loses
 // no real accuracy; the rest use a resolution well beyond what's physically
 // meaningful for this vehicle (see comments per field).
-//
-// +14 bytes for the TEMPORARY bench fields block below -- pull that whole
-// block back out once axis-mapping/allocation-sign calibration is done
-// (see config.h/AttitudeController.h) to get back to the size above.
 #pragma pack(push, 1)
 struct TelemetryPacket {
     uint8_t  magic[2];       // TELEM_MAGIC_0, TELEM_MAGIC_1
@@ -64,7 +60,13 @@ struct TelemetryPacket {
     int16_t  baro_alt_dm;    // decimeters (0.1m resolution), relative to launch site
     int16_t  vert_vel_cms;   // cm/s (0.01 m/s resolution), positive = up
 
-    // High-g accelerometer (ADXL375 is +-200g rated -- centi-g gives +-327g range)
+    // TEMPORARY: sourced from the BNO085's gravity-removed linear
+    // acceleration (m/s², converted to g), NOT the ADXL375 -- see
+    // IMU_LIFTOFF_ACCEL_THRESHOLD_MS2 in config.h for why. Reads ~0g at
+    // rest on all 3 axes now (gravity subtracted), unlike the ADXL375's
+    // ~1g-on-one-axis-at-rest. Field name/scale (centi-g, int16) kept as-is
+    // for GroundStation compatibility -- REVERT to highg_x/y/z_g once the
+    // ADXL375 hardware fault is resolved.
     int16_t  accel_x_cg;
     int16_t  accel_y_cg;
     int16_t  accel_z_cg;
@@ -101,19 +103,6 @@ struct TelemetryPacket {
     // the ground tell it to do," so the operator can confirm a command
     // actually landed instead of guessing from silence.
     uint8_t  attitude_status;
-
-    // ---- TEMPORARY: bench axis-mapping/allocation-sign calibration only --
-    // DELETE this block (and its GroundStation TEST tab counterpart) once
-    // config.h's ATTITUDE_*_RATE/ANGLE_ERR mapping is confirmed. Mirrors
-    // main.cpp's [AXIS CAL] serial debug print so GroundStation's TEST tab
-    // can show the same numbers live instead of reading a serial monitor.
-    // Not gated on demoEnabled() -- always populated (harmless near-zero
-    // outside a bench session) so it's just more columns on an existing
-    // struct, not conditional wire logic to remember to remove correctly.
-    int16_t  gyro_x_mrs;     // milli-rad/s (0.001 rad/s resolution), /1000 -> rad/s
-    int16_t  gyro_y_mrs;
-    int16_t  gyro_z_mrs;
-    int16_t  fin_cdeg[4];    // centidegrees, /100 -> deg. Index 0=S,1=E,2=N,3=W (CH1-4)
 
     uint16_t checksum;       // simple sum of all preceding bytes
 };

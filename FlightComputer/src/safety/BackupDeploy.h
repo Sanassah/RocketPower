@@ -64,13 +64,20 @@ private:
     _Stage _stage = _Stage::WAITING_FOR_BOOST;
 
     // Mirrors StateMachine's own liftoff-detection logic (see
-    // LIFTOFF_ACCEL_THRESHOLD/LIFTOFF_CONFIRM_MS in config.h) -- tracked
-    // completely separately so this never depends on StateMachine having
-    // survived whatever caused a reset.
+    // IMU_LIFTOFF_ACCEL_THRESHOLD_MS2/LIFTOFF_CONFIRM_MS in config.h) --
+    // tracked completely separately so this never depends on StateMachine
+    // having survived whatever caused a reset.
     uint32_t _boostFirstMs   = 0;
     bool     _boostDetecting = false;
 
     float    _refAltAtBoost  = 0.0f;
+
+    // Timeout fallback for WAITING_FOR_ALTITUDE -- see
+    // BACKUP_ALTITUDE_TIMEOUT_MS in config.h for why this exists: without
+    // it, a stuck/bad baro reading could leave this stage waiting forever,
+    // silently disabling the whole backup-deploy path for the rest of the
+    // flight. Timestamp of when WAITING_FOR_ALTITUDE was entered.
+    uint32_t _altitudeWaitStartMs = 0;
 
     // Mirrors StateMachine's apogee sustained-non-positive-velocity logic
     // (see APOGEE_DETECTION_WINDOW_MS in config.h), independently tracked.
