@@ -98,7 +98,7 @@ def _to_float(raw: str) -> Optional[float]:
 
 class _LiveRow:
     """One static label + a value that updates in place -- same visual
-    pattern as SensorPanel/TestPanel's row helpers elsewhere in this app."""
+    pattern as SensorPanel's row helpers elsewhere in this app."""
     def __init__(self, layout: QGridLayout, row: int, key: str):
         lbl = QLabel(key)
         lbl.setStyleSheet(f'color:{_MUTED};font-size:12px;border:none;background:transparent;')

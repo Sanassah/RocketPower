@@ -19,12 +19,9 @@ private:
     sh2_SensorValue_t _event;
     IMUData _data{};
 
-    // Most recent PRE-correction rotation vector, kept only so [IMU RAW]'s
-    // bench print can show it -- see IMU.cpp's update()/config.h's
-    // IMU_MOUNT_CAL_QUAT_* comment. Recalibrating requires the raw sensor
-    // value, not _data.quat_* (which is mounting-offset-corrected downstream
-    // of _applyEvent() and would trivially read ~identity once already
-    // calibrated).
+    // Last RAW rotation vector, for [IMU RAW]'s bench print only -- _event
+    // is transient (overwritten by later events), _data.quat_* is already
+    // corrected. See config.h's IMU_MOUNT_CAL_QUAT_*.
     float _rawQuatW = 1.0f, _rawQuatX = 0.0f, _rawQuatY = 0.0f, _rawQuatZ = 0.0f;
 
     void _applyEvent();

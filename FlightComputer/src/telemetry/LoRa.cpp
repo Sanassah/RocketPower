@@ -26,12 +26,9 @@ bool LoRaRadio::send(const TelemetryPacket& pkt) {
     Serial.write(reinterpret_cast<const uint8_t*>(&out), sizeof(out));
 #endif
 
-    // Human-readable summary for bench convenience. Pure ASCII so it can't
-    // desync GroundStation's binary parser on Serial (0xAA can't appear in
-    // text), but it WOULD visually interleave with the raw binary mirror
-    // above if both went to the same port -- exactly the garbled-serial-
-    // monitor problem this whole DEBUG_SERIAL split was for (see config.h).
-    // Goes to DEBUG_SERIAL, not Serial, same as every other bench print.
+    // Human-readable summary, DEBUG_SERIAL only -- ASCII on the binary
+    // Serial port would desync GroundStation's parser (the exact garbled-
+    // monitor problem DEBUG_SERIAL exists to avoid, see config.h).
     DEBUG_SERIAL.print("[TELEM] seq="); DEBUG_SERIAL.print(out.seq);
     DEBUG_SERIAL.print(" alt=");        DEBUG_SERIAL.print(out.baro_alt_dm / 10.0f, 1); DEBUG_SERIAL.print("m");
     DEBUG_SERIAL.print(" vel=");        DEBUG_SERIAL.print(out.vert_vel_cms / 100.0f, 1); DEBUG_SERIAL.print("m/s");

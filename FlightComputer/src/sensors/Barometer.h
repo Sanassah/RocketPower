@@ -4,7 +4,6 @@
 struct BarometerData {
     float pressure_hpa;
     float temperature_c;
-    float altitude_m;      // absolute (from sea-level pressure)
     float rel_altitude_m;  // relative to launch site (set by calibrate())
     float vert_vel_ms;     // m/s, derived by differentiation, positive = up
     bool  valid;
@@ -22,6 +21,6 @@ private:
     BarometerData   _data{};
 
     float    _groundPressure_hpa = 1013.25f;  // pressure at launch site, set by calibrate()
-    float    _prevAlt_m          = 0.0f;
+    float    _prevRelAlt_m       = 0.0f;
     uint32_t _prevTime_ms        = 0;
 };

@@ -1,5 +1,6 @@
 #include "GPS.h"
 #include "../config.h"
+#include "../DebugPrint.h"
 
 // ZOEM8 I2C DDC registers
 #define ZOEM8_REG_BYTES_AVAIL 0xFD   // MSB of bytes-available (followed by 0xFE)
@@ -38,13 +39,8 @@ bool GPS::update() {
 }
 
 bool GPS::_drainI2C() {
-    // TEMPORARY diagnostic (RocketPower bench investigation) -- splits this
-    // call into its 3 I2C stages to find where the remaining ~8ms goes,
-    // since the byte-budget cap below already cut this from ~24ms and the
-    // module's own data rate (~230 bytes/s, bench-measured via bytesRx) is
-    // too low for "big burst needs many chunks" to explain the rest -- most
-    // calls should see a small `avail`. Not durable, remove once the cause
-    // is found. See [GPS BREAKDOWN] below.
+    // [GPS BREAKDOWN] below: per-stage I2C timing (i2cXfer cost model:
+    // ~680us fixed + ~98us/byte, bench-derived).
     uint32_t _dbg_t0 = micros();
 
     // Read how many NMEA bytes the module has buffered
@@ -59,77 +55,51 @@ bool GPS::_drainI2C() {
     uint32_t _dbg_t2 = micros();
 
     uint16_t availOrig = avail;
-    uint32_t i2cXferUs = 0, drainBufUs = 0, parseUs = 0;
+    uint32_t xferUs = 0;
 
     // 0 or 0xFFFF just means "nothing buffered right now" -- not a comms
     // failure, so still report the module as alive.
     if (avail != 0 && avail != 0xFFFF) {
-        // BENCH-MEASURED (see main.cpp's [SENSOR BREAKDOWN] diagnostic): the
-        // module bursts a whole second's worth of NMEA sentences (~200-500
-        // bytes) at once, roughly 1Hz. Draining an arbitrarily large burst
-        // in one update() call would stall this loop iteration -- same
-        // category of problem as the IMU's own bounded events-per-call cap
-        // in SensorManager.cpp, and the same fix: bound how much ONE call
-        // can drain, so a burst spreads across several loop iterations
-        // instead of stalling a single one. A whole second of NMEA easily
-        // drains across the ~100 loop iterations before the next burst
-        // arrives, so this doesn't risk falling behind -- it only spreads
-        // the SAME total work out.
+        // Cap per-call drain: module bursts ~200-500B once/sec -- draining
+        // it all in one update() would stall that loop iteration (same fix
+        // as IMU's bounded per-call cap). Spreads across ~100 iterations
+        // before the next burst, no risk of falling behind.
         if (avail > 64) avail = 64;
         _data.bytesRxTotal += avail;
 
+        // requestFrom() is blocking -- the real I2C transfer cost happens
+        // INSIDE this call, before it returns, not in the drain loop after
+        // it. Timed from _dbg_t2 (before this call) for that reason.
         ZOEM8_I2C_BUS.requestFrom((uint8_t)ZOEM8_I2C_ADDR, (uint8_t)avail);
-        uint32_t _dbg_t2b = micros();   // TEMPORARY diagnostic -- isolates the I2C transfer itself
 
-        // TEMPORARY diagnostic -- drain Wire's already-filled buffer into a
-        // local array with NO parsing yet, so parsing cost (below) is
-        // isolated from I2C/Wire-buffer cost. GPS_DEBUG_RAW_NMEA is
-        // confirmed off (config.h), so that's not it -- last remaining
-        // candidate after ruling out I2C transaction count (1 vs 2 chunks
-        // made no difference to the total) is _parser.encode() itself
-        // (TinyGPS++, plus the GPGSV custom-field hook).
-        uint8_t localBuf[64];
-        uint8_t n = 0;
-        while (ZOEM8_I2C_BUS.available() && n < sizeof(localBuf)) {
-            localBuf[n++] = (uint8_t)ZOEM8_I2C_BUS.read();
+        while (ZOEM8_I2C_BUS.available()) {
+            char c = (char)ZOEM8_I2C_BUS.read();
+            _parser.encode(c);
+#if GPS_DEBUG_RAW_NMEA
+            DEBUG_SERIAL.write(c);
+#endif
         }
-        uint32_t _dbg_t2c = micros();
 
-        for (uint8_t i = 0; i < n; i++) {
-            _parser.encode((char)localBuf[i]);
-        }
-        uint32_t _dbg_t3 = micros();
-
-        i2cXferUs  = _dbg_t2b - _dbg_t2;
-        drainBufUs = _dbg_t2c - _dbg_t2b;
-        parseUs    = _dbg_t3  - _dbg_t2c;
+        xferUs = micros() - _dbg_t2;
     }
 
     {
-        static uint32_t _dbg_maxRegWrite = 0, _dbg_maxCountRead = 0;
-        static uint32_t _dbg_maxI2cXfer = 0, _dbg_maxDrainBuf = 0, _dbg_maxParse = 0;
+        static uint32_t _dbg_maxRegWrite = 0, _dbg_maxCountRead = 0, _dbg_maxXfer = 0;
         static uint16_t _dbg_maxAvail = 0;
         uint32_t regWriteUs  = _dbg_t1 - _dbg_t0;
         uint32_t countReadUs = _dbg_t2 - _dbg_t1;
         if (regWriteUs  > _dbg_maxRegWrite)  _dbg_maxRegWrite  = regWriteUs;
         if (countReadUs > _dbg_maxCountRead) _dbg_maxCountRead = countReadUs;
-        if (i2cXferUs   > _dbg_maxI2cXfer)   _dbg_maxI2cXfer   = i2cXferUs;
-        if (drainBufUs  > _dbg_maxDrainBuf)  _dbg_maxDrainBuf  = drainBufUs;
-        if (parseUs     > _dbg_maxParse)     _dbg_maxParse     = parseUs;
+        if (xferUs      > _dbg_maxXfer)      _dbg_maxXfer      = xferUs;
         if (availOrig   > _dbg_maxAvail)     _dbg_maxAvail     = availOrig;
         static uint32_t _dbg_lastPrintMs = 0;
-        if (millis() - _dbg_lastPrintMs >= 5000) {
-            _dbg_lastPrintMs = millis();
-            // ms, 3 decimals -- full us precision, just relabeled (see main.cpp).
-            // maxAvail is a byte count, not a time -- left unconverted.
+        if (debugPrintReady(_dbg_lastPrintMs, 5000)) {
+            // ms, 3 decimals. maxAvail is a byte count, left unconverted.
             DEBUG_SERIAL.print("[GPS BREAKDOWN] regWrite="); DEBUG_SERIAL.print(_dbg_maxRegWrite / 1000.0f, 3);
             DEBUG_SERIAL.print("ms countRead="); DEBUG_SERIAL.print(_dbg_maxCountRead / 1000.0f, 3);
-            DEBUG_SERIAL.print("ms i2cXfer="); DEBUG_SERIAL.print(_dbg_maxI2cXfer / 1000.0f, 3);
-            DEBUG_SERIAL.print("ms drainBuf="); DEBUG_SERIAL.print(_dbg_maxDrainBuf / 1000.0f, 3);
-            DEBUG_SERIAL.print("ms parse="); DEBUG_SERIAL.print(_dbg_maxParse / 1000.0f, 3);
+            DEBUG_SERIAL.print("ms xfer+parse="); DEBUG_SERIAL.print(_dbg_maxXfer / 1000.0f, 3);
             DEBUG_SERIAL.print("ms maxAvail="); DEBUG_SERIAL.println(_dbg_maxAvail);
-            _dbg_maxRegWrite = _dbg_maxCountRead = 0;
-            _dbg_maxI2cXfer = _dbg_maxDrainBuf = _dbg_maxParse = 0;
+            _dbg_maxRegWrite = _dbg_maxCountRead = _dbg_maxXfer = 0;
             _dbg_maxAvail = 0;
         }
     }

@@ -1,7 +1,7 @@
 """
 Decodes binary TelemetryPacket from the flight computer.
 
-Packet layout (packed, little-endian, 66 bytes total). Deliberately compact --
+Packet layout (packed, little-endian, 52 bytes total). Deliberately compact --
 the LoRa link is stuck at a slow factory-default air data rate and packet size
 is the only remaining lever to reduce airtime per packet, so most fields are
 scaled fixed-point (int16) instead of float. Values are unscaled back to
@@ -20,9 +20,11 @@ ever sees the same TelemetryData fields/units as before this change.
   20      1     uint8     gps_fix
   21      2     int16     baro_alt_dm           /10  -> meters
   23      2     int16     vert_vel_cms          /100 -> m/s
-  25      2     int16     accel_x_cg            /100 -> g
-  27      2     int16     accel_y_cg            /100 -> g
-  29      2     int16     accel_z_cg            /100 -> g
+  25      2     int16     accel_x_cg            /100 -> g (TEMPORARY: BNO085 linear
+  27      2     int16     accel_y_cg            /100 -> g  accel, gravity-removed --
+  29      2     int16     accel_z_cg            /100 -> g  reads ~0g at rest, NOT the
+                                                            ADXL375. See FlightComputer's
+                                                            Packet.h for why.)
   31      2     int16     quat_w_i16            /32767
   33      2     int16     quat_x_i16            /32767
   35      2     int16     quat_y_i16            /32767
@@ -30,8 +32,8 @@ ever sees the same TelemetryData fields/units as before this change.
   39      2     int16     voltage_cv            /100 -> V
   41      2     int16     current_ma
   43      1     int8      rssi
-  44      1     uint8     pyro_cont[0]  (CH1 ignition:  1=OK, 0=open)
-  45      1     uint8     pyro_cont[1]  (CH2 parachute: 1=OK, 0=open)
+  44      1     uint8     pyro_cont[0]  (CH1 parachute: 1=OK, 0=open)
+  45      1     uint8     pyro_cont[1]  (CH2 reserved:  1=OK, 0=open)
   46      1     uint8     pyro_cont[2]  (CH3 backup:    1=OK, 0=open)
   47      1     uint8     cam_recording (1=recording, 0=stopped -- FC's belief, no camera ack)
   48      1     uint8     system_status (bit0 imu, bit1 baro, bit2 accel, bit3 gps, bit4 power ok --
@@ -39,18 +41,7 @@ ever sees the same TelemetryData fields/units as before this change.
                                           bit5 sd_present, bit6 sd_recording -- live, not boot-time)
   49      1     uint8     attitude_status (bit0 control_on, bit1 demo_on -- last ground-commanded
                                           attitude-control mode, not sensor health; see AttitudeController)
-
-  -- TEMPORARY bench fields (Packet.h), remove alongside the TEST tab once
-     axis-mapping/allocation-sign calibration is done --
-  50      2     int16     gyro_x_mrs            /1000 -> rad/s
-  52      2     int16     gyro_y_mrs            /1000 -> rad/s
-  54      2     int16     gyro_z_mrs            /1000 -> rad/s
-  56      2     int16     fin_cdeg[0] (S)       /100  -> deg
-  58      2     int16     fin_cdeg[1] (E)       /100  -> deg
-  60      2     int16     fin_cdeg[2] (N)       /100  -> deg
-  62      2     int16     fin_cdeg[3] (W)       /100  -> deg
-
-  64      2     uint16    checksum      (sum of bytes 0..63)
+  50      2     uint16    checksum      (sum of bytes 0..49)
 """
 
 import struct
@@ -77,9 +68,9 @@ SD_STATUS_RECORDING    = 1 << 6
 ATTITUDE_STATUS_CONTROL_ON = 1 << 0
 ATTITUDE_STATUS_DEMO_ON    = 1 << 1
 
-# 36 fields, 66 bytes total (+7 int16 TEMPORARY bench fields -- see docstring)
-TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBBBBhhhhhhhH'
-TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 66
+# 29 fields, 52 bytes total
+TELEM_FORMAT = '<BBHIBffhBBhhhhhhhhhhhbBBBBBBH'
+TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 52
 
 # AckPacket: magic0, magic1, cmdSeq, cmdType, checksum
 ACK_FORMAT = '<BBBBH'
@@ -120,9 +111,9 @@ class TelemetryData:
     gps_fix:      int
     baro_alt_m:   float
     vert_vel_ms:  float
-    accel_x_g:    float
-    accel_y_g:    float
-    accel_z_g:    float
+    accel_x_g:    float        # TEMPORARY: BNO085 linear accel (gravity-removed,
+    accel_y_g:    float        # ~0g at rest), NOT the ADXL375 -- see packet layout
+    accel_z_g:    float        # comment above
     quat_w:       float
     quat_x:       float
     quat_y:       float
@@ -136,12 +127,6 @@ class TelemetryData:
     cam_recording: int         # 1=recording, 0=stopped (FC's belief, no camera ack)
     system_status: int         # bitfield, see SENSOR_HEALTH_*_OK / SD_STATUS_* above
     attitude_status: int       # bitfield, see ATTITUDE_STATUS_* above
-    # TEMPORARY bench fields -- see Packet.h / this module's docstring. Remove
-    # alongside the TEST tab once axis-mapping/allocation-sign calibration is done.
-    gyro_x:       float        # rad/s
-    gyro_y:       float        # rad/s
-    gyro_z:       float        # rad/s
-    fin_deg:      tuple[float, float, float, float]   # (S, E, N, W)
     checksum:     int
     # Derived — populated by decode_packet()
     accel_mag_g:  float = 0.0
@@ -149,8 +134,15 @@ class TelemetryData:
 
     @property
     def pyro_continuity(self) -> tuple[bool, bool, bool]:
-        """True per channel if the ematch (igniter wire) is connected."""
+        """True per channel (CH1 parachute, CH2 reserved, CH3 backup) if its
+        e-match/charge wire is connected."""
         return (bool(self.pyro_cont_0), bool(self.pyro_cont_1), bool(self.pyro_cont_2))
+
+    # True only if the PARACHUTE channel (CH1) specifically has continuity --
+    # the one that actually matters for "is it safe/ready to arm and fly."
+    @property
+    def parachute_continuity_ok(self) -> bool:
+        return bool(self.pyro_cont_0)
 
     @property
     def state_name(self) -> str:
@@ -192,6 +184,30 @@ class TelemetryData:
     @property
     def power_ok(self) -> bool:
         return bool(self.system_status & SENSOR_HEALTH_POWER_OK)
+
+    @property
+    def all_sensors_ok(self) -> bool:
+        return self.imu_ok and self.baro_ok and self.accel_ok and self.gps_ok and self.power_ok
+
+    # Go/no-go summary for the ARM panel: every sensor alive right now, and
+    # the parachute channel (CH1) specifically has continuity. Informational
+    # only -- doesn't gate the ARM button itself, just tells the operator
+    # what to check before they arm for real.
+    @property
+    def launch_ready(self) -> bool:
+        return self.all_sensors_ok and self.parachute_continuity_ok
+
+    # Which of the launch_ready checks are currently failing, for display.
+    @property
+    def launch_not_ready_reasons(self) -> list[str]:
+        reasons = []
+        if not self.imu_ok:    reasons.append('IMU')
+        if not self.baro_ok:   reasons.append('BARO')
+        if not self.accel_ok:  reasons.append('ACCEL')
+        if not self.gps_ok:    reasons.append('GPS')
+        if not self.power_ok:  reasons.append('POWER')
+        if not self.parachute_continuity_ok: reasons.append('PARACHUTE CONT.')
+        return reasons
 
     # Flight computer's onboard SD card -- live, not a boot-time check. Not to
     # be confused with the ground station's own local CSV log (see the "REC"
@@ -272,8 +288,6 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
      voltage_cv, current_ma,
      rssi, pyro_cont_0, pyro_cont_1, pyro_cont_2, cam_recording,
      system_status, attitude_status,
-     gyro_x_mrs, gyro_y_mrs, gyro_z_mrs,
-     fin_cdeg_0, fin_cdeg_1, fin_cdeg_2, fin_cdeg_3,
      checksum) = vals
 
     # Unscale wire fixed-point values back to normal engineering units --
@@ -299,10 +313,6 @@ def decode_packet(raw: bytes) -> Optional[TelemetryData]:
         cam_recording=cam_recording,
         system_status=system_status,
         attitude_status=attitude_status,
-        gyro_x=gyro_x_mrs / 1000.0,
-        gyro_y=gyro_y_mrs / 1000.0,
-        gyro_z=gyro_z_mrs / 1000.0,
-        fin_deg=(fin_cdeg_0 / 100.0, fin_cdeg_1 / 100.0, fin_cdeg_2 / 100.0, fin_cdeg_3 / 100.0),
         checksum=checksum,
     )
     data.accel_mag_g = math.sqrt(data.accel_x_g**2 + data.accel_y_g**2 + data.accel_z_g**2)

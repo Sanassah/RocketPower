@@ -1,5 +1,6 @@
 #pragma once
 #include <Adafruit_ADXL375.h>
+#include "../config.h"
 
 struct AccelerometerData {
     float x_g, y_g, z_g;    // in g (±200g range)
@@ -14,7 +15,9 @@ public:
     const AccelerometerData& data() const { return _data; }
 
 private:
-    // Wire2 passed in constructor (SCL2/SDA2 from schematic)
-    Adafruit_ADXL375 _adxl{1, &Wire2};
+    // ADXL375_I2C_BUS (config.h) passed in constructor -- unlike the other
+    // sensors (which take their bus at begin_I2C() time), this library's
+    // constructor is where the bus is set, so it has to happen here instead.
+    Adafruit_ADXL375 _adxl{1, &ADXL375_I2C_BUS};
     AccelerometerData _data{};
 };

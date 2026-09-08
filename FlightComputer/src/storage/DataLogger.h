@@ -28,16 +28,12 @@ public:
 
     bool isOpen() const { return _isOpen; }
 
-    // Whether a card answered the last presence check. Deliberately NOT
-    // continuously re-probed while idle -- an earlier version called
-    // SD.begin() every 2s from this same real-time loop to keep this live,
-    // and on real hardware SD.begin() is not cheap (it re-negotiates with
-    // the card, and can take a while when there's no card to answer at
-    // all). That periodic call was a plausible cause of intermittent
-    // telemetry stalls seen on the bench. This now only reflects the last
-    // *explicit* attempt: boot (main.cpp), a ground SD_START_RECORDING
-    // command, or write success/failure while actively recording. It won't
-    // notice a card inserted later on its own -- press Start again.
+    // Whether a card answered the last presence check. NOT continuously
+    // re-probed while idle -- SD.begin() isn't cheap (re-negotiates with the
+    // card, worse with none present), and doing that every 2s from the real-
+    // time loop was a plausible cause of bench telemetry stalls. Only
+    // reflects the last *explicit* attempt (boot/ground command/write
+    // result) -- won't notice a card inserted later on its own.
     bool cardPresent() const { return _cardPresent; }
 
 private:
@@ -47,19 +43,13 @@ private:
     uint32_t _lastLogMs     = 0;
     uint32_t _recordCount   = 0;
 
-    // A single short write() isn't necessarily a lost card -- require a run
-    // of consecutive failures before closing, so one transient hiccup (e.g.
-    // in-flight vibration momentarily interrupting contact) can't silently
-    // end a flight recording early. Kept at 2, not 1, for exactly that
-    // reason -- but no higher: each failed write() can itself block for up
-    // to ~1-3s (SdFat's internal SDIO busy-wait timeout, BUSY_TIMEOUT_MICROS
-    // in the vendored SdioTeensy.cpp, is a hardcoded 1s per bus wait and a
-    // single write() can chain a few of these -- not something this project
-    // overrides, see bench investigation). So worst case before giving up on
-    // a genuinely pulled card is ~2x that, roughly 2-6s of frozen loop
-    // instead of the previous 5x (~5-15s) -- bounded, but still real; a
-    // future fix would shrink BUSY_TIMEOUT_MICROS itself, which requires
-    // forking all of SdFat (declined for now -- too large a fork for this).
+    // Require 2 consecutive write failures (not 1) before closing -- so one
+    // transient hiccup (e.g. in-flight vibration) can't end a recording
+    // early -- but no higher: each failed write() can itself block ~1-3s
+    // (SdFat's hardcoded 1s-per-bus-wait BUSY_TIMEOUT_MICROS, uncustomizable
+    // short of forking all of SdFat, declined). Worst case before giving up
+    // on a truly pulled card: ~2-6s frozen, down from ~5-15s at the old
+    // retry count.
     uint8_t  _consecutiveWriteFails = 0;
     static constexpr uint8_t _MAX_CONSECUTIVE_WRITE_FAILS = 2;
 

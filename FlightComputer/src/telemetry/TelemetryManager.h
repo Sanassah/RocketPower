@@ -54,16 +54,11 @@ private:
     bool            _calibrateRequested = false;
     bool            _resetRequested     = false;
 
-    // Last-processed seq, tracked PER command type (indexed by the raw
-    // CommandType byte) rather than one global value. A single global last-
-    // seq is wrong: if command A executes and then a *different* command B
-    // executes before A's ack makes it back to the ground, a resend of A
-    // (because its ack got lost, not because A itself was lost) no longer
-    // matches the global "last seq" -- B's seq does -- so it looks new and
-    // gets re-run. Per-type tracking means A's resend is only ever compared
-    // against A's own last seq, regardless of what else ran in between.
-    // -1 = no command of this type processed yet (cmd.seq is uint8_t,
-    // 0-255, so this sentinel is never reachable by a real command).
+    // Last-processed seq, PER command type (not one global value) -- a
+    // global seq breaks if command B runs before A's lost ack triggers a
+    // resend of A: B's seq would make A's resend look "new" and re-run it.
+    // -1 = never processed (cmd.seq is uint8_t 0-255, so unreachable by a
+    // real command).
     static constexpr size_t _CMD_TYPE_SLOTS = 32;   // headroom above the highest CommandType value
     int16_t _lastProcessedSeqByType[_CMD_TYPE_SLOTS];
 

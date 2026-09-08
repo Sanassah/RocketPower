@@ -21,7 +21,7 @@ _RED    = '#EF4444'
 _BLUE   = '#3B82F6'
 
 PYRO_CHANNELS = 3
-_FIRE_NAMES = ['CH 1  --  Ignition', 'CH 2  --  Parachute', 'CH 3  --  Backup']
+_FIRE_NAMES = ['CH 1  --  Parachute', 'CH 2  --  Reserved', 'CH 3  --  Backup']
 
 FIN_CHANNELS = 4
 _COMPASS = {1: 'S', 2: 'E', 3: 'N', 4: 'W'}
@@ -124,12 +124,12 @@ class CommandPanel(QWidget):
         columns.addLayout(col_b, 1)
         root.addLayout(columns)
 
-        # ==== Column A: flight commands (IGNITION / ATTITUDE / UTILITIES) ====
+        # ==== Column A: flight commands (PYRO / ATTITUDE / UTILITIES) ====
         # ARM/DISARM deliberately not duplicated here -- it already lives in
         # the OVERVIEW page's ArmPanel.
 
         # Pyro fire
-        col_a.addWidget(_section('IGNITION CONTROL'))
+        col_a.addWidget(_section('PYRO CONTROL'))
         note = QLabel('Available from ARMED through DESCENT')
         note.setStyleSheet(
             f'color:{_MUTED};font-size:13px;border:none;background:transparent;'
@@ -441,7 +441,7 @@ class CommandPanel(QWidget):
             self.servo_save_cal_requested.emit()
 
     def _on_fire(self, channel: int) -> None:
-        names = {1: 'Ignition', 2: 'Parachute', 3: 'Backup'}
+        names = {1: 'Parachute', 2: 'Reserved', 3: 'Backup'}
         reply = QMessageBox.warning(
             self, f'Confirm Fire CH{channel}',
             f'Fire pyro channel {channel} ({names.get(channel, "")})?\n\nThis is IRREVERSIBLE.',

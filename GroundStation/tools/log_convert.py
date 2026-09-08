@@ -33,14 +33,21 @@ import sys
 
 # '<' = little-endian, no implicit alignment (we specify every pad byte
 # ourselves via 'x', matching the real compiler's layout exactly).
-RECORD_FORMAT = '<IB3x18fddfBB2x3f5B7x'
-RECORD_SIZE   = struct.calcsize(RECORD_FORMAT)  # 128, must equal sizeof(FlightData)
+# 4x before the doubles: adding accel_mag_ms2 (2026-09) bumped the offset
+# right before lat/lon from 80 to 84, which isn't 8-byte-aligned any more --
+# the compiler inserts 4 bytes of padding there to align the doubles, on top
+# of the 4 bytes accel_mag_ms2 itself adds. Re-verified via sizeof() against
+# the real ARM/GCC build (136), not assumed -- see FlightComputer's
+# SensorManager.h if this needs re-deriving again.
+RECORD_FORMAT = '<IB3x19f4xddfBB2x3f5B7x'
+RECORD_SIZE   = struct.calcsize(RECORD_FORMAT)  # 136, must equal sizeof(FlightData)
 
 FIELDS = [
     'timestamp_ms', 'state',
     'quat_w', 'quat_x', 'quat_y', 'quat_z',
     'lin_accel_x', 'lin_accel_y', 'lin_accel_z',
     'gyro_x', 'gyro_y', 'gyro_z',
+    'accel_mag_ms2',
     'pressure_hpa', 'temperature_c', 'baro_alt_m', 'vert_vel_ms',
     'highg_x_g', 'highg_y_g', 'highg_z_g', 'highg_mag_g',
     'lat', 'lon', 'gps_alt_m', 'gps_sats', 'gps_fix',

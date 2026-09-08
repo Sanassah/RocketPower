@@ -4,6 +4,7 @@
 #include <elapsedMillis.h>
 
 #include "config.h"
+#include "DebugPrint.h"
 #include "sensors/SensorManager.h"
 #include "states/StateMachine.h"
 #include "telemetry/LoRa.h"
@@ -190,10 +191,7 @@ void loop() {
     // plain serial monitor without any config.h change needed.
     if (attitude.demoEnabled()) {
         static uint32_t lastGyroPrintMs = 0;
-        uint32_t nowMs = millis();
-        if (nowMs - lastGyroPrintMs >= 200) {
-            lastGyroPrintMs = nowMs;
-
+        if (debugPrintReady(lastGyroPrintMs, 200)) {
             constexpr float kRadToDeg = 57.29577951308232f;
             float qw = d.quat_w, qx = d.quat_x, qy = d.quat_y, qz = d.quat_z;
             float sinTiltY = 2.0f * (qw * qy - qz * qx);
@@ -302,8 +300,7 @@ void loop() {
 
     // Print loop stats every 5 seconds
     static uint32_t lastStatMs = 0;
-    if (millis() - lastStatMs >= 5000) {
-        lastStatMs = millis();
+    if (debugPrintReady(lastStatMs, 5000)) {
         float hz = loopCount / 5.0f;
         // Printed in ms (3 decimals = full microsecond precision, just
         // relabeled -- e.g. 6952us prints as 6.952ms) rather than raw us.

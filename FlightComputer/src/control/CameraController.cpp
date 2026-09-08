@@ -47,7 +47,7 @@ void CameraController::onStateChange(FlightState prev, FlightState next) {
 void CameraController::toggleRecording() {
     _sendCameraControl(RUNCAM_OP_TOGGLE_RECORDING);
     _recording = !_recording;
-    Serial.println(_recording ? "[CAM] Recording started" : "[CAM] Recording stopped");
+    DEBUG_SERIAL.println(_recording ? "[CAM] Recording started" : "[CAM] Recording stopped");
 }
 
 void CameraController::_sendCameraControl(uint8_t op) {
@@ -78,14 +78,14 @@ void CameraController::_probeDeviceInfo() {
     }
 
     if (n == 0) {
-        Serial.println("[CAM] Probe: NO RESPONSE from camera -- check UART wiring/power.");
+        DEBUG_SERIAL.println("[CAM] Probe: NO RESPONSE from camera -- check UART wiring/power.");
     } else {
-        Serial.print("[CAM] Probe: got "); Serial.print(n); Serial.print(" byte(s): ");
+        DEBUG_SERIAL.print("[CAM] Probe: got "); DEBUG_SERIAL.print(n); DEBUG_SERIAL.print(" byte(s): ");
         for (uint8_t i = 0; i < n; i++) {
-            if (reply[i] < 0x10) Serial.print('0');
-            Serial.print(reply[i], HEX);
-            Serial.print(' ');
+            if (reply[i] < 0x10) DEBUG_SERIAL.print('0');
+            DEBUG_SERIAL.print(reply[i], HEX);
+            DEBUG_SERIAL.print(' ');
         }
-        Serial.println();
+        DEBUG_SERIAL.println();
     }
 }

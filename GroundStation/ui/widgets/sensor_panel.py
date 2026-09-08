@@ -134,9 +134,11 @@ class SensorPanel(QWidget):
         baro_grid.setVerticalSpacing(4)
         self._r_balt = _Row(baro_grid, 0, 'Baro Alt (m)')
         self._r_vvel = _Row(baro_grid, 1, 'Vert Vel (m/s)')
-        self._r_ax   = _Row(baro_grid, 2, 'Accel X (g)')
-        self._r_ay   = _Row(baro_grid, 3, 'Accel Y (g)')
-        self._r_az   = _Row(baro_grid, 4, 'Accel Z (g)')
+        # TEMPORARY: sourced from the BNO085 (gravity-removed, ~0g at rest),
+        # not the ADXL375 -- see FlightComputer's Packet.h.
+        self._r_ax   = _Row(baro_grid, 2, 'Lin. Accel X (g)')
+        self._r_ay   = _Row(baro_grid, 3, 'Lin. Accel Y (g)')
+        self._r_az   = _Row(baro_grid, 4, 'Lin. Accel Z (g)')
         self._r_amag = _Row(baro_grid, 5, 'Lin. |accel| (g)')
         col_b.addLayout(baro_grid)
         col_b.addWidget(_divider())
