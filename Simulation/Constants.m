@@ -17,59 +17,99 @@ R2D         = 180/pi;       % rad -> deg, on wx/wy/wz (6DOF rates -> Kd inputs!)
 K_quat2deg  = 360/pi;       % quat vector component -> error angle in deg
                             % (= 2 * 180/pi: undo half-angle, rad to deg)
 
-%% --- GEOMETRY [MEASURED] ---
-d           = 0.067;        % m  - Body diameter
+%% --- GEOMETRY [MEASURED - see CID_RocketPower 13.3] ---
+d           = 0.066;        % m  - Body diameter
 r           = d/2;          % m  - Body radius
-L_rocket    = 0.73;         % m  - Total length
-A_ref       = pi*r^2;       % m2 - Reference area (cross section) = 0.003526 m2
+L_rocket    = 0.75;         % m  - Total length
+A_ref       = pi*r^2;       % m2 - Reference area (cross section) = 0.003421 m2
                             % All aero coefficients below reference THIS area.
 
-%% --- MASS PROPERTIES [MEASURED] ---
-m_total     = 1.0;          % kg - Total mass at launch
-m_prop      = 0.055;        % kg - Propellant mass (G38 datasheet)
-m_dry       = m_total - m_prop; % kg - Dry mass after burnout = 0.945
+%% --- MASS PROPERTIES [MEASURED - see CID_RocketPower 13.3] ---
+m_total     = 0.743;        % kg - Total mass at launch (loaded, live motor installed)
+m_prop      = 0.055;        % kg - Propellant mass (G38 datasheet) [UNVERIFIED vs
+                            %     this rocket's own motor -- CID 13.3/13.5 still
+                            %     lists propellant mass as TODO pending the actual
+                            %     spec sheet. 743g loaded - 656g no-motor = 87g
+                            %     total motor mass; 87-55=32g implied casing is
+                            %     plausible for a G-class motor, but not confirmed
+                            %     -- this is this file's own number, not newly
+                            %     supplied. Re-check before trusting mdot/t_burn.
+m_dry       = m_total - m_prop; % kg - Mass at burnout = 0.688. NOTE: despite the
+                            %     name, this is BURNOUT mass (spent casing still
+                            %     onboard, only propellant subtracted), NOT the
+                            %     656g no-motor-at-all bench reference -- see CID
+                            %     13.4. Name kept as-is since Simulink blocks
+                            %     reference it; don't rename without updating the
+                            %     .slx too.
 
-%% --- INERTIA [PLACEHOLDER - replace with Fusion360] ---
+%% --- INERTIA [Ixx/Iyy MEASURED - bifilar pendulum, loaded; Izz still PLACEHOLDER] ---
 % Drone convention: z = longitudinal => Izz is the SMALL spin inertia.
-Ixx         = 0.08;         % kg.m2 - Transverse (tilt about x)
-Iyy         = 0.08;         % kg.m2 - Transverse (tilt about y)
-Izz         = 0.002;        % kg.m2 - Spin about the long axis
+Ixx         = 0.0338;       % kg.m2 - Transverse (tilt about x) [MEASURED - bifilar
+                            %     pendulum, loaded config, see CID 13.2.2/13.3]
+Iyy         = 0.0338;       % kg.m2 - Transverse (tilt about y) [MEASURED - same
+                            %     bifilar pendulum result, symmetric assumption]
+Izz         = 0.001;        % kg.m2 - Spin about the long axis [PLACEHOLDER -
+                            %     roll-axis inertia not yet measured, CID 13.5.
+                            %     Order-of-magnitude sanity check: modeling the
+                            %     body alone as a cylinder (m=0.743, r=0.033)
+                            %     gives 0.0004 (solid) to 0.00081 (thin shell)
+                            %     kg.m2; fins sit outside that radius and add a
+                            %     bit more despite their small mass. 0.001 sits
+                            %     just above the body-only band -- reasoned
+                            %     placeholder, not a substitute for the real
+                            %     nose-up bifilar measurement.
 
 %% --- MASS CENTER & AERO CENTERS (all measured from NOSE TIP, along z) ---
-CG_z        = 0.382;        % m - [OPENROCKET/balance test] Center of gravity:
-                            %     the pivot. Every arm is measured FROM here.
-CP_rocket_z = 0.457;        % m - [OPENROCKET] WHOLE-ROCKET center of pressure:
-                            %     where total aero force acts at angle of attack.
-                            %     Weighted average of all components' CPs.
-                            %     Used by the PASSIVE aero subsystem only.
-CP_fin_z    = 0.70;         % m - [BARROWMAN/PLACEHOLDER] FIN center of pressure:
-                            %     where the DEFLECTION force acts. One of the
-                            %     ingredients inside CP_rocket_z, isolated here
-                            %     because fin deflection adds force only there.
+CG_z        = 0.390;        % m - [MEASURED - balance test, loaded, CID 13.3]
+                            %     Center of gravity: the pivot. Every arm is
+                            %     measured FROM here.
+CP_rocket_z = 0.478;        % m - [OPENROCKET] WHOLE-ROCKET center of pressure,
+                            %     Barrowman method, CID 13.3. CAUTION: CID's own
+                            %     CAD flat-plate CP estimate (0.361m) disagrees
+                            %     with this by ~11.7cm and implies CP FORWARD of
+                            %     CG (unstable) -- unresolved, see CID 13.5. This
+                            %     Simulink file trusts the OpenRocket value.
+                            %     Where total aero force acts at angle of attack,
+                            %     weighted average of all components' CPs. Used
+                            %     by the PASSIVE aero subsystem only.
+CP_fin_z    = 0.696;         % m - [MEASURED] FIN center of pressure: where the
+                            %     DEFLECTION force acts. One of the ingredients
+                            %     inside CP_rocket_z, isolated here because fin
+                            %     deflection adds force only there. Derived from
+                            %     a direct measurement of 0.306 m between CG and
+                            %     fin CP (CG_z + 0.306); close to the old
+                            %     Barrowman-offset/placeholder guess of 0.70,
+                            %     off by only 4mm -- good cross-check.
 CG          = [0; 0; CG_z]; % m - vector forms, if blocks want them
 CP          = [0; 0; CP_rocket_z];
 SM          = (CP_rocket_z - CG_z)/d; % calibers - [COMPUTED] static margin, want >1
 
 %% --- PASSIVE AERODYNAMICS (weathercock subsystem - NOT the fin chains) ---
-Cn_alpha    = 2.0;          % /rad - [OPENROCKET/PLACEHOLDER] whole-rocket normal
-                            %     force slope, ref A_ref. NOTE: 2.0 looks like a
-                            %     nose-alone value; a finned rocket is typically
-                            %     8-12 on this reference. Pull the real one.
+Cn_alpha    = 8.0;          % /rad - [RECONCILED] whole-rocket normal force
+                            %     slope, ref A_ref. Was 2.0 -- flagged in its own
+                            %     comment as looking like a nose-alone value; a
+                            %     finned rocket is typically 8-12 here. Matched
+                            %     to the Dynamic Drag coeff fcn's own CNa, which
+                            %     was already a reasonable placeholder in that
+                            %     range -- one number now, not two disagreeing
+                            %     guesses. Still not a real OpenRocket/wind-
+                            %     tunnel value; pull one if you want better.
 Cmq         = -8.0;         % /rad - [PLACEHOLDER] pitch damping derivative,
                             %     ref A_ref and L_ref (add when passive
                             %     subsystem is built; keeps sim from ringing)
 Cd          = 0.5;          % -    - [OPENROCKET] drag coefficient
 L_ref       = d;            % m    - reference length for moment coefficients
-L_arm_passive = CP_rocket_z - CG_z; % m - [COMPUTED] rocket CP to CG = 0.075.
+L_arm_passive = CP_rocket_z - CG_z; % m - [COMPUTED] rocket CP to CG = 0.088.
                             %     PASSIVE subsystem arm ONLY. Never in fin chains.
 
-%% --- FIN GEOMETRY [MEASURED - go measure, these are guesses] ---
+%% --- FIN GEOMETRY [OPENROCKET - Trapezoidal Fin Set export] ---
 n_fins      = 4;            % -   - Number of fins
-fin_span    = 0.05;         % m   - Semispan, root to tip [PLACEHOLDER]
-fin_root    = 0.04;         % m   - Root chord [PLACEHOLDER]
-fin_tip     = 0.02;         % m   - Tip chord [PLACEHOLDER]
+fin_span    = 0.043;        % m   - Semispan, root to tip (OpenRocket "Height")
+fin_root    = 0.074;        % m   - Root chord
+fin_tip     = 0.0286;       % m   - Tip chord
+fin_sweep   = 0.0461;       % m   - Sweep length, root LE to tip LE (0 cant)
 fin_area    = 0.5*(fin_root+fin_tip)*fin_span; % m2 - [COMPUTED] trapezoid
-                            %     panel area = 0.0015 (bookkeeping/hinge check;
+                            %     panel area = 0.002206 (bookkeeping/hinge check;
                             %     the moment chains use A_ref, not this)
 
 %% --- FIN CONTROL AERODYNAMICS (the three moment chains) ---
@@ -80,9 +120,10 @@ Cn_delta    = 15;           % /rad - [BARROWMAN/PLACEHOLDER] deflecting fin PAIR
 Cl_delta    = 0.1;          % /rad - [PLACEHOLDER] differential-deflection spin
                             %     coefficient for the z channel, ref A_ref
 % Moment arms - names match the gain blocks in your Simulink diagram:
-L_arm_roll  = CP_fin_z - CG_z;    % m - x row: fin CP to CG = 0.318 [COMPUTED]
+L_arm_roll  = CP_fin_z - CG_z;    % m - x row: fin CP to CG = 0.306 [MEASURED,
+                            %     see CP_fin_z above].
 L_arm_pitch = L_arm_roll;         % m - y row: same physics, same variable
-L_arm_yaw   = r + 0.45*fin_span;  % m - z row (spin): RADIAL arm = 0.056
+L_arm_yaw   = r + 0.45*fin_span;  % m - z row (spin): RADIAL arm = 0.0524
                             %     body radius + spanwise CP of the panel.
                             %     Constant through flight (pure geometry),
                             %     unlike the axial arms which grow as CG
@@ -114,26 +155,80 @@ rho         = 1.225;        % kg/m3
 g           = 9.81;         % m/s2
 v_sound     = 343;          % m/s
 
-%% --- MOTOR (AeroTech G38) [MEASURED from datasheet] ---
-T_avg       = 40.2;         % N   - average thrust
-T_max       = 78.2;         % N   - max thrust
-I_total     = 87.7;         % N.s - total impulse
-t_burn      = 2.64;         % s   - burn time
+%% --- MOTOR (AeroTech G38) ---
+% T_max and I_total used to live here too, but nothing ever read them (not
+% the model, not even the sanity prints below) and they didn't match the
+% G38 Motor Thrust lookup block's own embedded curve (peak 52.9N, impulse
+% 86.8 N.s vs the datasheet-nameplate 78.2N/87.7N here) -- removed as stale,
+% redundant duplicates of data the lookup table already encodes correctly.
+T_avg       = 32.9;         % N   - average thrust [RECOMPUTED from the G38
+                            %     Motor Thrust lookup block's own breakpoint
+                            %     data via trapezoidal integration -- the
+                            %     40.2N datasheet-nameplate value didn't match
+                            %     what the lookup table (the thing actually
+                            %     driving the sim) integrates to]
+t_burn      = 2.64;         % s   - burn time (matches the lookup table's
+                            %     last breakpoint exactly)
 
 %% --- PID GAINS [TUNE] - degrees loop: deg of fin per deg of error ---
+% Firmware runs PD-only on ALL THREE axes (config.h: RATE_KI=0 for roll/
+% pitch/yaw, no angle-integral term exists at all) -- "0 = pure-PD
+% (recommended starting point)... risks winding up over a short, dynamic
+% powered-ascent phase. Only consider enabling after PD-only behavior is
+% validated." Ki_roll/Ki_pitch zeroed to match (were 0.001) -- same
+% mismatch class as yaw's Ki, just smaller magnitude.
 % x row - transverse tilt ("Roll PID" in your diagram)
-Kp_roll     = 1.0;
-Ki_roll     = 0.001;
-Kd_roll     = 2.0;          % deg fin per deg/s -> feed wx*R2D (deg/s!)
+Kp_roll     = 0.4363;       % [RECONCILED, 2026-09] was 1.0 -- same units
+                            % mismatch class as Kd (see below): this Kp
+                            % multiplies a DEGREES angle-error signal (traced
+                            % Roll PID's input back through Gain2, 360/pi,
+                            % to the quaternion-error computation), while
+                            % firmware's ATTITUDE_ROLL_ANGLE_KP=25.0f is
+                            % "deg fin per RADIAN of drift" (config.h,
+                            % applied to tiltX/tiltY -- asinf/atan2f,
+                            % radian-native). Converted: 25.0*(pi/180) =
+                            % 0.4363. CAVEAT: the Kd settling-time sweep
+                            % below was run against the OLD Kp=1.0, not
+                            % this value -- a different Kp changes the whole
+                            % system's dynamics (critical damping point
+                            % moves too), so that sweep should be re-run
+                            % now that Kp is also firmware-representative.
+Ki_roll     = 0;
+Kd_roll     = 0.5;          % deg fin per deg/s -> feed wx*R2D (deg/s!)
+                            % [TUNE, 2026-09, NEEDS RE-VALIDATION] settling-
+                            % time sweep (0 diverged, 0.07 rang/overshot,
+                            % 0.5 settled clean ~3s, 1 took 3.5s, 2 took
+                            % 11.5s, 100 saturated) was run with Kp_roll=1.0,
+                            % not the now-corrected 0.4363 above -- re-sweep
+                            % before trusting 0.5 as final. Firmware's
+                            % ATTITUDE_ROLL_RATE_KP already updated to this
+                            % value's unit-converted equivalent (config.h);
+                            % re-derive that too if this changes.
 % y row - transverse tilt ("Pitch PID")
-Kp_pitch    = 1.0;
-Ki_pitch    = 0.001;
-Kd_pitch    = 2.0;
+Kp_pitch    = 0.4363;       % [RECONCILED, 2026-09] same reasoning as
+                            % Kp_roll above -- same physics both axes.
+Ki_pitch    = 0;
+Kd_pitch    = 0.5;          % [TUNE, 2026-09, NEEDS RE-VALIDATION] same
+                            % caveat as Kd_roll above.
+                            % Left literally as Kd_roll's value, not the
+                            % variable itself, so the two can diverge later
+                            % if roll/pitch ever need separate tuning.
 % z row - spin about long axis ("Yaw PID" - the WEAK channel: Cl_delta
-% small, arm 0.056 vs 0.318 -> needs its own much gentler tuning)
-Kp_yaw      = 0.01;
-Ki_yaw      = 0.001;
-Kd_yaw      = 0.005;
+% small, arm 0.0524 vs 0.31 -> needs its own much gentler tuning)
+%
+% Yaw is now a pure RATE controller on the real firmware (ATTITUDE_YAW_
+% ANGLE_KP=0 in config.h) -- angle term deliberately disabled, only rate
+% damping survives. Kp_yaw/Ki_yaw zeroed to match. There's no firmware
+% angle-integral term at all (any axis) and no derivative-of-error term
+% either (firmware's "damping" is direct proportional-on-rate, not a
+% classic PID D) -- see the Yaw PID block's own D field and the separate
+% Kd_yaw-driven rate-gain block in the .slx, both zeroed/fixed to match
+% this architecture, not just this file.
+Kp_yaw      = 0;
+Ki_yaw      = 0;
+Kd_yaw      = 0.005;         % [TUNE] -- sim-tuned rate gain, not required
+                            %     to numerically match firmware's RATE_KP
+                            %     (validated independently, sim vs bench)
 % No N filter coefficients: D comes from the gyro rate directly, so there
 % is no error derivative to filter. If you ever switch to derivative-on-
 % error, reintroduce N here AND implement the identical filter in firmware.
