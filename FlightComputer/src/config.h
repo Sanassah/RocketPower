@@ -161,7 +161,7 @@
 // 1520us, rated travel 1100-1900us (90 deg total, ~8.9us/deg). We deliberately
 // command a much smaller window than the full rated range for now.
 #define SERVO_CENTER_US     1520   // neutral (datasheet value, not 1500)
-#define SERVO_MAX_ANGLE_DEG 25     // max deflection each side of center (rated travel is +-45deg)
+#define SERVO_MAX_ANGLE_DEG 15     // max deflection each side of center (rated travel is +-45deg)
 #define SERVO_MIN_US        (SERVO_CENTER_US - (800L * SERVO_MAX_ANGLE_DEG) / 90)
 #define SERVO_MAX_US        (SERVO_CENTER_US + (800L * SERVO_MAX_ANGLE_DEG) / 90)
 #define SERVO_TEST_STEP_MS 500    // dwell time at each position during a test sweep
@@ -317,10 +317,29 @@
 // that axis. Keeps the angle term above from overshooting/oscillating on
 // the way back to the reference -- the PD controller's "D" term, in effect.
 // Independent per axis since fin authority and the rocket's moment of
-// inertia aren't the same for roll vs. pitch/yaw. Same "provisional demo
-// value" caveat as the angle gains above.
-#define ATTITUDE_ROLL_RATE_KP    4.0f
-#define ATTITUDE_PITCH_RATE_KP   4.0f
+// inertia aren't the same for roll vs. pitch/yaw.
+//
+// ROLL/PITCH (2026-09): derived from a settling-time sweep of the matching
+// Simulink gain (Kd_roll/Kd_pitch in Constants.m) -- 0 diverged, 0.07
+// rang/overshot badly, 0.5 settled cleanly ~3s after takeoff, 1 took 3.5s,
+// 2 (the old value here, via a naive equal-number carryover) took 11.5s,
+// 100 saturated and stopped correcting entirely -- classic damping-gain
+// U-curve, 0.5 sits near critical damping. That 0.5 is in Simulink's units
+// though, NOT this one: the Simulink gain multiplies a DEG/s-converted
+// rate signal, while this firmware gain multiplies the raw RAD/s gyro
+// value directly (see ATTITUDE_ROLL_RATE(d) below -- no deg conversion).
+// Converting Simulink's validated 0.5 into this macro's rad/s-based
+// convention: 0.5 * (180/pi) = 28.6479. Using the raw 0.5 here directly
+// would make the real fin response ~57x WEAKER than what was actually
+// validated -- close to reproducing the "diverges" case on real hardware,
+// not the "settles in 3s" one.
+#define ATTITUDE_ROLL_RATE_KP    28.6479f
+#define ATTITUDE_PITCH_RATE_KP   28.6479f
+// YAW: untouched -- this sweep/tuning pass was roll/pitch only. Yaw is a
+// different, much weaker control channel (Cl_delta small, arm 0.0524 vs
+// 0.31 -- see Constants.m) and now runs as a pure rate controller (angle
+// term zeroed, see ATTITUDE_YAW_ANGLE_KP above) -- no reason to expect its
+// rate gain should equal roll/pitch's. Still the old provisional value.
 #define ATTITUDE_YAW_RATE_KP     4.0f
 
 // Optional integral gains on the RATE term -- 0 = pure-PD (recommended
@@ -351,14 +370,16 @@
 // whole servo range at the expense of the other two. The per-fin total
 // (after allocation) is still hard-clamped again by FinController to
 // SERVO_MIN_US/SERVO_MAX_US regardless, as a second, independent backstop.
-// TEMPORARY, for bench visibility only -- bumped from 10.0f alongside the
-// ROLL/PITCH_ANGLE_KP bump above, same reason. Still well inside
-// SERVO_MAX_ANGLE_DEG (25 deg physical travel each side) even in the worst
-// case (yaw + one transverse term both near this ceiling at the same fin),
-// and FinController's own SERVO_MIN_US/MAX_US clamp is still there as an
-// independent hard backstop regardless. Revert to 10.0f alongside the gains
-// above once done.
-#define ATTITUDE_MAX_AXIS_DEG   20.0f
+// Back to 10.0f (2026-09) -- was TEMPORARILY bumped to 20.0f for bench
+// visibility alongside the ROLL/PITCH_ANGLE_KP bump, but SERVO_MAX_ANGLE_DEG
+// dropping to 15 left 20 sitting ABOVE the physical/software travel limit,
+// i.e. dead: every value it would've allowed through was just getting
+// clamped tighter by the servo limit anyway. 10.0f is comfortably inside
+// that 15 ceiling again, so this clamp actually does something once more.
+// ATTITUDE_ROLL/PITCH_ANGLE_KP are still at their own bumped 25.0f,
+// untouched by this change -- revert those separately if/when done with
+// bench visibility on them too.
+#define ATTITUDE_MAX_AXIS_DEG   10.0f
 
 // ===== Flight Constants =====
 #define LIFTOFF_ACCEL_THRESHOLD    2.5f   // g — triggers POWERED_ASCENT (ADXL375, NOT currently used -- see below)
