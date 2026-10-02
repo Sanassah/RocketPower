@@ -178,41 +178,31 @@ t_burn      = 2.64;         % s   - burn time (matches the lookup table's
 % validated." Ki_roll/Ki_pitch zeroed to match (were 0.001) -- same
 % mismatch class as yaw's Ki, just smaller magnitude.
 % x row - transverse tilt ("Roll PID" in your diagram)
-Kp_roll     = 0.4363;       % [RECONCILED, 2026-09] was 1.0 -- same units
-                            % mismatch class as Kd (see below): this Kp
-                            % multiplies a DEGREES angle-error signal (traced
-                            % Roll PID's input back through Gain2, 360/pi,
-                            % to the quaternion-error computation), while
-                            % firmware's ATTITUDE_ROLL_ANGLE_KP=25.0f is
-                            % "deg fin per RADIAN of drift" (config.h,
-                            % applied to tiltX/tiltY -- asinf/atan2f,
-                            % radian-native). Converted: 25.0*(pi/180) =
-                            % 0.4363. CAVEAT: the Kd settling-time sweep
-                            % below was run against the OLD Kp=1.0, not
-                            % this value -- a different Kp changes the whole
-                            % system's dynamics (critical damping point
-                            % moves too), so that sweep should be re-run
-                            % now that Kp is also firmware-representative.
+Kp_roll     = 0.01;         % REVERTED 2026-09: 0.013 (~1.3x up) was
+                            % REAL-HITL tested and came back oscillating
+                            % too -- even this small a step. The real
+                            % stability boundary sits somewhere between 1x
+                            % (0.01, clean) and 1.3x (0.013, oscillates),
+                            % i.e. right on top of the known-good point, not
+                            % out at 2x as previously thought. Gain alone
+                            % has very little headroom left above this
+                            % value -- see the project notes on reducing
+                            % AttitudeController's actual loop delay
+                            % (running it faster than the rest of
+                            % main.cpp's ~50Hz loop) as the real lever for
+                            % more speed, not further gain increases. This
+                            % value is REAL-HITL-confirmed, reproducible,
+                            % clean (23deg IC -> 0 in ~6s, no oscillation).
 Ki_roll     = 0;
-Kd_roll     = 0.5;          % deg fin per deg/s -> feed wx*R2D (deg/s!)
-                            % [TUNE, 2026-09, NEEDS RE-VALIDATION] settling-
-                            % time sweep (0 diverged, 0.07 rang/overshot,
-                            % 0.5 settled clean ~3s, 1 took 3.5s, 2 took
-                            % 11.5s, 100 saturated) was run with Kp_roll=1.0,
-                            % not the now-corrected 0.4363 above -- re-sweep
-                            % before trusting 0.5 as final. Firmware's
-                            % ATTITUDE_ROLL_RATE_KP already updated to this
-                            % value's unit-converted equivalent (config.h);
-                            % re-derive that too if this changes.
+Kd_roll     = 0.015;        % REVERTED 2026-09 along with Kp_roll -- see its
+                            % comment. REAL-HITL-confirmed value.
 % y row - transverse tilt ("Pitch PID")
-Kp_pitch    = 0.4363;       % [RECONCILED, 2026-09] same reasoning as
-                            % Kp_roll above -- same physics both axes.
+Kp_pitch    = 0.01;         % [TUNE, 2026-09] same reasoning/
+                            % value as Kp_roll above -- same physics both
+                            % axes.
 Ki_pitch    = 0;
-Kd_pitch    = 0.5;          % [TUNE, 2026-09, NEEDS RE-VALIDATION] same
-                            % caveat as Kd_roll above.
-                            % Left literally as Kd_roll's value, not the
-                            % variable itself, so the two can diverge later
-                            % if roll/pitch ever need separate tuning.
+Kd_pitch    = 0.015;        % REVERTED 2026-09, same reasoning/value, see
+                            % Kd_roll above.
 % z row - spin about long axis ("Yaw PID" - the WEAK channel: Cl_delta
 % small, arm 0.0524 vs 0.31 -> needs its own much gentler tuning)
 %
@@ -226,9 +216,14 @@ Kd_pitch    = 0.5;          % [TUNE, 2026-09, NEEDS RE-VALIDATION] same
 % this architecture, not just this file.
 Kp_yaw      = 0;
 Ki_yaw      = 0;
-Kd_yaw      = 0.005;         % [TUNE] -- sim-tuned rate gain, not required
-                            %     to numerically match firmware's RATE_KP
-                            %     (validated independently, sim vs bench)
+Kd_yaw      = 0.005;         % [TUNE] -- sim-tuned rate gain, validated
+                            %     independently, sim vs bench. 2026-09:
+                            %     firmware's ATTITUDE_YAW_RATE_KP was found
+                            %     to NOT match this (stale 4.0f, ~14x too
+                            %     high via the (180/pi) conversion used
+                            %     everywhere else) and has been brought down
+                            %     to 0.29f to match. NOT real-HITL-tested at
+                            %     this value yet.
 % No N filter coefficients: D comes from the gyro rate directly, so there
 % is no error derivative to filter. If you ever switch to derivative-on-
 % error, reintroduce N here AND implement the identical filter in firmware.

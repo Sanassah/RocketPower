@@ -303,14 +303,18 @@
 // angle term drops out entirely regardless of ATTITUDE_YAW_ANGLE_ERR/the
 // latched reference. If a future payload ever needs roll-locked pointing,
 // this is the one line to change back to a nonzero value.
-// TEMPORARY, for bench visibility only -- bumped from 10.0f/10.0f so a
-// moderate hand-tilt is clearly visible on the real servos instead of a
-// couple of easy-to-miss degrees. Not a tuning change, not simulation-
-// validated at this value -- revert ROLL/PITCH back to 10.0f (and
-// ATTITUDE_MAX_AXIS_DEG back to 10.0f below) once done confirming
-// allocation-sign/orientation behavior by eye.
-#define ATTITUDE_ROLL_ANGLE_KP   25.0f
-#define ATTITUDE_PITCH_ANGLE_KP  25.0f
+// REVERTED 2026-09: 0.74f (~1.3x up from 0.57f) was REAL-HITL tested and
+// came back oscillating too -- even this small a step. The real stability
+// boundary sits somewhere between 1x (0.57f, clean) and 1.3x (0.74f,
+// oscillates), i.e. right on top of the known-good point, not out at 2x as
+// previously thought. Gain alone has very little headroom left above
+// 0.57f -- see the project notes on reducing AttitudeController's actual
+// loop delay (running it faster than the rest of main.cpp's ~50Hz loop)
+// as the real lever for more speed, not further gain increases.
+// 0.57f (Kp_roll=0.01) is REAL-HITL-confirmed, reproducible, clean (23deg
+// IC -> 0 in ~6s, no oscillation): 0.01*(180/pi) = 0.57.
+#define ATTITUDE_ROLL_ANGLE_KP   0.57f
+#define ATTITUDE_PITCH_ANGLE_KP  0.57f
 #define ATTITUDE_YAW_ANGLE_KP    0.0f
 
 // Rate (damping) gain: fin correction (deg) per (rad/s) of sensed rate on
@@ -319,28 +323,21 @@
 // Independent per axis since fin authority and the rocket's moment of
 // inertia aren't the same for roll vs. pitch/yaw.
 //
-// ROLL/PITCH (2026-09): derived from a settling-time sweep of the matching
-// Simulink gain (Kd_roll/Kd_pitch in Constants.m) -- 0 diverged, 0.07
-// rang/overshot badly, 0.5 settled cleanly ~3s after takeoff, 1 took 3.5s,
-// 2 (the old value here, via a naive equal-number carryover) took 11.5s,
-// 100 saturated and stopped correcting entirely -- classic damping-gain
-// U-curve, 0.5 sits near critical damping. That 0.5 is in Simulink's units
-// though, NOT this one: the Simulink gain multiplies a DEG/s-converted
-// rate signal, while this firmware gain multiplies the raw RAD/s gyro
-// value directly (see ATTITUDE_ROLL_RATE(d) below -- no deg conversion).
-// Converting Simulink's validated 0.5 into this macro's rad/s-based
-// convention: 0.5 * (180/pi) = 28.6479. Using the raw 0.5 here directly
-// would make the real fin response ~57x WEAKER than what was actually
-// validated -- close to reproducing the "diverges" case on real hardware,
-// not the "settles in 3s" one.
-#define ATTITUDE_ROLL_RATE_KP    28.6479f
-#define ATTITUDE_PITCH_RATE_KP   28.6479f
-// YAW: untouched -- this sweep/tuning pass was roll/pitch only. Yaw is a
-// different, much weaker control channel (Cl_delta small, arm 0.0524 vs
-// 0.31 -- see Constants.m) and now runs as a pure rate controller (angle
-// term zeroed, see ATTITUDE_YAW_ANGLE_KP above) -- no reason to expect its
-// rate gain should equal roll/pitch's. Still the old provisional value.
-#define ATTITUDE_YAW_RATE_KP     4.0f
+// REVERTED 2026-09 along with ATTITUDE_ROLL_ANGLE_KP -- see its comment.
+// 0.86f (Kd_roll=0.015) is the REAL-HITL-confirmed value: 0.015*(180/pi)
+// = 0.86.
+#define ATTITUDE_ROLL_RATE_KP    0.86f
+#define ATTITUDE_PITCH_RATE_KP   0.86f
+// [TUNE, 2026-09] was 4.0f, "the old provisional value," never actually
+// validated -- unlike roll/pitch, nobody had ever checked whether this
+// numerically matched Constants.m's Kd_yaw via the same (180/pi) factor
+// used everywhere else. It didn't: Kd_yaw=0.005 converts to 0.29f, ~14x
+// lower than the stale 4.0f. Kd_yaw's own comment claims real grounding
+// ("validated independently, sim vs bench"), so treating it as the
+// trustworthy side and bringing firmware down to match, same conservative
+// bias as every other gain decision this session. NOT real-HITL-tested at
+// this value -- needs a real test before trusting it, same as roll/pitch.
+#define ATTITUDE_YAW_RATE_KP     0.29f
 
 // Optional integral gains on the RATE term -- 0 = pure-PD (recommended
 // starting point, and the only mode that's been reasoned about above). An

@@ -17,6 +17,9 @@ void AttitudeController::reset() {
     _pitchIntegral  = 0.0f;
     _yawIntegral    = 0.0f;
     _prevUpdateMs   = 0;
+    _lastRollCmd  = 0.0f;
+    _lastPitchCmd = 0.0f;
+    _lastYawCmd   = 0.0f;
 }
 
 void AttitudeController::update(const FlightData& d, FinController& fins) {
@@ -101,6 +104,20 @@ void AttitudeController::update(const FlightData& d, FinController& fins) {
     float rollCmd  = -(ATTITUDE_ROLL_ANGLE_KP  * rollAngleErr  + ATTITUDE_ROLL_RATE_KP  * rollRate  + ATTITUDE_ROLL_RATE_KI  * _rollIntegral);
     float pitchCmd = -(ATTITUDE_PITCH_ANGLE_KP * pitchAngleErr + ATTITUDE_PITCH_RATE_KP * pitchRate + ATTITUDE_PITCH_RATE_KI * _pitchIntegral);
     float yawCmd   = -(ATTITUDE_YAW_ANGLE_KP   * yawAngleErr   + ATTITUDE_YAW_RATE_KP   * yawRate   + ATTITUDE_YAW_RATE_KI   * _yawIntegral);
+
+    // DIAGNOSTIC (2026-09): stash the RAW, PRE-clamp command for HITL to
+    // report (see lastRollCmd()/etc's comment) -- so a HITL run can show
+    // what the controller actually WANTS to command, unclamped, to check
+    // whether it's a sane-but-saturating value (real instability) or
+    // something nonsensical (a computation/sensor bug). Actuation below
+    // still uses the CLAMPED value (rollCmd/pitchCmd/yawCmd themselves) --
+    // this only changes what's reported, not what's actually commanded to
+    // the fins, so real closed-loop behavior/safety margins are unchanged.
+    // Revert once this diagnostic pass is done: just report the clamped
+    // values here instead, same as before.
+    _lastRollCmd  = rollCmd;
+    _lastPitchCmd = pitchCmd;
+    _lastYawCmd   = yawCmd;
 
     rollCmd  = _clampf(rollCmd,  -ATTITUDE_MAX_AXIS_DEG, ATTITUDE_MAX_AXIS_DEG);
     pitchCmd = _clampf(pitchCmd, -ATTITUDE_MAX_AXIS_DEG, ATTITUDE_MAX_AXIS_DEG);

@@ -75,41 +75,39 @@ of the board arriving/unboxing]
 While the board was busy pretending to be dead, the rest of the rocket had
 to keep moving in parallel.
 
-The airframe came together inside Fusion 360: carbon fiber rods, a
-modular 3D-printed body, and 4.4g servos driving 3D-printed fins. The
-mechanical design was entirely self-taught, which included learning the
-importance of revision control after corrupted CAD files wiped out hours
-of work.
+Fusion 360: carbon fiber rods, a 3D-printed body, 4.4g servos on
+3D-printed fins, all self-taught, including the hard way why revision
+control matters (RIP a few corrupted CAD files).
 
-Meanwhile, procurement turned into its own logistical side-quest: tracking
-down motors, cameras, LiPos, parachute ejection charges, e-matches,
-telemetry radios, and all the tiny hardware that eats up your budget.
-During that same stretch, I built the ground station software: one of
-those "I'll just fix one quick bug" projects where suddenly it's 3:00 AM,
-you're staring into the void, and your terminal is staring back.
+Procurement became its own side-quest, motors, cameras, LiPos, ejection
+charges, e-matches, telemetry, while I built the ground station in
+parallel: the classic "one quick fix" that ends at 3AM with the terminal
+staring back. Sensors blinked to life one by one, each a small dopamine
+hit, minus the time I shorted a connector and blew a fuse (protection
+circuitry: confirmed working).
 
-One by one, the sensors finally blinked to life (barometer, GPS, IMU),
-each one delivering a sweet hit of dopamine. (I did manage to short a
-connector and blow a fuse along the way, but hey, at least the protection
-circuitry works as advertised.)
+The real test was 6DOF simulation in Simulink, real mass/CG/CP from
+Fusion and OpenRocket, tuning fin control before the flight computer ever
+touched real hardware. Handling the airframe also exposed a flimsy
+direct-drive fin mount, fixed with a tiny press-fit bearing, and pushed
+me to make the fins fail safe on a dead servo.
 
-The final boss was the 6DOF flight simulation. This was the one area
-where I actually felt at home, having modeled vehicle dynamics before. I
-dumped the real mass properties from Fusion and the aero coefficients from
-OpenRocket straight into a custom Simulink model to tune the fin control
-gains before letting the flight computer anywhere near actual hardware.
+Then hardware-in-the-loop: real flight computer, real control code, wired
+straight into the simulation. Watching the 6DOF animation and the ground
+station agree on every flight phase live was the best moment of this
+project yet. Honest caveat: no RTOS, so a stray SD card hiccup at the
+wrong moment is a risk I'm flying with, eyes open.
 
-Now, the entire thing is assembled and standing in front of me. Looking at
-a fully functional rocket that started as random ideas and late-night CAD
-sketches still doesn't feel completely real.
+The whole thing is assembled and sitting in front of me. Still doesn't
+feel real.
 
-Next up: finding a suitable launch site and prepping for flight testing.
-To be continued.
+Next up: finding a launch site. To be continued.
 
-[MEDIA: Fusion 360 render or assembly photo, plus a Simulink scope
-screenshot]
+[MEDIA: 20s HITL + ground station video (see PreflightVideo-ShotList.md)
+as the primary post video, plus a close-up photo of the bearing mod as a
+secondary image if LinkedIn's carousel allows more than one attachment]
 
-#cad #groundstation #controlsystems #aerospace
+#cad #groundstation #hitl #controlsystems #aerospace
 
 ---
 

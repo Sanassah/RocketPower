@@ -28,7 +28,14 @@ public:
     // USB_SERIAL_BINARY_MIRROR is on -- a direct USB link has no airtime
     // constraint, so there's no reason to throttle it to the radio's rate.
     // Also checks for incoming commands and dispatches them.
-    void update(const FlightData& d);
+    // loopUs: the PREVIOUS loop iteration's measured duration (main.cpp's
+    // own micros()-based timing, one loop lagged since this loop's own
+    // elapsed time isn't known yet when update() runs) -- HITL_MODE only,
+    // folded into HITLResponsePacket.loop_us so TeensyBridge.m can log the
+    // real firmware's own per-loop timing on the SAME channel/run as
+    // hitlRoundTripMs, instead of needing a second serial connection just
+    // for diagnostics. Harmless to pass on non-HITL builds (ignored).
+    void update(const FlightData& d, uint32_t loopUs = 0);
 
     // Returns true (once) when a CALIBRATE_BARO command arrived.
     // main.cpp polls this and calls sensors.calibrateBaro().

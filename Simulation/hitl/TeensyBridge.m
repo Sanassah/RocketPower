@@ -19,18 +19,20 @@ classdef TeensyBridge < matlab.System
     %      back -- the real, compiled StateMachine/AttitudeController/
     %      FinController's actual decision for this sample, clamping
     %      included.
-    %   4. Recovers pre-allocation roll/pitch/yaw commands (deg) from the 4
-    %      real per-fin degrees (CH1=S, CH2=E, CH3=N, CH4=W -- see
-    %      AttitudeController.h's allocation table) so they drop straight
-    %      into RocketPowerSim's existing per-axis actuator/moment chain
-    %      (the "15deg sat"/"1000deg/s"/"Servo lag" blocks) in place of the
-    %      model's own simulated Roll/Pitch/Yaw PID -- see
-    %      build_hitl_model.m, which does that splice. As of the firmware's
-    %      config.h/AttitudeController.cpp axis-naming fix, "roll"/"pitch"/
-    %      "yaw" mean the SAME physical thing on both sides now (roll/pitch
-    %      = the two transverse-tilt axes, yaw = spin about the rocket's
-    %      own longitudinal axis, matching Constants.m's own convention) --
-    %      build_hitl_model.m wires output i straight to actuator row i.
+    %   4. Reads the firmware's real pre-allocation roll/pitch/yaw commands
+    %      (deg) straight from HITLResponsePacket's axis_roll_deg/
+    %      axis_pitch_deg/axis_yaw_deg -- AttitudeController's own PD output
+    %      per axis, after its individual clamp, before allocation into the
+    %      4 fins. Deliberately NOT reconstructed from the per-fin fin_deg
+    %      values (see stepImpl's comment for why that broke down under fin
+    %      saturation). These drop straight into RocketPowerSim's existing
+    %      per-axis actuator/moment chain (the "15deg sat"/"1000deg/s"/
+    %      "Servo lag" blocks) in place of the model's own simulated Roll/
+    %      Pitch/Yaw PID -- see build_hitl_model.m, which does that splice.
+    %      "roll"/"pitch"/"yaw" mean the same physical thing on both sides
+    %      (roll/pitch = the two transverse-tilt axes, yaw = spin about the
+    %      rocket's own longitudinal axis, matching Constants.m's own
+    %      convention) -- build_hitl_model.m wires output i to actuator row i.
     %
     % Input (1 port, 10-wide double vector) -- pack these 3 signals
     % straight off RocketPowerSim's "6DOF (Quaternion)" block via a Mux, in
@@ -94,6 +96,10 @@ classdef TeensyBridge < matlab.System
         HasPrevXe
         HasPrevVelWorld
         LastState
+        RoundTripLog   % ms, one entry per step that got a real (non-timeout) reply this run
+        LoopUsLog      % us, real firmware main.cpp loop duration, same steps as RoundTripLog
+        StateLog       % FlightState (0-6), same steps as RoundTripLog -- all three share one
+                        % time base so they can be correlated after a run, see releaseImpl
     end
 
     methods (Access = protected)
@@ -109,6 +115,41 @@ classdef TeensyBridge < matlab.System
             obj.HasPrevXe        = false;
             obj.HasPrevVelWorld  = false;
             obj.LastState        = -1;   % -1 = no response received yet
+            obj.RoundTripLog     = zeros(1, 0);
+            obj.LoopUsLog        = zeros(1, 0);
+            obj.StateLog         = zeros(1, 0);
+        end
+
+        function resetImpl(obj)
+            % Simulink calls this at the START of EVERY run, unlike
+            % setupImpl (only once, when the System object itself is
+            % (re)built by a diagram edit). ensurePortOpen() deliberately
+            % keeps the same serial connection alive across any run that
+            % doesn't touch the model structure (see its own comment), but
+            % that's fine to leave alone -- what actually needs clearing
+            % every run is THIS object's own differentiation state. Without
+            % this, step 1 of a new run differentiates Xe against PrevXe
+            % left over from wherever the LAST run physically ended,
+            % producing a huge bogus velocity/accel spike purely in MATLAB
+            % -- enough on its own to false-trigger the firmware's liftoff
+            % detection even at a genuinely clean IC.
+            %
+            % Deliberately does NOT touch the real firmware (no
+            % reset_request/RESET sent here) -- a HITL run needs to already
+            % be armed and stabilization-enabled BEFORE it starts, so an
+            % automatic reset at run-start would silently undo that. Use
+            % GroundStation's "Reset (back to IDLE)" button as an explicit
+            % step BEFORE arming instead; see main.cpp's section 5c.
+            obj.StepIdx          = uint64(0);
+            obj.WallClockRef     = tic;
+            obj.PrevXe           = [0 0 0];
+            obj.PrevVelWorld     = [0 0 0];
+            obj.HasPrevXe        = false;
+            obj.HasPrevVelWorld  = false;
+            obj.LastState        = -1;
+            obj.RoundTripLog     = zeros(1, 0);   % fresh timing log every run, same reasoning as above
+            obj.LoopUsLog        = zeros(1, 0);
+            obj.StateLog         = zeros(1, 0);
         end
 
         function ensurePortOpen(obj)
@@ -246,6 +287,13 @@ classdef TeensyBridge < matlab.System
             gyroOut = gyro(:)';
 
             % ---- 3. send SensorInjectPacket, block for the real reply ----
+            % Timed end-to-end: write + the real Teensy's own processing +
+            % its reply, all of it -- this is the actual added latency a
+            % zero-delay "Normal Sim" run never has to survive. Logged (not
+            % just printed) so it can be analyzed quantitatively after a run
+            % -- see releaseImpl, which dumps it to the base workspace as
+            % hitlRoundTripMs.
+            rtTic = tic;
             pkt = hitl_encode_sensor(obj.StepIdx, quat, gyro, linAccel, highgVec, alt, vvel);
             write(obj.Port, pkt, 'uint8');
 
@@ -258,23 +306,63 @@ classdef TeensyBridge < matlab.System
                 state = obj.LastState;
                 return;
             end
+            % Only real (non-timeout) round trips -- a timeout's elapsed
+            % time is just ResponseTimeoutS and would skew mean/max/jitter
+            % stats with a value that isn't a real measurement. LoopUsLog/
+            % StateLog append on the SAME steps (same index), so they can be
+            % correlated against RoundTripLog after the run -- see
+            % releaseImpl for where all three land in the base workspace.
+            obj.RoundTripLog(end + 1) = toc(rtTic) * 1000;
+            obj.LoopUsLog(end + 1)    = resp.loop_us;
+            obj.StateLog(end + 1)     = resp.state;
 
-            % Recovers the firmware's own roll/pitch/yaw commands from its 4
-            % real per-fin degrees, per AttitudeController.cpp's allocation
-            % (S=yaw-roll, E=yaw-pitch, N=yaw+roll, W=yaw+pitch -- yaw is
-            % the uniform/spin term, roll/pitch the two transverse
-            % differentials, in this file's Simulation-matching convention,
-            % see config.h's axis-naming note):
-            finDeg   = resp.fin_deg;   % [S E N W], real post-clamp degrees
-            rollCmd  = (finDeg(3) - finDeg(1)) / 2;   % N - S
-            pitchCmd = (finDeg(4) - finDeg(2)) / 2;   % W - E
-            yawCmd   = sum(finDeg) / 4;          % (N-S cancels, W-E cancels)/4 = yaw;
-                                                  % average of all 4 -- pre-clamp yaw exactly
+            % Real per-axis commands, read straight from the firmware's own
+            % AttitudeController::lastRollCmd()/lastPitchCmd()/lastYawCmd()
+            % (see Packet.h's axis_roll_deg/axis_pitch_deg/axis_yaw_deg).
+            % Deliberately NOT reconstructed from resp.fin_deg anymore --
+            % that inversion (rollCmd = (fin_deg(N)-fin_deg(S))/2, etc.) is
+            % only valid when no individual fin has hit FinController's
+            % servo clamp; once one channel saturates independently of its
+            % pair, it silently produces a nonzero reading for an axis whose
+            % real command is actually zero. It was ALSO built against the
+            % wrong allocation sign convention (S=yaw-roll/E=yaw-pitch),
+            % which is the opposite of what AttitudeController.cpp actually
+            % does (S=yaw-pitch/E=yaw-roll) -- bench-caught via a roll-only
+            % disturbance producing a spurious oscillating "yaw" command
+            % with yaw/pitch fully disconnected from the plant.
+            rollCmd  = resp.axis_roll_deg;
+            pitchCmd = resp.axis_pitch_deg;
+            yawCmd   = resp.axis_yaw_deg;
             state    = resp.state;
             obj.LastState = state;
         end
 
         function releaseImpl(obj)
+            % Dump this run's measured diagnostics to the base workspace --
+            % all from the SAME channel/run, same step index, so they can
+            % be correlated without needing a second serial connection or
+            % any Simulink diagram change (no new output port, no scope):
+            %   hitlRoundTripMs - ms, write->real Teensy->reply (stepImpl's
+            %     rtTic/RoundTripLog)
+            %   hitlLoopUs      - us, the REAL firmware's own main.cpp loop
+            %     duration (one loop lagged -- see Packet.h's loop_us
+            %     comment), i.e. what used to only be visible as [LOOP]/
+            %     [LOOP BREAKDOWN] text on the separate DEBUG_SERIAL link
+            %   hitlState       - FlightState (0-6) at each of those steps,
+            %     for correlating e.g. a timing spike against a real state
+            %     transition (ARMED->POWERED_ASCENT etc.)
+            if ~isempty(obj.RoundTripLog)
+                assignin('base', 'hitlRoundTripMs', obj.RoundTripLog);
+                assignin('base', 'hitlLoopUs', obj.LoopUsLog);
+                assignin('base', 'hitlState', obj.StateLog);
+                fprintf('[TeensyBridge] Round trip (ms) over %d steps: mean=%.2f median=%.2f max=%.2f std=%.2f\n', ...
+                    numel(obj.RoundTripLog), mean(obj.RoundTripLog), median(obj.RoundTripLog), ...
+                    max(obj.RoundTripLog), std(obj.RoundTripLog));
+                fprintf('[TeensyBridge] Real firmware loop (us): mean=%.0f median=%.0f max=%.0f std=%.0f (%.1f Hz avg)\n', ...
+                    mean(obj.LoopUsLog), median(obj.LoopUsLog), max(obj.LoopUsLog), std(obj.LoopUsLog), ...
+                    1e6 / mean(obj.LoopUsLog));
+                fprintf('[TeensyBridge] Saved to base workspace: hitlRoundTripMs, hitlLoopUs, hitlState.\n');
+            end
             obj.Port = [];   % serialport closes the port when its last reference is cleared
         end
 
