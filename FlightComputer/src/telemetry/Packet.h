@@ -138,13 +138,16 @@ enum class CommandType : uint8_t {
     // boot-equivalent IDLE without an actual power cycle: disarms, clears
     // StateMachine's and BackupDeploy's detection state (including
     // BackupDeploy's own "fires at most once" latch -- see its reset()),
-    // resets AttitudeController, and closes/reopens the SD log so the next
-    // run gets its own file. Exists for repeated bench/HITL test flights --
-    // see main.cpp's handling for exactly what it touches. Deliberately
-    // does NOT reset PyroController's continuity reads (those are live,
-    // not latched) or anything HITL-specific (that's TeensyBridge/
-    // SensorManager's own concern, this only touches real flight-logic
-    // state that persists in RAM across a would-be flight).
+    // resets AttitudeController, zeroes all 4 fin channels' live correction
+    // (FinController's _liveUs[] otherwise just keeps reporting whatever the
+    // PREVIOUS run last commanded, since nothing else touches it), and
+    // closes/reopens the SD log so the next run gets its own file. Exists
+    // for repeated bench/HITL test flights -- see main.cpp's handling for
+    // exactly what it touches. Deliberately does NOT reset PyroController's
+    // continuity reads (those are live, not latched) or anything HITL-
+    // specific (that's TeensyBridge/SensorManager's own concern, this only
+    // touches real flight-logic state that persists in RAM across a
+    // would-be flight).
     RESET = 0x14,
 };
 
@@ -242,7 +245,36 @@ struct HITLResponsePacket {
     // Real, post-allocation, post-clamp commanded fin deflection (deg) per
     // channel -- CH1=S, CH2=E, CH3=N, CH4=W (see AttitudeController.h). This
     // is what actually got written to the servo this loop, clamp included.
+    // Kept for reference/debugging -- NOT what HITL should reconstruct
+    // rollCmd/pitchCmd/yawCmd from (see axis_*_deg below for why).
     float fin_deg[4];
+
+    // Real per-axis command (deg), AFTER the PD combine and the individual
+    // +-ATTITUDE_MAX_AXIS_DEG clamp, BEFORE allocation into fin_deg above --
+    // see AttitudeController::lastRollCmd()/lastPitchCmd()/lastYawCmd().
+    // This is what TeensyBridge.m should read directly. Reconstructing
+    // these from fin_deg (as it previously did, via e.g. rollCmd =
+    // (fin_deg[N]-fin_deg[S])/2) is only a valid inversion of the S=yaw-
+    // pitch/E=yaw-roll/N=yaw+pitch/W=yaw+roll allocation when NO individual
+    // fin has hit FinController's SERVO_MIN_US/MAX_US clamp -- once one
+    // channel saturates independently of its pair, that inversion silently
+    // produces a nonzero result for an axis whose real command is actually
+    // zero (bench-observed: a roll-only disturbance large enough to
+    // saturate a fin showed a spurious oscillating "yaw" command with
+    // yaw/pitch fully disconnected from the plant).
+    float axis_roll_deg;
+    float axis_pitch_deg;
+    float axis_yaw_deg;
+
+    // The PREVIOUS main.cpp loop iteration's real measured duration
+    // (micros()), one loop lagged since this loop's own elapsed time isn't
+    // known yet when this packet is built -- see TelemetryManager::update()'s
+    // loopUs parameter. Exists so TeensyBridge.m can log the real firmware's
+    // own per-loop timing into the SAME base-workspace dump as
+    // hitlRoundTripMs after a run, instead of needing a second serial
+    // connection just to watch main.cpp's own [LOOP]/[LOOP BREAKDOWN]
+    // DEBUG_SERIAL prints.
+    uint32_t loop_us;
 
     uint8_t  attitude_status;   // see ATTITUDE_STATUS_* above
 

@@ -87,6 +87,23 @@ public:
     bool demoEnabled() const        { return _demoEnabled; }
     void reset();
 
+    // Last computed per-axis command (deg), right after the PD combine --
+    // i.e. exactly what update() computed as rollCmd/pitchCmd/yawCmd.
+    // Exists so HITL (TeensyBridge.m, via HITLResponsePacket) can read the
+    // real per-axis commands directly instead of reconstructing them from
+    // the allocated/clamped-per-CHANNEL fin_deg[4], which is only a valid
+    // inversion when no individual fin has saturated -- see Packet.h's
+    // HITLResponsePacket comment for why that broke down.
+    // DIAGNOSTIC (2026-09): currently PRE-clamp (raw, unclamped by
+    // +-ATTITUDE_MAX_AXIS_DEG) so a HITL run can show what the controller
+    // actually wants to command -- see update()'s comment on this. The
+    // fins themselves still only ever receive the CLAMPED value; this only
+    // changes what gets reported here, not real closed-loop behavior.
+    // Revert to post-clamp once this diagnostic pass is done.
+    float lastRollCmd()  const { return _lastRollCmd; }
+    float lastPitchCmd() const { return _lastPitchCmd; }
+    float lastYawCmd()   const { return _lastYawCmd; }
+
 private:
     bool _controlEnabled = false;
     bool _demoEnabled    = false;
@@ -112,6 +129,11 @@ private:
     float _pitchIntegral = 0.0f;
     float _yawIntegral   = 0.0f;
     uint32_t _prevUpdateMs = 0;
+
+    // See lastRollCmd()/lastPitchCmd()/lastYawCmd() above.
+    float _lastRollCmd  = 0.0f;
+    float _lastPitchCmd = 0.0f;
+    float _lastYawCmd   = 0.0f;
 
     static float _clampf(float v, float lo, float hi);
 };

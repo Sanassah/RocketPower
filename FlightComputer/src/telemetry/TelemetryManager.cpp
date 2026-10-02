@@ -12,7 +12,7 @@ bool TelemetryManager::begin() {
     return _lora.begin();
 }
 
-void TelemetryManager::update(const FlightData& d) {
+void TelemetryManager::update(const FlightData& d, uint32_t loopUs) {
     uint32_t now = millis();
 
     // LoRa: airtime-limited, see TELEMETRY_INTERVAL_MS in config.h.
@@ -47,6 +47,10 @@ void TelemetryManager::update(const FlightData& d) {
         resp.fin_deg[1]   = _fins.liveCorrectionDeg(2);
         resp.fin_deg[2]   = _fins.liveCorrectionDeg(3);
         resp.fin_deg[3]   = _fins.liveCorrectionDeg(4);
+        resp.axis_roll_deg  = _attitude.lastRollCmd();
+        resp.axis_pitch_deg = _attitude.lastPitchCmd();
+        resp.axis_yaw_deg   = _attitude.lastYawCmd();
+        resp.loop_us        = loopUs;
         resp.attitude_status = (_attitude.controlEnabled() ? ATTITUDE_STATUS_CONTROL_ON : 0)
                               | (_attitude.demoEnabled()    ? ATTITUDE_STATUS_DEMO_ON    : 0);
         resp.checksum = packetChecksum(reinterpret_cast<const uint8_t*>(&resp), sizeof(resp) - 2);

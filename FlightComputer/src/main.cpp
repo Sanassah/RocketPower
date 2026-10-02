@@ -36,6 +36,11 @@ elapsedMillis loopTimer;     // tracks time since last loop start
 uint32_t      loopCount    = 0;
 uint32_t      loopMaxUs    = 0;
 FlightState   prevState    = FlightState::IDLE;
+// Previous loop's real measured duration -- fed into telem.update() for
+// HITLResponsePacket.loop_us (see TelemetryManager.h). One loop lagged
+// since this loop's own elapsed time isn't known until section 6, after
+// telem.update() has already run.
+uint32_t      lastLoopElapsedUs = 0;
 
 // TEMPORARY diagnostic -- per-stage breakdown of loopMaxUs above, so a
 // bench run pinpoints WHICH stage is stalling instead of just confirming
@@ -254,7 +259,7 @@ void loop() {
     uint32_t tLog = micros();   // TEMPORARY diagnostic, see maxSensorsUs above
 
     // ---- 5. Telemetry (send + receive commands) ----
-    telem.update(d);
+    telem.update(d, lastLoopElapsedUs);
     uint32_t tTelem = micros();   // TEMPORARY diagnostic, see maxSensorsUs above
 
     // ---- 5b. Execute calibration if requested by ground station ----
@@ -269,12 +274,26 @@ void loop() {
     // Packet.h's RESET for why this exists (repeated bench/HITL test
     // flights). Touches every piece of RAM-only flight/detection state this
     // file itself owns references to; TelemetryManager only flags the
-    // request since it doesn't hold a BackupDeploy reference.
+    // request since it doesn't hold a BackupDeploy reference. Deliberately
+    // a manual, ground-commanded action only (GroundStation's "Reset (back
+    // to IDLE)" button) -- NOT auto-triggered at the start of a HITL run,
+    // since a HITL test needs to already be armed + stabilization-enabled
+    // BEFORE the run starts, and an automatic reset there would silently
+    // undo that. The correct bench sequence is: Reset -> Arm -> enable
+    // stabilization -> THEN start the Simulink run.
     if (telem.resetRequested()) {
         DEBUG_SERIAL.println("[RESET] Soft reset requested -- clearing all flight/detection state.");
         fsm.reset();
         pyro.disarm();
         attitude.reset();
+        // attitude.reset() only clears AttitudeController's OWN state (flags,
+        // integrators) -- it never told the servos anything, so FinController's
+        // _liveUs[] (and thus liveCorrectionDeg()/HITLResponsePacket.fin_deg)
+        // otherwise just keeps reporting whatever the PREVIOUS run last
+        // commanded until a fresh attitude.update() overwrites it. Explicit
+        // zero here closes that gap instead of waiting on the first real
+        // control computation to paper over it.
+        for (int ch = 1; ch <= SERVO_NUM_CHANNELS; ch++) fins.setCorrectionDeg(ch, 0.0f);
         backupDeploy.reset();
         if (camera.isRecording()) camera.toggleRecording();
         logger.close();
@@ -287,6 +306,7 @@ void loop() {
     uint32_t elapsed = micros() - loopStart;
     if (elapsed > loopMaxUs) loopMaxUs = elapsed;
     loopCount++;
+    lastLoopElapsedUs = elapsed;   // for next loop's telem.update() call, see its declaration
 
     // TEMPORARY diagnostic -- see maxSensorsUs above.
     uint32_t sensorsUs = tSensors - loopStart;

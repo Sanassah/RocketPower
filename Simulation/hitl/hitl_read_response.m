@@ -5,7 +5,7 @@ function resp = hitl_read_response(port, timeoutS)
 %   GroundStation/core/packet_decoder.py's find_packet_start()). Returns []
 %   on timeout (link dropped or Teensy not running the rocketpower_hitl
 %   build), otherwise a struct from hitl_decode_response.m.
-    RESP_SIZE = 26;
+    RESP_SIZE = 42;
     resp = [];
     tStart = tic;
     have = 0;

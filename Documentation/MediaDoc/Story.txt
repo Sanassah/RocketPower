@@ -1,6 +1,4 @@
-It is a bit cringy honestly, just make me a template of posts, 10 posts is  abit much, maybe 6 max, ill tell you the story of the project and you will
-  make me a template of order of ideas to put in and ill write the text, so if you see some stuff that make me look bad, dont put it or omit it, so the
-  project started after i finished school, i needed something on my own to continue because my capstone finished and we made a drone frome scratch and it
+The project started after i finished school, i needed something on my own to continue because my capstone finished and we made a drone frome scratch and it
   was insane, i wanted to touch all sides of engineering, so since i was in rocketry concordia i wanted to make a fin active control rocket, with custom
   made pcb and all, so i started the schematic of the board of the mcu but no sensors and didnt touch it for from 2024 to 2025 becaue i traveled all of
   asia with my friends, got a new job in engineering, and got a house with my highschool sweetheart but i needed to do real engineering for me and have fun, because as mch as we say work is engineering sometimes you gett stuck in mundain tasks, so 2025 i got back in the project and buy a refurbished 3d printer for 200$ and a solder sstation.
@@ -29,4 +27,25 @@ It is a bit cringy honestly, just make me a template of posts, 10 posts is  abit
   i have 2 left hands and nearly burnt my only board. got the barometer, accelerometer, sd card on board and imu working also. Next step is simulate everything on simulink, i already have experience on modeling vehicle so this part was the easiest.
    just need the fusion 360 and openrocket numbers to have the right number and fix the PIDS in simulation and on the real board. Simulation is not simple but with the help of internet
  the physics behind that rocket (that is technically named a missile but i dont like it) is well documented and i learned a lot about dynamics and reference frames and moments and forces and drag and center of gravity and center of pressure and also fins center of pressure etc. 
- Now i have to find a site to launch, to be continued...
+
+9-23-2026:
+I simulated the rocket dynamics using the aerospace library on Simulink, it includes Thrust of motor 
+in lookup table, dynamic drag, animated flight, servo model, PID control, Fins model 
+and physical properties like the rocket inertia, cg, cp which were measured physically, the inertia was measured 
+with the bifilar pendulum technique). Upon looking at weak points of the rokcet i saw that the direct drive of the fin
+was super flimsy, the fin could rotate in axis where its not supposed to and i was scared it would brake
+the servo horn or with air speed could break. So even if I had 0 space to make it sturdier because of the directdrive 
+and that the motor is in the middle of the rocket surrounded by the 4 servos, I activated all my neurons
+to find solutions, the easiest design one that took me 2 days after work to implement was to put a 3mm wide
+bearing between the servo horn and the servo itself, there is a small gap where a bearing could be press fit with 
+a modification of the 3d printed holders and so the fin could sourround the bearing and have all axis support instead of
+the fin just surrounding the servo horn it was a success. Now for safety, the issue is that if the servos fail
+the passive aerodynamics needs to be designed so with air speed the fins stay completely flat and pointing 
+towards the axis of the rocket to avoid creating unwanted moments thats what i did by having 
+the attachment more on the top of the fin so air pressure would be a lot more on the bottom of the fin.
+Another challenge was the HITL testing, I made a setup where connected by usb the flight computer would receive 
+inputs like altitude, angle, speed, etc from the simulink simulation, and then the flight computer would give
+servo angle to the simulation. Everything worked great, i have a button in the simulation to switch from HITL to normal simulation.
+I feel like I am flight ready with all those testing. The only thing im scared of is since for now i did not use RTOS type dev
+Everything is linear, so if i have a missconnection of the sdcard for example the embedded app will try to reconnect for a few ms
+which could be catastrophic if its directly upon critical flight phases and with vibration i dont know so thats risky.
