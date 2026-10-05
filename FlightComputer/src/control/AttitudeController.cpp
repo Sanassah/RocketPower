@@ -140,8 +140,13 @@ void AttitudeController::update(const FlightData& d, FinController& fins) {
     // config.h's axis-naming note) is uniform across all 4 fins; rollCmd
     // (N/S-tilt-driven) allocates to the E/W pair, pitchCmd (E/W-tilt-
     // driven) allocates to the N/S pair.
-    fins.setCorrectionDeg(1, yawCmd - pitchCmd);  // S
-    fins.setCorrectionDeg(2, yawCmd - rollCmd);   // E
-    fins.setCorrectionDeg(3, yawCmd + pitchCmd);  // N
-    fins.setCorrectionDeg(4, yawCmd + rollCmd);   // W
+    // DIAGNOSTIC/DEMO ONLY -- see ATTITUDE_DEMO_FIN_GAIN's comment in
+    // config.h. Gated to the bench demo specifically (never real/HITL
+    // flight control) and applied after rollCmd/pitchCmd/yawCmd are already
+    // clamped, so only the physical servo deflection changes.
+    float demoGain = (_demoEnabled && !_controlEnabled) ? ATTITUDE_DEMO_FIN_GAIN : 1.0f;
+    fins.setCorrectionDeg(1, demoGain * (yawCmd - pitchCmd));  // S
+    fins.setCorrectionDeg(2, demoGain * (yawCmd - rollCmd));   // E
+    fins.setCorrectionDeg(3, demoGain * (yawCmd + pitchCmd));  // N
+    fins.setCorrectionDeg(4, demoGain * (yawCmd + rollCmd));   // W
 }
