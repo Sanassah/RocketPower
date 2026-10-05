@@ -161,10 +161,20 @@
 // 1520us, rated travel 1100-1900us (90 deg total, ~8.9us/deg). We deliberately
 // command a much smaller window than the full rated range for now.
 #define SERVO_CENTER_US     1520   // neutral (datasheet value, not 1500)
-#define SERVO_MAX_ANGLE_DEG 15     // max deflection each side of center (rated travel is +-45deg)
+#define SERVO_MAX_ANGLE_DEG 30     // DIAGNOSTIC: was 15 -- bumped for bench demo visibility. RESTORE to 15 before any real/HITL flight-relevant run. (max deflection each side of center, rated travel is +-45deg)
 #define SERVO_MIN_US        (SERVO_CENTER_US - (800L * SERVO_MAX_ANGLE_DEG) / 90)
 #define SERVO_MAX_US        (SERVO_CENTER_US + (800L * SERVO_MAX_ANGLE_DEG) / 90)
 #define SERVO_TEST_STEP_MS 500    // dwell time at each position during a test sweep
+
+// testSweep()'s bench diagnostic deliberately exercises MORE of the servo's
+// real mechanical range than SERVO_MAX_ANGLE_DEG allows for flight -- the
+// point of a sweep test is to catch binding/mechanical issues across the
+// servo's real travel, not to stay inside the flight-authority window. Still
+// well inside the datasheet's rated 1100-1900us range (see comment above),
+// never full-send to the rated limit itself.
+#define SERVO_TEST_SWEEP_ANGLE_DEG 30
+#define SERVO_RATED_MIN_US  1100
+#define SERVO_RATED_MAX_US  1900
 
 // Per-channel trim (offset from SERVO_CENTER_US) is set by nudging against a
 // printed alignment jig and saved to flash -- see FinController.
@@ -326,8 +336,8 @@
 // REVERTED 2026-09 along with ATTITUDE_ROLL_ANGLE_KP -- see its comment.
 // 0.86f (Kd_roll=0.015) is the REAL-HITL-confirmed value: 0.015*(180/pi)
 // = 0.86.
-#define ATTITUDE_ROLL_RATE_KP    0.86f
-#define ATTITUDE_PITCH_RATE_KP   0.86f
+#define ATTITUDE_ROLL_RATE_KP    0.0f  // DIAGNOSTIC: was 0.86f (REAL-HITL-confirmed) -- zeroed for bench demo visibility. RESTORE to 0.86f before any real/HITL flight-relevant run.
+#define ATTITUDE_PITCH_RATE_KP   0.0f  // DIAGNOSTIC: was 0.86f -- see ATTITUDE_ROLL_RATE_KP's note, same reason/restore.
 // [TUNE, 2026-09] was 4.0f, "the old provisional value," never actually
 // validated -- unlike roll/pitch, nobody had ever checked whether this
 // numerically matched Constants.m's Kd_yaw via the same (180/pi) factor
@@ -337,7 +347,7 @@
 // trustworthy side and bringing firmware down to match, same conservative
 // bias as every other gain decision this session. NOT real-HITL-tested at
 // this value -- needs a real test before trusting it, same as roll/pitch.
-#define ATTITUDE_YAW_RATE_KP     0.29f
+#define ATTITUDE_YAW_RATE_KP     0.0f  // DIAGNOSTIC: was 0.29f -- zeroed alongside ROLL/PITCH_RATE_KP, see that note. RESTORE before any real/HITL flight-relevant run.
 
 // Optional integral gains on the RATE term -- 0 = pure-PD (recommended
 // starting point, and the only mode that's been reasoned about above). An
@@ -377,6 +387,16 @@
 // untouched by this change -- revert those separately if/when done with
 // bench visibility on them too.
 #define ATTITUDE_MAX_AXIS_DEG   10.0f
+
+// DIAGNOSTIC/DEMO ONLY -- NOT A FLIGHT PARAMETER. Multiplies the real servo
+// deflection, ONLY while the ATTITUDE_DEMO_ENABLE bench hand-tilt demo is
+// active (_demoEnabled && !_controlEnabled in AttitudeController.cpp) --
+// never during real or HITL flight control. Applied after the real command
+// is already computed/clamped, so it's purely cosmetic: only changes how far
+// the servo physically moves for a given real tilt, not the control law
+// itself. Still hard-clamped by FinController to SERVO_MIN_US/MAX_US
+// (+-SERVO_MAX_ANGLE_DEG) regardless of this value.
+#define ATTITUDE_DEMO_FIN_GAIN  50.0f
 
 // ===== Flight Constants =====
 #define LIFTOFF_ACCEL_THRESHOLD    2.5f   // g — triggers POWERED_ASCENT (ADXL375, NOT currently used -- see below)

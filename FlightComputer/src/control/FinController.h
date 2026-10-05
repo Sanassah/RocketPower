@@ -15,14 +15,10 @@ class FinController {
 public:
     bool begin();    // load trim from EEPROM, attach all 4 servos, drive to trimmed center
 
-    // Move one channel (1-4) to an angle in degrees (0-180, 90 = center pulse width).
-    void setAngle(uint8_t channel, uint8_t angleDeg);
-
     // Fast, direct deflection from the trimmed center (0 = trimmed-neutral,
     // + / - = deflection in each direction, degrees) -- for a real-time
     // control loop (see AttitudeController), not bench-test choreography.
-    // Unlike setAngle(), this is relative to the per-channel trim rather
-    // than an absolute 0-180 sweep, and unlike testSweep()/
+    // Relative to the per-channel trim, and unlike testSweep()/
     // preflightSequence() there's no ramping -- it writes immediately, still
     // hard-clamped to SERVO_MIN_US/SERVO_MAX_US by _writeUs() same as
     // everything else.
@@ -67,10 +63,31 @@ private:
     uint16_t _liveUs[SERVO_NUM_CHANNELS] = {};   // currently commanded pulse width per channel
 
     void _loadCalibration();
-    void _writeUs(uint8_t idx, int32_t us);
+
+    // loUs/hiUs default to the flight-authority SERVO_MIN_US/MAX_US, same as
+    // always -- only testSweep() overrides them (to SERVO_RATED_MIN_US/MAX_US)
+    // to reach further than flight ever commands for its bench diagnostic.
+    void _writeUs(uint8_t idx, int32_t us, int32_t loUs = SERVO_MIN_US, int32_t hiUs = SERVO_MAX_US);
+
+    // This channel's +-SERVO_TEST_SWEEP_ANGLE_DEG travel limits around its
+    // trimmed center, in raw microseconds, bounded by SERVO_RATED_MIN_US/
+    // MAX_US and clamped to the SAME distance from center both directions
+    // (the smaller of the two available margins) so a nonzero trim can't
+    // make it reach further one way than the other. Shared by testSweep()
+    // and preflightSequence() so both bench diagnostics reach the same,
+    // beyond-flight-authority range.
+    void _symmetricSweepLimits(uint8_t idx, int32_t& loUs, int32_t& hiUs) const;
+
+    // Same idea as _symmetricSweepLimits, but bounded by the flight-
+    // authority SERVO_MIN_US/MAX_US instead of the wider rated range --
+    // used by setCorrectionDeg() so real/HITL/demo commands also get
+    // matched authority both directions, not just the bench tests above.
+    void _symmetricFlightLimits(uint8_t idx, int32_t& loUs, int32_t& hiUs) const;
 
     // Cosmetic ramps (linear, stepped) so choreography looks like intentional
     // motion instead of instant snaps. Purely visual -- no functional need.
-    void _rampTo(uint8_t idx, int32_t targetUs, uint32_t durationMs);
-    void _rampAllTo(const int32_t targets[SERVO_NUM_CHANNELS], uint32_t durationMs);
+    // loUs/hiUs default to flight-authority SERVO_MIN_US/MAX_US, same as
+    // _writeUs(); preflightSequence() overrides them to the wider rated range.
+    void _rampTo(uint8_t idx, int32_t targetUs, uint32_t durationMs, int32_t loUs = SERVO_MIN_US, int32_t hiUs = SERVO_MAX_US);
+    void _rampAllTo(const int32_t targets[SERVO_NUM_CHANNELS], uint32_t durationMs, int32_t loUs = SERVO_MIN_US, int32_t hiUs = SERVO_MAX_US);
 };
