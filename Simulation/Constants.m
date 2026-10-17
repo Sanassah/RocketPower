@@ -194,15 +194,19 @@ Kp_roll     = 0.01;         % REVERTED 2026-09: 0.013 (~1.3x up) was
                             % value is REAL-HITL-confirmed, reproducible,
                             % clean (23deg IC -> 0 in ~6s, no oscillation).
 Ki_roll     = 0;
-Kd_roll     = 0.015;        % REVERTED 2026-09 along with Kp_roll -- see its
-                            % comment. REAL-HITL-confirmed value.
+Kd_roll     = 0;            % DIAGNOSTIC (2026-10): was 0.015 (REAL-HITL-
+                            % confirmed) -- zeroed for the empirical pure-P
+                            % tuning pass (find a good Kp alone first, add
+                            % Kd back after). RESTORE to 0.015 once that's
+                            % done, matching firmware's ATTITUDE_ROLL_RATE_KP.
 % y row - transverse tilt ("Pitch PID")
 Kp_pitch    = 0.01;         % [TUNE, 2026-09] same reasoning/
                             % value as Kp_roll above -- same physics both
                             % axes.
 Ki_pitch    = 0;
-Kd_pitch    = 0.015;        % REVERTED 2026-09, same reasoning/value, see
-                            % Kd_roll above.
+Kd_pitch    = 0;            % DIAGNOSTIC (2026-10): was 0.015 -- zeroed
+                            % alongside Kd_roll for the empirical pure-P
+                            % pass, see that note. RESTORE to 0.015 once done.
 % z row - spin about long axis ("Yaw PID" - the WEAK channel: Cl_delta
 % small, arm 0.0524 vs 0.31 -> needs its own much gentler tuning)
 %

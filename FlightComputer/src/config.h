@@ -396,7 +396,7 @@
 // the servo physically moves for a given real tilt, not the control law
 // itself. Still hard-clamped by FinController to SERVO_MIN_US/MAX_US
 // (+-SERVO_MAX_ANGLE_DEG) regardless of this value.
-#define ATTITUDE_DEMO_FIN_GAIN  50.0f
+#define ATTITUDE_DEMO_FIN_GAIN  100.0f
 
 // ===== Flight Constants =====
 #define LIFTOFF_ACCEL_THRESHOLD    2.5f   // g — triggers POWERED_ASCENT (ADXL375, NOT currently used -- see below)
@@ -435,22 +435,15 @@
 // thrusting. 2 m/s clears fusion noise (~0.15m/s) but is tiny next to real
 // powered-flight accel, so it can't fire while genuinely still thrusting.
 #define POWERED_ASCENT_VELOCITY_DROP_MS 2.0f
-#define APOGEE_DETECTION_WINDOW_MS 200    // vertical-velocity zero-crossing window
+#define APOGEE_DETECTION_WINDOW_MS 500    // velocity must stay <= 0 for 0.5 s (primary and backup)
 #define LANDED_STABLE_MS           10000  // altitude stable for this long = LANDED
 #define LANDED_ALT_TOLERANCE_M     2.0f   // ±m to count as "stable"
 
-// ===== Independent backup apogee detection (see BackupDeploy) =====
-// StateMachine's flight state and PyroController's armed flag both live in
-// RAM only -- neither survives a reset. If the flight computer resets
-// mid-flight (vibration-induced brownout on a custom board is a real risk),
-// it boots back into IDLE + disarmed, and since IDLE only ever exits via a
-// ground-commanded ARM, the state machine can never reach APOGEE again on
-// its own -- the primary parachute deployment then never fires. BackupDeploy
-// is a second, completely independent detector using the same physical
-// signature (sustained accel, then real altitude gain, then a velocity
-// zero-crossing) but never touching StateMachine or requiring
-// PyroController's armed flag -- its own multi-stage evidence is the safety
-// gate instead. See PyroController::fireBackupUnconditional().
+// ===== Backup apogee detection (see BackupDeploy) =====
+// Enabled from READY_FOR_FLIGHT onward; IDLE/ARMED clear its evidence.
+// This separate state machine shares sensors/velocity with the primary and
+// loses flight history on reboot. It is not an independent reboot recovery
+// system (PR-005). Its evidence sequence gates fireBackupUnconditional().
 #define BACKUP_MIN_ALT_GAIN_M   50.0f  // must climb this far past the boost
                                         // point before apogee-watching even
                                         // starts -- rules out a G-spike from
@@ -461,8 +454,7 @@
                                         // zero-crossing before firing --
                                         // gives the primary path (and a
                                         // ground operator) every chance to
-                                        // act first; a redundant fire into
-                                        // an already-open bay is harmless
+                                        // act first
 
 // Fallback for BackupDeploy's WAITING_FOR_ALTITUDE stage -- without this, a
 // single bad/stuck baro reading (RF-coupled noise, see Barometer.cpp) at or

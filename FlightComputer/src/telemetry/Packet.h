@@ -86,10 +86,8 @@ struct TelemetryPacket {
 
     uint8_t  pyro_cont[3];   // continuity per channel: 1=OK 0=open (index 0=CH1, 1=CH2, 2=CH3)
 
-    // Camera recording state as last commanded by CameraController. The RunCam
-    // UART link has no ack, so this is what the FC believes it told the camera,
-    // not a hardware-confirmed state -- still enough to catch a missed command
-    // (e.g. sent while out of range) from the ground without touching a cable.
+    // Assumed camera state: recording at power-up, then tracked by toggles.
+    // This is not hardware-confirmed; check the camera LED before flight.
     uint8_t  cam_recording;  // 1=recording, 0=stopped
 
     // Live sensor + SD card status, re-derived every loop -- see the bit
@@ -148,8 +146,14 @@ enum class CommandType : uint8_t {
     // specific (that's TeensyBridge/SensorManager's own concern, this only
     // touches real flight-logic state that persists in RAM across a
     // would-be flight).
-    RESET = 0x14,
+    RESET = 0x14, // permitted only in IDLE/ARMED/LANDED; rejected in READY/flight
+    READY_FOR_FLIGHT = 0x15, // ARMED only; finish preparation and enable launch detection
 };
+
+// ACK cmdType keeps the command ID in bits 0..6; bit 7 means rejected.
+// Packet size stays unchanged. An accepted ACK is receipt/acceptance, not
+// completion of a blocking operation; telemetry confirms flight state.
+constexpr uint8_t ACK_REJECTED = 0x80;
 
 #pragma pack(push, 1)
 struct CommandPacket {

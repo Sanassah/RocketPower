@@ -3,7 +3,8 @@
 
 // Controls RunCam-compatible camera over Serial7 (UART).
 // Cam_TX→pin28 (Serial7 RX), Cam_RX→pin29 (Serial7 TX).
-// Starts recording on ARMED, stops on LANDED.
+// Assumes camera auto-records at power-up; leaves it alone on ARMED and
+// toggles it off on LANDED if still believed to be recording.
 class CameraController {
 public:
     bool begin();
@@ -17,7 +18,7 @@ public:
     bool isRecording() const { return _recording; }
 
 private:
-    bool _recording = false;
+    bool _recording = true;
 
     void _sendCameraControl(uint8_t op);
 

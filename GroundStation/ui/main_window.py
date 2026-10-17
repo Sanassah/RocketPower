@@ -10,9 +10,9 @@ from PyQt6.QtCore import Qt, QThread, pyqtSlot
 from PyQt6.QtGui  import QFont
 
 from core.serial_worker   import SerialWorker, LinkStats, list_serial_ports
-from core.packet_decoder  import TelemetryData
+from core.packet_decoder  import TelemetryData, ACK_REJECTED
 from core.packet_encoder  import (
-    encode_arm, encode_disarm, encode_fire_pyro,
+    encode_arm, encode_ready, encode_disarm, encode_fire_pyro,
     encode_calibrate,
     encode_servo_test, encode_cam_toggle,
     encode_servo_nudge, encode_servo_save_cal, encode_servo_center_all,
@@ -161,6 +161,7 @@ class MainWindow(QMainWindow):
         self._pages.addWidget(self._build_page_telemetry())
         self._pages.addWidget(self._build_page_test())
         self._pages.addWidget(self._build_page_data_tools())
+        self._pages.addWidget(self._build_page_3d())
         body.addWidget(self._pages, stretch=1)
 
         self._status_bar = QStatusBar()
@@ -200,7 +201,7 @@ class MainWindow(QMainWindow):
 
         # Nav buttons (icon + label)
         self._nav_btns: list[_NavBtn] = []
-        for i, label in enumerate(['⊞  OVERVIEW', '↗  TELEMETRY', '⚙  DEBUG', '⇄  DATA TOOLS']):
+        for i, label in enumerate(['⊞  OVERVIEW', '↗  TELEMETRY', '⚙  DEBUG', '⇄  DATA TOOLS', '▲  3D VIEW']):
             btn = _NavBtn(label)
             btn.clicked.connect(lambda _, idx=i: self._switch_page(idx))
             self._nav_btns.append(btn)
@@ -338,7 +339,7 @@ class MainWindow(QMainWindow):
 
         top.addWidget(self._wrap(self._gps_map, 'o  GPS MAP'))
         top.addWidget(self._traj_plot)           # already has its own header
-        top.addWidget(self._wrap_rocket())
+        top.addWidget(self._wrap_rocket(self._rocket_vis))
         # Matches the bottom row's sizes exactly (see bot.setSizes below) so
         # all 3 columns line up top-to-bottom: GPS/Pyro, Trajectory/
         # Continuity, 3D/Arm.
@@ -401,7 +402,7 @@ class MainWindow(QMainWindow):
         lay.addWidget(widget)
         return card
 
-    def _wrap_rocket(self) -> QWidget:
+    def _wrap_rocket(self, widget: QWidget) -> QWidget:
         card = QWidget()
         card.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         card.setStyleSheet(
@@ -426,8 +427,26 @@ class MainWindow(QMainWindow):
         hl.addWidget(lbl); hl.addStretch()
 
         lay.addWidget(hdr)
-        lay.addWidget(self._rocket_vis)
+        lay.addWidget(widget)
         return card
+
+    # ── Page 4: 3D Orientation, full-size (filming) ─────────────────────────────
+    def _build_page_3d(self) -> QWidget:
+        page = QWidget()
+        page.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        page.setStyleSheet(f'background-color:{_BG};')
+
+        root = QVBoxLayout(page)
+        root.setContentsMargins(18, 18, 18, 18)
+        root.setSpacing(0)
+
+        # Second, independent RocketVisual instance -- same live data as the
+        # overview page's copy (both updated in _on_packet), just alone on
+        # its own page so it fills the whole window for filming instead of
+        # sharing a row with the GPS map/trajectory plot.
+        self._rocket_vis_full = RocketVisual()
+        root.addWidget(self._wrap_rocket(self._rocket_vis_full))
+        return page
 
     # ── Page 1: Telemetry / Commands / Events ─────────────────────────────────
     def _build_page_telemetry(self) -> QWidget:
@@ -535,6 +554,7 @@ class MainWindow(QMainWindow):
     # ── Signals ───────────────────────────────────────────────────────────────
     def _connect_signals(self) -> None:
         self._arm_panel.arm_requested.connect(self._send_arm)
+        self._arm_panel.ready_requested.connect(self._send_ready)
         self._arm_panel.disarm_requested.connect(self._send_disarm)
         self._arm_panel.attitude_control_enable_requested.connect(self._send_attitude_control_enable)
         self._arm_panel.attitude_control_disable_requested.connect(self._send_attitude_control_disable)
@@ -607,6 +627,7 @@ class MainWindow(QMainWindow):
         self._gps_map.update_data(data)
         self._traj_plot.update_data(data)
         self._rocket_vis.update_data(data)
+        self._rocket_vis_full.update_data(data)
         self._pyro_panel.update_data(data)
         self._cont_panel.update_data(data)
         self._arm_panel.update_data(data)
@@ -634,9 +655,16 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot(int, int)
     def _on_ack(self, cmd_seq: int, cmd_type: int) -> None:
-        pending = self._pending_acks.pop(cmd_seq, None)
+        pending = self._pending_acks.get(cmd_seq)
+        if pending and pending['payload'][2] != (cmd_type & 0x7F):
+            return
         if pending:
-            self._event_log.log(f'✓ {pending["label"]} confirmed', level='ok')
+            del self._pending_acks[cmd_seq]
+            rejected = bool(cmd_type & ACK_REJECTED)
+            self._event_log.log(
+                f'{pending["label"]} -- ' + ('REJECTED by flight computer' if rejected else 'accepted; check telemetry for resulting state'),
+                level='error' if rejected else 'ok',
+            )
 
     @pyqtSlot(object)
     def _on_stats(self, stats: LinkStats) -> None:
@@ -699,6 +727,9 @@ class MainWindow(QMainWindow):
 
     def _send_arm(self) -> None:
         self._send_tracked(encode_arm, label='ARM')
+
+    def _send_ready(self) -> None:
+        self._send_tracked(encode_ready, label='READY FOR FLIGHT', level='warn')
 
     def _send_disarm(self) -> None:
         self._send_tracked(encode_disarm, label='DISARM')

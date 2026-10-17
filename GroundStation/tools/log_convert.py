@@ -58,6 +58,7 @@ FIELDS = [
 BINARY_SENTINEL = 0x1E  # ASCII "record separator" -- marks end of the ASCII header
 
 STATE_NAMES = {
+    7: 'READY_FOR_FLIGHT',
     0: 'IDLE', 1: 'ARMED', 2: 'POWERED_ASCENT', 3: 'COAST',
     4: 'APOGEE', 5: 'DESCENT', 6: 'LANDED',
 }

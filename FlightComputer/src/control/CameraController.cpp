@@ -30,16 +30,15 @@ static uint8_t crc8Dvb(const uint8_t* data, size_t len) {
 
 bool CameraController::begin() {
     CAM_SERIAL.begin(CAM_BAUD);
-    _recording = false;
+    // This installation auto-records when camera power is applied. This is
+    // an assumption, not a recording-status response from the camera.
+    _recording = true;
     _probeDeviceInfo();
     return true;
 }
 
 void CameraController::onStateChange(FlightState prev, FlightState next) {
-    (void)prev;
-    if (next == FlightState::ARMED && !_recording) {
-        toggleRecording();
-    } else if (next == FlightState::LANDED && _recording) {
+    if (prev != FlightState::LANDED && next == FlightState::LANDED && _recording) {
         toggleRecording();
     }
 }
@@ -47,7 +46,7 @@ void CameraController::onStateChange(FlightState prev, FlightState next) {
 void CameraController::toggleRecording() {
     _sendCameraControl(RUNCAM_OP_TOGGLE_RECORDING);
     _recording = !_recording;
-    DEBUG_SERIAL.println(_recording ? "[CAM] Recording started" : "[CAM] Recording stopped");
+    DEBUG_SERIAL.println(_recording ? "[CAM] Toggle sent; assumed recording" : "[CAM] Toggle sent; assumed stopped");
 }
 
 void CameraController::_sendCameraControl(uint8_t op) {

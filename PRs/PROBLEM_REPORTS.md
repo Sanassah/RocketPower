@@ -9,7 +9,7 @@ When a PR is fixed: move its entry to the **Resolved** section at the bottom
 with the resolution, don't delete it — the ruled-out list is often the most
 valuable part for the next person (or future you) hitting something similar.
 
-Last updated: 2026-09-08
+Last updated: 2026-10-17
 
 ---
 
@@ -120,25 +120,34 @@ RF noise while telemetry is actively transmitting during descent.
 
 ---
 
-### PR-003 — SERVO_PREFLIGHT / SERVO_TEST commands lack flight-state gating
-**Status:** OPEN — identified in full-project audit, not yet fixed
+### PR-003 — Bench commands can interrupt flight processing
+**Status:** IMPLEMENTED — firmware/ground-station checks passed; hardware V&V pending
 **Severity:** High (could freeze the flight loop mid-flight)
 
-**Symptom (risk, not yet observed in the field):** `SERVO_PREFLIGHT` is a
-blocking ~6s all-4-channel choreography; `SERVO_TEST` is a blocking sweep.
-Neither checks the current `FlightState` before running. If either command
-reaches the flight computer while armed or mid-flight (accidental ground
-send, a duplicated/misrouted command), the main loop freezes for the
-duration — no sensor reads, no telemetry, no state-machine updates — during
-active flight.
+**Original symptom:** Blocking servo tests were accepted in every flight
+state. Calibration, SD operations, and RESET also lacked a flight lockout.
+
+**Implemented 2026-10-17:** Added explicit ARMED -> READY_FOR_FLIGHT command.
+ARMED is preparation only; launch detection starts in READY. Entry ends demo
+mode and centers fins at saved trim. Firmware uses a command allowlist:
+maintenance and attitude-mode commands only in IDLE/ARMED; RESET only in
+IDLE/ARMED/LANDED. READY permits DISARM cancellation before detected liftoff,
+and manual pyro recovery remains available while ready/airborne. The backup
+clears its evidence in IDLE/ARMED and starts watching from READY. Rejections
+are reported in command ACKs, and the ground station disables blocked controls.
+Existing flight-state wire IDs are preserved; READY uses ID 7.
+
+**Validation:** Flight and HITL builds passed. Compile-time tests check every
+command byte against every defined flight state. Ground-station tests cover
+READY encoding/display, confirmation, maintenance lockout, cancellation button
+availability, rejected ACK decoding, and avoiding a false FIRED display in READY.
 
 **Remaining actions:**
-- [ ] Add a flight-state guard in `TelemetryManager::_handleCommand()` (e.g.
-      only allow `SERVO_PREFLIGHT`/`SERVO_TEST` when `state == IDLE` or
-      `ARMED`-but-not-yet-launched; reject and log otherwise)
-- [ ] Decide whether `SERVO_CENTER_ALL`/nudge commands need the same
-      treatment (lower risk — non-blocking — but worth a deliberate decision,
-      not an oversight)
+- [ ] With inert loads, exercise ARM -> READY -> liftoff -> recovery on the
+      board, including READY cancellation and a second preparation cycle.
+- [ ] Inject delayed bench/RESET commands during READY and simulated flight;
+      verify rejection, uninterrupted sensor processing, and manual recovery.
+- [ ] Confirm actual output neutral positions and deployment pulse timing.
 
 ---
 
@@ -197,6 +206,45 @@ the module again.
 - [ ] Once wired: revisit the air-rate/interval choice (9.6kbps / REG0=0xE4
       was the conservative first pick given a ~1km max range requirement,
       see chat history — field-test range before committing further)
+
+---
+
+### PR-005 — In-flight reboot loses automatic recovery history
+**Status:** OPEN — identified by code review; investigation deferred at user's request
+**Severity:** Critical if a reboot occurs before recovery deployment
+
+**Symptom (code-derived failure scenario, not an observed reboot):** A restart
+after burnout returns the primary state machine to IDLE and disarms pyro.
+The backup monitor also loses its RAM state and starts at
+`WAITING_FOR_BOOST`. During normal coast there is no new sustained boost,
+so neither path automatically resumes deployment at apogee.
+
+**Cause / evidence:** `StateMachine` and `BackupDeploy` retain flight history
+only in RAM. `BackupDeploy::update()` requires a new boost, then at least
+`BACKUP_MIN_ALT_GAIN_M` (50 m) of altitude gain, before watching for apogee.
+Its separate state machine does not provide independence from a processor
+reset. See `FlightComputer/src/safety/BackupDeploy.h`, `BackupDeploy.cpp`,
+`states/StateMachine.cpp`, and startup in `main.cpp`.
+
+**Scope and limitations:** An already deployed parachute is unaffected.
+With the READY gate added on 2026-10-17, reboot returns to IDLE and neither
+automatic detector resumes without ground intervention, even during boost.
+Manual deployment requires communications to recover and pyro to be re-armed
+first. This is not a verified reboot recovery strategy. This finding does
+not establish that the PCB is likely to reboot.
+
+**Current mitigation:** No validated automatic recovery from an in-flight
+reboot. The READY change (PR-003) explicitly gates the backup and corrects
+its misleading reset-protection comments; reboot recovery remains deferred.
+
+**Remaining actions:**
+- [ ] Review startup duration and recovery behavior for resets during boost,
+      coast, and descent using inert deployment loads.
+- [ ] Decide on a recovery design for processor/power resets, including
+      whether an independently powered recovery device is required.
+- [ ] If retained in software, design and validate safe flight-state recovery
+      without enabling unintended deployment on an ordinary ground boot.
+- [x] Correct the backup's documentation to state its actual fault coverage.
 
 ---
 

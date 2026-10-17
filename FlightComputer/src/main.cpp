@@ -28,7 +28,7 @@ CameraController   camera;
 DataLogger         logger;
 TelemetryManager   telem(radio, fsm, pyro, fins, camera, logger, attitude);
 StatusLED          statusLed;
-// Independent of fsm/pyro's armed state on purpose -- see BackupDeploy.h.
+// Separate detector, enabled for a flight session starting at READY.
 BackupDeploy        backupDeploy;
 
 // ===== Timing =====
@@ -140,13 +140,11 @@ void loop() {
     // ---- 2. Update state machine ----
     fsm.update(d);
     FlightState newState = fsm.state();
+    sensors.setState(newState);
 
     // ---- 2a. Independent backup apogee monitor ----
-    // Deliberately unconditional -- no state or armed-flag check here. See
-    // BackupDeploy.h for why: if fsm/pyro's state got reset mid-flight
-    // (neither survives a reboot), this is the only thing that can still
-    // notice the rocket already went through a real boost and reached
-    // apogee, and fire the backup channel anyway.
+    // BackupDeploy clears its evidence in IDLE/ARMED and watches from READY
+    // onward. It does not recover flight history after a processor reboot.
     backupDeploy.update(d, pyro);
 
     // ---- 2b. Active attitude control ----
@@ -280,7 +278,7 @@ void loop() {
     // since a HITL test needs to already be armed + stabilization-enabled
     // BEFORE the run starts, and an automatic reset there would silently
     // undo that. The correct bench sequence is: Reset -> Arm -> enable
-    // stabilization -> THEN start the Simulink run.
+    // stabilization -> Ready for Flight -> THEN start the Simulink run.
     if (telem.resetRequested()) {
         DEBUG_SERIAL.println("[RESET] Soft reset requested -- clearing all flight/detection state.");
         fsm.reset();
@@ -295,7 +293,8 @@ void loop() {
         // control computation to paper over it.
         for (int ch = 1; ch <= SERVO_NUM_CHANNELS; ch++) fins.setCorrectionDeg(ch, 0.0f);
         backupDeploy.reset();
-        if (camera.isRecording()) camera.toggleRecording();
+        // Preserve camera recording through a flight-state reset. ARM no
+        // longer starts it; recording normally continues from power-up.
         logger.close();
         if (logger.cardPresent()) logger.open();   // fresh log file for the next run, same as a real reboot would get
         prevState = FlightState::IDLE;             // keep this loop's own change-detection var in sync with fsm's new state

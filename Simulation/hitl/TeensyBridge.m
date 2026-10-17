@@ -59,7 +59,7 @@ classdef TeensyBridge < matlab.System
     %     recovered per-axis commands (see stepImpl).
     %   4 state  -- the real firmware's own FlightState this step (0=IDLE,
     %     1=ARMED, 2=POWERED_ASCENT, 3=COAST, 4=APOGEE, 5=DESCENT,
-    %     6=LANDED, -1=no response received yet). Scope this alongside the
+    %     6=LANDED, 7=READY_FOR_FLIGHT, -1=no response received yet). Scope this alongside the
     %     commands to confirm directly whether a command is still changing
     %     because the firmware is still in POWERED_ASCENT/COAST, rather
     %     than cross-referencing GroundStation's own (differently-clocked)
@@ -98,7 +98,7 @@ classdef TeensyBridge < matlab.System
         LastState
         RoundTripLog   % ms, one entry per step that got a real (non-timeout) reply this run
         LoopUsLog      % us, real firmware main.cpp loop duration, same steps as RoundTripLog
-        StateLog       % FlightState (0-6), same steps as RoundTripLog -- all three share one
+        StateLog       % FlightState (0-7; READY=7), same steps as RoundTripLog -- all three share one
                         % time base so they can be correlated after a run, see releaseImpl
     end
 
@@ -348,9 +348,9 @@ classdef TeensyBridge < matlab.System
             %     duration (one loop lagged -- see Packet.h's loop_us
             %     comment), i.e. what used to only be visible as [LOOP]/
             %     [LOOP BREAKDOWN] text on the separate DEBUG_SERIAL link
-            %   hitlState       - FlightState (0-6) at each of those steps,
+            %   hitlState       - FlightState (0-7; READY=7) at each of those steps,
             %     for correlating e.g. a timing spike against a real state
-            %     transition (ARMED->POWERED_ASCENT etc.)
+            %     transition (READY_FOR_FLIGHT->POWERED_ASCENT etc.)
             if ~isempty(obj.RoundTripLog)
                 assignin('base', 'hitlRoundTripMs', obj.RoundTripLog);
                 assignin('base', 'hitlLoopUs', obj.LoopUsLog);

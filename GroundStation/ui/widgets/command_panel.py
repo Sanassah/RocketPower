@@ -96,6 +96,7 @@ class CommandPanel(QWidget):
         self._sd_present  = False
         self._sd_recording = False
         self._attitude_demo_on    = False
+        self._bench_buttons = []
 
         root = QVBoxLayout(self)
         root.setContentsMargins(18, 12, 18, 14)
@@ -200,6 +201,7 @@ class CommandPanel(QWidget):
         # the barometer, so the name can't just say "Baro" anymore.
         col_a.addWidget(_section('UTILITIES'))
         calibrate_btn = _flat_btn('Calibrate')
+        self._bench_buttons.append(calibrate_btn)
         calibrate_btn.clicked.connect(self._on_calibrate)
         col_a.addWidget(calibrate_btn)
 
@@ -212,6 +214,7 @@ class CommandPanel(QWidget):
         # it's a bigger action than Calibrate, but not as irreversible/
         # dangerous as a pyro fire.
         reset_btn = QPushButton('Reset  (back to IDLE)')
+        self._reset_btn = reset_btn
         reset_btn.setFixedHeight(30)
         reset_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         reset_btn.clicked.connect(self._on_reset)
@@ -254,6 +257,7 @@ class CommandPanel(QWidget):
         col_b.addWidget(_section('FIN SERVOS  (BENCH TEST)'))
 
         preflight_btn = QPushButton('▶  PREFLIGHT  (S→E→N→W, ~6s)')
+        self._bench_buttons.append(preflight_btn)
         preflight_btn.setFixedHeight(32)
         preflight_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         preflight_btn.clicked.connect(self.servo_preflight_requested.emit)
@@ -285,6 +289,7 @@ class CommandPanel(QWidget):
             test_btn  = _flat_btn('Test', height=27)
             minus_btn = _flat_btn('-', height=27, width=32, font_size=15)
             plus_btn  = _flat_btn('+', height=27, width=32, font_size=15)
+            self._bench_buttons.extend([test_btn, minus_btn, plus_btn])
             test_btn.clicked.connect(lambda checked, c=ch: self.servo_test_requested.emit(c))
             minus_btn.clicked.connect(lambda checked, c=ch: self.servo_nudge_requested.emit(c, False))
             plus_btn.clicked.connect(lambda checked, c=ch: self.servo_nudge_requested.emit(c, True))
@@ -303,6 +308,7 @@ class CommandPanel(QWidget):
         center_btn.clicked.connect(self.servo_center_requested.emit)
 
         save_cal_btn = QPushButton('Save Calibration')
+        self._bench_buttons.extend([center_btn, save_cal_btn])
         save_cal_btn.setFixedHeight(30)
         save_cal_btn.setFont(QFont('Segoe UI', 12, QFont.Weight.Bold))
         save_cal_btn.clicked.connect(self._on_save_calibration)
@@ -343,6 +349,12 @@ class CommandPanel(QWidget):
         col_b.addWidget(self._cam_btn)
         col_b.addStretch()
 
+        for btn in self._bench_buttons + [self._att_demo_btn, self._sd_btn, self._cam_btn, self._reset_btn]:
+            btn.setStyleSheet(btn.styleSheet() + f'\nQPushButton:disabled {{ color:{_MUTED}; border-color:{_BORDER}; background-color:{_CARD2}; }}')
+        for btn in self._bench_buttons + [self._att_demo_btn, self._sd_btn, self._cam_btn]:
+            btn.setToolTip('Available in IDLE or ARMED. Locked from READY FOR FLIGHT onward.')
+        self._reset_btn.setToolTip('Available in IDLE, ARMED, or LANDED. DISARM cancels READY before detected liftoff.')
+
         self._update_button_states()
 
     def update_data(self, data: TelemetryData) -> None:
@@ -362,7 +374,11 @@ class CommandPanel(QWidget):
             self._update_button_states()
 
     def _update_button_states(self) -> None:
-        can_fire = self._state in {1, 2, 3, 4, 5}
+        can_prepare = self._state in {0, 1}
+        for btn in self._bench_buttons + [self._att_demo_btn, self._sd_btn, self._cam_btn]:
+            btn.setEnabled(can_prepare)
+        self._reset_btn.setEnabled(self._state in {0, 1, 6})
+        can_fire = self._state in {1, 2, 3, 4, 5, 7}
         for btn in self._fire_btns:
             btn.setEnabled(can_fire)
 

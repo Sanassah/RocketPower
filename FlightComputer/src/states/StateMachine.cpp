@@ -25,8 +25,14 @@ void StateMachine::onArm() {
     }
 }
 
-void StateMachine::onDisarm() {
+void StateMachine::onReady() {
     if (_state == FlightState::ARMED) {
+        _enterState(FlightState::READY_FOR_FLIGHT, millis());
+    }
+}
+
+void StateMachine::onDisarm() {
+    if (_state == FlightState::ARMED || _state == FlightState::READY_FOR_FLIGHT) {
         _enterState(FlightState::IDLE, millis());
     }
 }
@@ -50,10 +56,11 @@ void StateMachine::update(const FlightData& d) {
 
         // ---- IDLE: wait for arm command (handled by onArm()) ----
         case FlightState::IDLE:
+        case FlightState::ARMED:
             break;
 
-        // ---- ARMED: detect liftoff ----
-        case FlightState::ARMED: {
+        // ---- READY_FOR_FLIGHT: detect liftoff ----
+        case FlightState::READY_FOR_FLIGHT: {
             // TEMPORARY: accel_mag_ms2 (BNO085) instead of highg_mag_g
             // (ADXL375) -- see IMU_LIFTOFF_ACCEL_THRESHOLD_MS2 in config.h.
             bool highG = (d.accel_mag_ms2 > IMU_LIFTOFF_ACCEL_THRESHOLD_MS2);

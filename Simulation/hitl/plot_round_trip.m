@@ -3,7 +3,7 @@ function plot_round_trip()
 %   round-trip latency, the real firmware's own loop timing, and its state
 %   trace, all in one place. TeensyBridge.m logs all three on the SAME
 %   step index and, when the run stops, dumps them to the base workspace
-%   as hitlRoundTripMs (ms), hitlLoopUs (us), hitlState (0-6) -- see
+%   as hitlRoundTripMs (ms), hitlLoopUs (us), hitlState (0-7; READY=7) -- see
 %   TeensyBridge.m's releaseImpl. Run this AFTER stopping a HITL run
 %   (Normal Sim runs never populate them, since TeensyBridge's stepImpl
 %   never actually executes then).
@@ -26,14 +26,14 @@ function plot_round_trip()
             mean(lu), median(lu), max(lu), std(lu), 1e6 / mean(lu));
     end
 
-    stateNames = {'IDLE','ARMED','POWERED_ASCENT','COAST','APOGEE','DESCENT','LANDED'};
+    stateNames = {'IDLE','ARMED','POWERED_ASCENT','COAST','APOGEE','DESCENT','LANDED','READY_FOR_FLIGHT'};
     if haveState
         st = evalin('base', 'hitlState');
         uState = unique(st);
         fprintf('States seen this run: ');
         for i = 1:numel(uState)
             s = uState(i);
-            if s >= 0 && s <= 6
+            if s >= 0 && s <= 7
                 fprintf('%s ', stateNames{s+1});
             else
                 fprintf('STATE_%d ', s);
@@ -64,7 +64,7 @@ function plot_round_trip()
         subplot(nPlots, 1, p); p = p + 1;
         plot(st, '.-', 'Color', [0.47 0.67 0.19]);
         xlabel('step'); ylabel('state');
-        yticks(0:6); yticklabels(stateNames);
+        yticks(0:7); yticklabels(stateNames);
         title('Real firmware FlightState per step');
         grid on;
     end

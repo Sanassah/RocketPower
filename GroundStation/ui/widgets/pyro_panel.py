@@ -139,7 +139,7 @@ class PyroPanel(QWidget):
         root.addStretch()
 
     def update_data(self, data: TelemetryData) -> None:
-        armed = data.state >= 1
+        armed = data.state in {1, 2, 3, 4, 5, 7}
         for ch, row in self._rows.items():
             row.set_continuity(data.pyro_continuity[ch - 1])
             if ch in self._fired:
@@ -156,7 +156,7 @@ class PyroPanel(QWidget):
         # CH2 (reserved) and CH3 (backup) only ever get marked FIRED via an
         # explicit ground command (mark_fired()) -- BackupDeploy's own
         # autonomous fire isn't currently reflected here.
-        if data.state >= 5 and 1 not in self._fired:
+        if data.state in {5, 6} and 1 not in self._fired:
             self._fired.add(1)
         if data.state == 0:
             self._fired.clear()

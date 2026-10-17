@@ -2,6 +2,12 @@
 #include "../config.h"
 
 void BackupDeploy::update(const FlightData& d, PyroController& pyro) {
+    // READY is the explicit start of a flight session. Preparation/cancellation
+    // clears all evidence so hand movements cannot prime automatic deployment.
+    if (d.state == FlightState::IDLE || d.state == FlightState::ARMED) {
+        reset();
+        return;
+    }
     if (_stage == _Stage::DONE) return;
     uint32_t now = millis();
 

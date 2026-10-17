@@ -68,8 +68,9 @@ private:
     // real command).
     static constexpr size_t _CMD_TYPE_SLOTS = 32;   // headroom above the highest CommandType value
     int16_t _lastProcessedSeqByType[_CMD_TYPE_SLOTS];
+    bool _lastAcceptedByType[_CMD_TYPE_SLOTS]{};
 
     TelemetryPacket _buildPacket(const FlightData& d) const;
     void _handleCommand(const CommandPacket& cmd);
-    void _sendAck(const CommandPacket& cmd);
+    void _sendAck(const CommandPacket& cmd, bool accepted);
 };

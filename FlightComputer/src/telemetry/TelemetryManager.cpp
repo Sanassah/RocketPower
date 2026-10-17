@@ -1,4 +1,5 @@
 #include "TelemetryManager.h"
+#include "CommandPolicy.h"
 #include "../config.h"
 #include "../states/StateMachine.h"
 #include "../control/PyroController.h"
@@ -69,35 +70,47 @@ void TelemetryManager::update(const FlightData& d, uint32_t loopUs) {
     }
 
     if (gotCmd) {
-        // Ack first, before executing -- so even a slow/blocking command
-        // (e.g. SERVO_PREFLIGHT) is confirmed promptly and the ground stops
-        // retrying right away instead of retrying into an in-progress command.
-        _sendAck(cmd);
-
         uint8_t typeIdx = (uint8_t)cmd.type;
         bool isDuplicate = (typeIdx < _CMD_TYPE_SLOTS) &&
                             ((int16_t)cmd.seq == _lastProcessedSeqByType[typeIdx]);
+        bool accepted = isDuplicate ? _lastAcceptedByType[typeIdx]
+                                    : commandAllowed(cmd.type, _sm.state());
+        if (!isDuplicate && (cmd.type == CommandType::READY_FOR_FLIGHT ||
+                             cmd.type == CommandType::FIRE_PYRO)) {
+            accepted = accepted && _pyro.isArmed();
+        }
+        if (cmd.type == CommandType::FIRE_PYRO) {
+            accepted = accepted && cmd.param >= 1 && cmd.param <= PYRO_NUM_CHANNELS;
+        }
+        // Respond before any blocking preparation operation. Rejected commands
+        // are also remembered, so retries cannot execute later in a different state.
+        _sendAck(cmd, accepted);
 
         // Single-line, always-printed record of every command RX -- easy to
         // scan/grep for exactly what arrived and whether it actually ran.
         DEBUG_SERIAL.print("[CMD RX] seq="); DEBUG_SERIAL.print(cmd.seq);
         DEBUG_SERIAL.print(" type=0x"); DEBUG_SERIAL.print(typeIdx, HEX);
         DEBUG_SERIAL.print(" param="); DEBUG_SERIAL.print(cmd.param);
-        DEBUG_SERIAL.println(isDuplicate ? "  -> DUPLICATE (re-acked only, not re-run)" : "  -> NEW (executing)");
+        DEBUG_SERIAL.println(!accepted ? "  -> REJECTED in current state" :
+                            isDuplicate ? "  -> DUPLICATE (re-acked only)" : "  -> NEW (executing)");
 
         if (!isDuplicate) {
-            if (typeIdx < _CMD_TYPE_SLOTS) _lastProcessedSeqByType[typeIdx] = cmd.seq;
-            _handleCommand(cmd);
+            if (typeIdx < _CMD_TYPE_SLOTS) {
+                _lastProcessedSeqByType[typeIdx] = cmd.seq;
+                _lastAcceptedByType[typeIdx] = accepted;
+            }
+            if (accepted) _handleCommand(cmd);
         }
     }
 }
 
-void TelemetryManager::_sendAck(const CommandPacket& cmd) {
+void TelemetryManager::_sendAck(const CommandPacket& cmd, bool accepted) {
     AckPacket ack{};
     ack.magic[0] = ACK_MAGIC_0;
     ack.magic[1] = ACK_MAGIC_1;
     ack.cmdSeq   = cmd.seq;
-    ack.cmdType  = cmd.type;
+    ack.cmdType  = static_cast<CommandType>(static_cast<uint8_t>(cmd.type) |
+                                          (accepted ? 0 : ACK_REJECTED));
     _lora.sendAck(ack);
 }
 
@@ -160,11 +173,24 @@ void TelemetryManager::_handleCommand(const CommandPacket& cmd) {
         case CommandType::DISARM:
             DEBUG_SERIAL.println("[TELEM] CMD: DISARM");
             _sm.onDisarm();
+            _pyro.disarm();
+            _attitude.reset();
+            for (int ch = 1; ch <= SERVO_NUM_CHANNELS; ++ch) _fins.setCorrectionDeg(ch, 0.0f);
             break;
+
+        case CommandType::READY_FOR_FLIGHT: {
+            // Preserve the selected flight mode, but discard all demo history.
+            bool controlEnabled = _attitude.controlEnabled();
+            _attitude.reset();
+            _attitude.setControlEnabled(controlEnabled);
+            for (int ch = 1; ch <= SERVO_NUM_CHANNELS; ++ch) _fins.setCorrectionDeg(ch, 0.0f);
+            _sm.onReady();
+            break;
+        }
 
         case CommandType::FIRE_PYRO:
             DEBUG_SERIAL.print("[TELEM] CMD: FIRE_PYRO ch="); DEBUG_SERIAL.println(cmd.param);
-            _pyro.fire(cmd.param);   // PyroController enforces armed + continuity checks
+            _pyro.fire(cmd.param);   // PyroController enforces armed + valid channel
             break;
 
         case CommandType::CALIBRATE_BARO:

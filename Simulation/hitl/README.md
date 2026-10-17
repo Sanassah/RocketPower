@@ -66,15 +66,26 @@ To exercise ARM → liftoff → apogee → landed in HITL, send the same
 the Teensy's **first** serial port, at whatever point in the run you want
 them to take effect — the state machine reacts to them exactly as it would
 in flight. Active fin control is a separate opt-in from ARM — send
-`ATTITUDE_CONTROL_ENABLE` (works any time before liftoff, survives ARM) or
+`ATTITUDE_CONTROL_ENABLE` (works in IDLE/ARMED, before READY) or
 `ATTITUDE_DEMO_ENABLE` (takes effect in `IDLE` or `ARMED`, no need to arm
 first) if you want the fins to actually respond.
+
+### Ready gate before each run
+
+Use **Reset → Arm → select stabilization → Ready for Flight → start the
+simulation**. Confirm READY_FOR_FLIGHT in telemetry before starting. ARM
+alone no longer detects launch. Both recovery detectors ignore preparation
+movements in IDLE/ARMED. DISARM cancels READY before detected liftoff; RESET
+and bench commands are rejected from READY through descent. After LANDED,
+RESET unlocks preparation for another run. A test stuck in an airborne state
+requires a physical restart with inert loads, or completing the simulated
+flight; RESET is deliberately not a flight override.
 
 ### Debug scopes (inside "HITL Bridge")
 
 - **"HITL Firmware State"** — the real firmware's own `FlightState` this
   step (`0`=IDLE, `1`=ARMED, `2`=POWERED_ASCENT, `3`=COAST, `4`=APOGEE,
-  `5`=DESCENT, `6`=LANDED, `-1`=no response yet). Scope it alongside
+  `5`=DESCENT, `6`=LANDED, `7`=READY_FOR_FLIGHT, `-1`=no response yet). Scope it alongside
   `rollCmd`/`pitchCmd`/`yawCmd` (`HITL Bridge`'s own outputs, or tap them
   where they feed the `Mode Switch N` blocks at the top level) if a command
   looks like it's still moving when you think it shouldn't be — this

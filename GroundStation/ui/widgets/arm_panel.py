@@ -23,6 +23,7 @@ _BLUE   = '#3B82F6'
 _STATE_COLOR = {
     'IDLE':           '#64748B',
     'ARMED':          _BLUE,
+    'READY_FOR_FLIGHT': _GREEN,
     'POWERED_ASCENT': _ORANGE,
     'COAST':          _GREEN,
     'APOGEE':         '#A78BFA',
@@ -33,6 +34,7 @@ _STATE_COLOR = {
 _STATE_SUB = {
     'IDLE':           'ROCKET IS SAFE',
     'ARMED':          'PYROS HOT  --  STAND CLEAR',
+    'READY_FOR_FLIGHT': 'AWAITING LIFTOFF — PREPARATION LOCKED',
     'POWERED_ASCENT': 'MOTOR BURNING',
     'COAST':          'COASTING TO APOGEE',
     'APOGEE':         'AT APOGEE',
@@ -56,6 +58,7 @@ def _card_header(symbol: str, title: str) -> QHBoxLayout:
 
 class ArmPanel(QWidget):
     arm_requested    = pyqtSignal()
+    ready_requested  = pyqtSignal()
     disarm_requested = pyqtSignal()
     attitude_control_enable_requested  = pyqtSignal()
     attitude_control_disable_requested = pyqtSignal()
@@ -193,6 +196,13 @@ class ArmPanel(QWidget):
         btn_row.addWidget(self._disarm_btn)
         root.addLayout(btn_row)
 
+        self._flight_ready_btn = QPushButton('READY FOR FLIGHT')
+        self._flight_ready_btn.setFixedHeight(40)
+        self._flight_ready_btn.setEnabled(False)
+        self._flight_ready_btn.setStyleSheet(self._arm_btn.styleSheet())
+        self._flight_ready_btn.clicked.connect(self._on_ready)
+        root.addWidget(self._flight_ready_btn)
+
     def _set_ready_style(self, color: str) -> None:
         self._ready_lbl.setStyleSheet(
             f'color:{color};background:transparent;border:1px solid {color};'
@@ -203,10 +213,10 @@ class ArmPanel(QWidget):
         # Every packet, regardless of whether flight state changed below --
         # sensor health or continuity can flicker while state stays put.
         if data.launch_ready:
-            self._ready_lbl.setText('LAUNCH READY')
+            self._ready_lbl.setText('SENSOR / CONTINUITY CHECKS OK')
             self._set_ready_style(_GREEN)
         else:
-            self._ready_lbl.setText('NOT READY: ' + ', '.join(data.launch_not_ready_reasons))
+            self._ready_lbl.setText('CHECK: ' + ', '.join(data.launch_not_ready_reasons))
             self._set_ready_style(_RED)
 
         if data.attitude_control_on != self._attitude_control_on:
@@ -236,7 +246,9 @@ class ArmPanel(QWidget):
         is_idle  = sn == 'IDLE'
         is_armed = sn == 'ARMED'
         self._arm_btn.setEnabled(is_idle)
-        self._disarm_btn.setEnabled(is_armed)
+        self._flight_ready_btn.setEnabled(is_armed)
+        self._disarm_btn.setEnabled(is_armed or sn == 'READY_FOR_FLIGHT')
+        self._att_switch.setEnabled(is_idle or is_armed)
 
         if is_armed:
             self._flash_on = True
@@ -261,6 +273,20 @@ class ArmPanel(QWidget):
         )
         if reply == QMessageBox.StandardButton.Yes:
             self.arm_requested.emit()
+
+    def _on_ready(self) -> None:
+        reply = QMessageBox.question(
+            self, 'Confirm Ready for Flight',
+            'Finish preparation and enable launch detection?\n\n'
+            'This centers the fins at their saved trim, stops demo mode, and locks '
+            'bench commands. Select stabilization and finish all checks first.\n\n'
+            'Wait for READY FOR FLIGHT in telemetry before launching. '
+            'DISARM cancels readiness before detected liftoff.',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            self.ready_requested.emit()
 
     def _update_attitude_labels(self) -> None:
         on_color  = _RED

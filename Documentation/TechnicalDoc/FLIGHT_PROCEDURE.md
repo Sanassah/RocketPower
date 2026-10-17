@@ -55,8 +55,11 @@ it's built.
 5. Optional: run a fin servo preflight sequence (TELEMETRY page → FIN
    SERVOS section → **PREFLIGHT**) to visually confirm all 4 channels move
    correctly before you close up the airframe.
-6. Optional: toggle the camera on/off once (CAMERA section) to confirm the
-   UART link is alive — it also self-probes at boot and reports to Serial.
+6. Confirm the camera LED blinks blue (recording). This installation starts
+   recording at power-up; the telemetry recording flag is only an assumption.
+   Optional: use CAMERA toggle twice to check stop/start over UART, ending
+   with blue blinking. ARM and flight-state RESET leave the camera unchanged.
+   After a previous landing, manually restart recording before another run.
 
 ---
 
@@ -74,24 +77,39 @@ it's built.
    - Arms the pyro channels (fire commands only work while armed).
    - Re-calibrates the barometer at the pad — this is why the rocket needs
      to be stationary and already in its final position.
-   - Starts the camera recording, if not already running.
+   - Leaves the camera recording unchanged; confirm blue blinking before READY.
    - SD logging is already running by this point (started automatically at
      boot) — arming doesn't gate it, it's just confirmed by the SD status
      row.
 4. Double check the SD status row now reads **RECORDING** and pyro
    continuity still looks correct before proceeding — this is your last
    easy checkpoint before the log starts mattering.
+5. Finish calibration, servo checks, and selecting STATIC / ACTIVE STAB.
+   Then press **READY FOR FLIGHT** in the OVERVIEW arm panel. It ends demo
+   mode, centers the fins at saved trim, and enables launch detection for
+   both the primary and backup. Wait until telemetry displays
+   **READY FOR FLIGHT** before launching; a command ACK alone is not the
+   state confirmation. ARM alone no longer enables automatic flight detection.
+6. From READY onward, calibration, servo tests/trim, camera toggles, SD
+   commands, and attitude-mode changes are rejected by firmware. Manual
+   pyro recovery commands remain available. Before detected liftoff,
+   **DISARM** cancels READY and returns to IDLE; ARM and complete preparation
+   again to retry. RESET is rejected in READY and airborne states. After
+   LANDED, RESET returns to IDLE and unlocks preparation for another test.
+
+The ground station and flight firmware must both include this READY update.
+State IDs 0–6 are unchanged; READY_FOR_FLIGHT is ID 7. The automatic backup
+does not watch for boost during IDLE/ARMED, and reboot recovery remains an
+unresolved limitation (PR-005).
 
 ---
 
 ## 3. Launch
 
-- If your motor uses **electronic ignition**: press **Fire CH 1 —
-  Ignition** in the IGNITION CONTROL section. This is a real, irreversible
-  action (confirmation dialog says so) — it's the actual launch trigger.
-- If you're hand-lighting the motor: ARM is still required first (it's
-  what enables liftoff detection and parachute deployment logic), but
-  ignition itself happens outside the electrical system.
+- Motor ignition is handled by the external launch system, after telemetry
+  confirms **READY FOR FLIGHT**. CH1 is the parachute, CH2 is reserved, and
+  CH3 is backup recovery. Do not use a flight-computer pyro command to ignite
+  the motor.
 
 From here the flight computer runs itself — you're a spectator with an
 abort/backup option (§5), not a pilot.
@@ -105,10 +123,11 @@ sensor data, no ground input needed:
 
 | Transition | Trigger |
 |---|---|
-| ARMED → POWERED_ASCENT | High-g accel > 2.5g, held for 100ms (liftoff) |
-| POWERED_ASCENT → COAST | High-g accel drops below 1.0g (burnout) |
-| COAST → APOGEE | Vertical velocity crosses from + to -, held for 200ms |
-| APOGEE → DESCENT | Immediate — parachute (CH2) fires automatically here |
+| ARMED → READY_FOR_FLIGHT | Explicit READY command after preparation |
+| READY_FOR_FLIGHT → POWERED_ASCENT | BNO085 linear-acceleration magnitude > 15 m/s² for 100 ms |
+| POWERED_ASCENT → COAST | Linear-acceleration magnitude < 2 m/s² for 100 ms, or sustained velocity drop fallback |
+| COAST → APOGEE | Estimated vertical velocity stays ≤ 0 for 500 ms |
+| APOGEE → DESCENT | Next state update — parachute (CH1) fires |
 | DESCENT → LANDED | Altitude stable within 2m for 10 continuous seconds |
 
 Also automatic: the camera stops recording on LANDED, the SD log flushes

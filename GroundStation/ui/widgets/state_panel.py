@@ -11,6 +11,7 @@ from core.packet_decoder import TelemetryData
 
 # iOS / Apple HIG-aligned palette, one colour per state
 _STATE_COLORS = {
+    'READY_FOR_FLIGHT': '#22C55E',
     'IDLE':           '#8E8E93',   # system grey
     'ARMED':          '#0071E3',   # Apple blue
     'POWERED_ASCENT': '#FF9F0A',   # iOS orange

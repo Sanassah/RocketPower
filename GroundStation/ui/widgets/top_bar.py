@@ -29,6 +29,7 @@ _VMIN, _VMAX = 6.0, 8.4
 _STATE_COLOR = {
     'IDLE':           '#94A3B8',
     'ARMED':          _BLUE,
+    'READY_FOR_FLIGHT': _GREEN,
     'POWERED_ASCENT': _ORANGE,
     'COAST':          _GREEN,
     'APOGEE':         '#A78BFA',

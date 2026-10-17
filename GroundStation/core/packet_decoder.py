@@ -75,6 +75,7 @@ TELEM_SIZE   = struct.calcsize(TELEM_FORMAT)  # 52
 # AckPacket: magic0, magic1, cmdSeq, cmdType, checksum
 ACK_FORMAT = '<BBBBH'
 ACK_SIZE   = struct.calcsize(ACK_FORMAT)  # 6
+ACK_REJECTED = 0x80  # high bit of cmdType; low 7 bits retain the command ID
 
 STATE_NAMES = {
     0: 'IDLE',
@@ -84,11 +85,13 @@ STATE_NAMES = {
     4: 'APOGEE',
     5: 'DESCENT',
     6: 'LANDED',
+    7: 'READY_FOR_FLIGHT',
 }
 
 STATE_COLORS = {
     'IDLE':           '#555577',
     'ARMED':          '#cc8800',
+    'READY_FOR_FLIGHT': '#22C55E',
     'POWERED_ASCENT': '#ff5500',
     'COAST':          '#2255dd',
     'APOGEE':         '#8800cc',

@@ -21,6 +21,7 @@ CMD_SIZE   = struct.calcsize(CMD_FORMAT)  # 7
 
 
 class CommandType(IntEnum):
+    READY_FOR_FLIGHT = 0x15
     ARM            = 0x01
     DISARM         = 0x02
     FIRE_PYRO      = 0x03
@@ -50,6 +51,7 @@ def encode_command(cmd_type: CommandType, param: int = 0, seq: int = 0) -> bytes
 
 
 def encode_arm(seq: int = 0)                  -> bytes: return encode_command(CommandType.ARM, 0, seq)
+def encode_ready(seq: int = 0)                -> bytes: return encode_command(CommandType.READY_FOR_FLIGHT, 0, seq)
 def encode_disarm(seq: int = 0)               -> bytes: return encode_command(CommandType.DISARM, 0, seq)
 def encode_fire_pyro(ch: int, seq: int = 0)   -> bytes: return encode_command(CommandType.FIRE_PYRO, ch, seq)
 def encode_calibrate(seq: int = 0)            -> bytes: return encode_command(CommandType.CALIBRATE_BARO, 0, seq)
