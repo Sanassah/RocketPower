@@ -56,11 +56,14 @@ void FinController::_symmetricFlightLimits(uint8_t idx, int32_t& loUs, int32_t& 
     int32_t marginDown = center - SERVO_MIN_US;
     int32_t marginUp   = SERVO_MAX_US - center;
     int32_t symMarginUs = (marginDown < marginUp) ? marginDown : marginUp;
+    const int32_t flightUs = (800L * SERVO_FLIGHT_MAX_ANGLE_DEG) / 90;
+    if (symMarginUs > flightUs) symMarginUs = flightUs;
+    if (symMarginUs < 0) symMarginUs = 0;
     loUs = center - symMarginUs;
     hiUs = center + symMarginUs;
 }
 
-void FinController::setCorrectionDeg(uint8_t channel, float correctionDeg) {
+void FinController::setCorrectionDeg(uint8_t channel, float correctionDeg, bool benchDemo) {
     if (channel < 1 || channel > SERVO_NUM_CHANNELS) return;
     uint8_t idx = channel - 1;
     int32_t center = (int32_t)SERVO_CENTER_US + _trimUs[idx];
@@ -72,7 +75,8 @@ void FinController::setCorrectionDeg(uint8_t channel, float correctionDeg) {
     // +/-X deg always produces matched real authority, same reasoning
     // (and now the same fix) as testSweep()/preflightSequence().
     int32_t loUs, hiUs;
-    _symmetricFlightLimits(idx, loUs, hiUs);
+    if (benchDemo) _symmetricSweepLimits(idx, loUs, hiUs);
+    else _symmetricFlightLimits(idx, loUs, hiUs);
 
     // Same us-per-degree scale as SERVO_MIN_US/SERVO_MAX_US in config.h
     // (800us / 90deg on the BMS-101HV datasheet).
@@ -81,12 +85,13 @@ void FinController::setCorrectionDeg(uint8_t channel, float correctionDeg) {
     if (us < loUs) us = loUs;
     if (us > hiUs) us = hiUs;
 
-    _writeUs(idx, us);   // still hard-clamped to SERVO_MIN_US/MAX_US in here as a backstop
+    _writeUs(idx, us, benchDemo ? SERVO_RATED_MIN_US : SERVO_MIN_US,
+                      benchDemo ? SERVO_RATED_MAX_US : SERVO_MAX_US);
 }
 
 void FinController::_symmetricSweepLimits(uint8_t idx, int32_t& loUs, int32_t& hiUs) const {
     int32_t center = (int32_t)SERVO_CENTER_US + _trimUs[idx];
-    int32_t sweepUs    = (int32_t)lroundf(800.0f * SERVO_TEST_SWEEP_ANGLE_DEG / 90.0f);
+    int32_t sweepUs    = (800L * SERVO_TEST_SWEEP_ANGLE_DEG) / 90;
     int32_t marginDown = center - SERVO_RATED_MIN_US;
     int32_t marginUp   = SERVO_RATED_MAX_US - center;
     int32_t symMarginUs = sweepUs;

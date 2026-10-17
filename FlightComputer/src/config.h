@@ -34,6 +34,7 @@
 
 #define BNO085_I2C_BUS   Wire
 #define BNO085_I2C_ADDR  0x4A   // SA0 pulled LOW (BNO085_SCL/SDA, no suffix)
+#define BNO085_RESET_PIN 31    // BNO085_RST: MCU GPIO_EMC_36/C3 -> BNO NRST; active LOW
 
 #define BMP390_I2C_BUS   Wire1
 #define BMP390_I2C_ADDR  0x77   // SDO pulled HIGH (BMP390_SCL1/SDA1)
@@ -116,12 +117,13 @@
 // stalls seen on the bench.
 
 // ===== Pyro Channels =====
-// From HighCurrentComponents.kicad_sch hierarchical labels
-// PyroCHx_N  → low-side MOSFET gate, MCU pin N (active HIGH to fire)
+// Active-HIGH low-side MOSFET gates. Pin numbers follow the PCB's actual
+// MCU pads and Teensy core mapping, NOT the legacy net-name suffixes.
+// PyroCH2_3 and PyroCH3_4 are wired to Teensy pins 11 and 12, not 3 and 4.
 // Pyrox_Test_N → continuity sense (analog input), MCU pin N
-#define PYRO_CH1_FIRE_PIN   2     // PyroCH1_2  — parachute
-#define PYRO_CH2_FIRE_PIN   3     // PyroCH2_3  — reserved (future booster/2nd stage), unused
-#define PYRO_CH3_FIRE_PIN   4     // PyroCH3_4  — backup
+#define PYRO_CH1_FIRE_PIN   2     // PyroCH1_2: GPIO_EMC_04, F2 — parachute
+#define PYRO_CH2_FIRE_PIN   11    // PyroCH2_3: GPIO_B0_02, E8 — reserved/manual
+#define PYRO_CH3_FIRE_PIN   12    // PyroCH3_4: GPIO_B0_01, E7 — backup
 
 #define PYRO_CH1_CONT_PIN   40    // Pyro1_Test_40
 #define PYRO_CH2_CONT_PIN   41    // Pyro2_Test_41
@@ -161,13 +163,14 @@
 // 1520us, rated travel 1100-1900us (90 deg total, ~8.9us/deg). We deliberately
 // command a much smaller window than the full rated range for now.
 #define SERVO_CENTER_US     1520   // neutral (datasheet value, not 1500)
-#define SERVO_MAX_ANGLE_DEG 30     // DIAGNOSTIC: was 15 -- bumped for bench demo visibility. RESTORE to 15 before any real/HITL flight-relevant run. (max deflection each side of center, rated travel is +-45deg)
+#define SERVO_MAX_ANGLE_DEG 30     // absolute window for startup/trim commands
+#define SERVO_FLIGHT_MAX_ANGLE_DEG 15 // maximum correction from saved trim in flight/HITL
 #define SERVO_MIN_US        (SERVO_CENTER_US - (800L * SERVO_MAX_ANGLE_DEG) / 90)
 #define SERVO_MAX_US        (SERVO_CENTER_US + (800L * SERVO_MAX_ANGLE_DEG) / 90)
 #define SERVO_TEST_STEP_MS 500    // dwell time at each position during a test sweep
 
 // testSweep()'s bench diagnostic deliberately exercises MORE of the servo's
-// real mechanical range than SERVO_MAX_ANGLE_DEG allows for flight -- the
+// real mechanical range than SERVO_FLIGHT_MAX_ANGLE_DEG allows for flight -- the
 // point of a sweep test is to catch binding/mechanical issues across the
 // servo's real travel, not to stay inside the flight-authority window. Still
 // well inside the datasheet's rated 1100-1900us range (see comment above),
@@ -336,8 +339,8 @@
 // REVERTED 2026-09 along with ATTITUDE_ROLL_ANGLE_KP -- see its comment.
 // 0.86f (Kd_roll=0.015) is the REAL-HITL-confirmed value: 0.015*(180/pi)
 // = 0.86.
-#define ATTITUDE_ROLL_RATE_KP    0.0f  // DIAGNOSTIC: was 0.86f (REAL-HITL-confirmed) -- zeroed for bench demo visibility. RESTORE to 0.86f before any real/HITL flight-relevant run.
-#define ATTITUDE_PITCH_RATE_KP   0.0f  // DIAGNOSTIC: was 0.86f -- see ATTITUDE_ROLL_RATE_KP's note, same reason/restore.
+#define ATTITUDE_ROLL_RATE_KP    0.86f // restored damping (simulation Kd_roll=0.015)
+#define ATTITUDE_PITCH_RATE_KP   0.86f // restored damping (simulation Kd_pitch=0.015)
 // [TUNE, 2026-09] was 4.0f, "the old provisional value," never actually
 // validated -- unlike roll/pitch, nobody had ever checked whether this
 // numerically matched Constants.m's Kd_yaw via the same (180/pi) factor
@@ -347,7 +350,7 @@
 // trustworthy side and bringing firmware down to match, same conservative
 // bias as every other gain decision this session. NOT real-HITL-tested at
 // this value -- needs a real test before trusting it, same as roll/pitch.
-#define ATTITUDE_YAW_RATE_KP     0.0f  // DIAGNOSTIC: was 0.29f -- zeroed alongside ROLL/PITCH_RATE_KP, see that note. RESTORE before any real/HITL flight-relevant run.
+#define ATTITUDE_YAW_RATE_KP     0.29f // restored damping (simulation Kd_yaw=0.005)
 
 // Optional integral gains on the RATE term -- 0 = pure-PD (recommended
 // starting point, and the only mode that's been reasoned about above). An
@@ -375,27 +378,18 @@
 // Per-axis correction authority limit (deg), clamped BEFORE allocating
 // across the 4 fins -- keeps one noisy or saturated axis from eating the
 // whole servo range at the expense of the other two. The per-fin total
-// (after allocation) is still hard-clamped again by FinController to
-// SERVO_MIN_US/SERVO_MAX_US regardless, as a second, independent backstop.
-// Back to 10.0f (2026-09) -- was TEMPORARILY bumped to 20.0f for bench
-// visibility alongside the ROLL/PITCH_ANGLE_KP bump, but SERVO_MAX_ANGLE_DEG
-// dropping to 15 left 20 sitting ABOVE the physical/software travel limit,
-// i.e. dead: every value it would've allowed through was just getting
-// clamped tighter by the servo limit anyway. 10.0f is comfortably inside
-// that 15 ceiling again, so this clamp actually does something once more.
-// ATTITUDE_ROLL/PITCH_ANGLE_KP are still at their own bumped 25.0f,
-// untouched by this change -- revert those separately if/when done with
-// bench visibility on them too.
+// (after allocation) is capped again by FinController at +/-15 deg in
+// flight/HITL, with symmetric trim-aware pulse limits as a backstop.
 #define ATTITUDE_MAX_AXIS_DEG   10.0f
 
 // DIAGNOSTIC/DEMO ONLY -- NOT A FLIGHT PARAMETER. Multiplies the real servo
 // deflection, ONLY while the ATTITUDE_DEMO_ENABLE bench hand-tilt demo is
-// active (_demoEnabled && !_controlEnabled in AttitudeController.cpp) --
+// active in IDLE/ARMED (see AttitudeController.cpp) --
 // never during real or HITL flight control. Applied after the real command
 // is already computed/clamped, so it's purely cosmetic: only changes how far
 // the servo physically moves for a given real tilt, not the control law
-// itself. Still hard-clamped by FinController to SERVO_MIN_US/MAX_US
-// (+-SERVO_MAX_ANGLE_DEG) regardless of this value.
+// itself. Demo travel is capped at +/-SERVO_TEST_SWEEP_ANGLE_DEG (30 deg),
+// reduced if saved trim leaves less symmetric room within rated travel.
 #define ATTITUDE_DEMO_FIN_GAIN  100.0f
 
 // ===== Flight Constants =====

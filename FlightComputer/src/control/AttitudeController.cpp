@@ -144,9 +144,11 @@ void AttitudeController::update(const FlightData& d, FinController& fins) {
     // config.h. Gated to the bench demo specifically (never real/HITL
     // flight control) and applied after rollCmd/pitchCmd/yawCmd are already
     // clamped, so only the physical servo deflection changes.
-    float demoGain = (_demoEnabled && !_controlEnabled) ? ATTITUDE_DEMO_FIN_GAIN : 1.0f;
-    fins.setCorrectionDeg(1, demoGain * (yawCmd - pitchCmd));  // S
-    fins.setCorrectionDeg(2, demoGain * (yawCmd - rollCmd));   // E
-    fins.setCorrectionDeg(3, demoGain * (yawCmd + pitchCmd));  // N
-    fins.setCorrectionDeg(4, demoGain * (yawCmd + rollCmd));   // W
+    const bool benchDemo = _demoEnabled &&
+        (d.state == FlightState::IDLE || d.state == FlightState::ARMED);
+    float demoGain = benchDemo ? ATTITUDE_DEMO_FIN_GAIN : 1.0f;
+    fins.setCorrectionDeg(1, demoGain * (yawCmd - pitchCmd), benchDemo);  // S
+    fins.setCorrectionDeg(2, demoGain * (yawCmd - rollCmd), benchDemo);   // E
+    fins.setCorrectionDeg(3, demoGain * (yawCmd + pitchCmd), benchDemo);  // N
+    fins.setCorrectionDeg(4, demoGain * (yawCmd + rollCmd), benchDemo);   // W
 }

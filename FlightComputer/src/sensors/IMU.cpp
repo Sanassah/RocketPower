@@ -3,7 +3,17 @@
 #include "../DebugPrint.h"
 
 bool IMU::begin() {
+    // begin_I2C probes the address BEFORE the driver's hardware reset.
+    // Ensure NRST is released and the device has time to boot for that probe.
+    pinMode(BNO085_RESET_PIN, OUTPUT);
+    digitalWrite(BNO085_RESET_PIN, HIGH);
+    delay(100);
     if (!_bno.begin_I2C(BNO085_I2C_ADDR, &BNO085_I2C_BUS)) return false;
+    _bno.wasReset(); // consume the expected startup-reset notification
+    return _enableReports();
+}
+
+bool IMU::_enableReports() {
     bool ok = true;
     // Linear accel detuned to 50Hz, off-tick from the other two (100Hz
     // each) -- same tick = queued together = more 32-byte I2C chunks to
@@ -17,6 +27,15 @@ bool IMU::begin() {
 }
 
 bool IMU::update() {
+    if (_bno.wasReset()) {
+        _data.valid = false;
+        DEBUG_SERIAL.println("[IMU] Sensor reset detected; restoring reports");
+        if (!_enableReports()) {
+            DEBUG_SERIAL.println("[IMU] Failed to restore sensor reports");
+        }
+        // A reset/configuration operation is not a fresh measurement.
+        return false;
+    }
     if (!_bno.getSensorEvent(&_event)) return false;
 
     // Captured before _applyEvent() overwrites _event's union with a later

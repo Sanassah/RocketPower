@@ -48,7 +48,7 @@ from PyQt6.QtCore import Qt, QThread, QTimer, pyqtSlot
 from PyQt6.QtGui import QFont
 
 from core.raw_serial_worker import RawSerialWorker
-from core.serial_worker import list_serial_ports
+from ui.widgets.port_selector import refresh_port_combo
 
 # Matches a leading "[SOME TAG]" at the start of a line, e.g. "[BARO RAW]",
 # "[SENSOR BREAKDOWN]", "[GPS BREAKDOWN]" -- everything firmware prints on
@@ -179,7 +179,7 @@ class DebugLogPanel(QWidget):
         """
         self._port_combo = QComboBox()
         self._port_combo.setFixedHeight(24)
-        self._port_combo.setFixedWidth(110)
+        self._port_combo.setMinimumWidth(260)
         self._port_combo.setStyleSheet(combo_css)
         hdr.addWidget(self._port_combo)
 
@@ -486,12 +486,7 @@ class DebugLogPanel(QWidget):
             """)
 
     def _refresh_ports(self) -> None:
-        current = self._port_combo.currentText()
-        self._port_combo.clear()
-        ports = list_serial_ports()
-        self._port_combo.addItems(ports)
-        if current in ports:
-            self._port_combo.setCurrentText(current)
+        refresh_port_combo(self._port_combo, 'secondary')
 
     def _clear(self) -> None:
         self._text.clear()
@@ -509,7 +504,7 @@ class DebugLogPanel(QWidget):
         if self._connected:
             self._stop()
         else:
-            port = self._port_combo.currentText()
+            port = self._port_combo.currentData()
             if port:
                 self._start(port)
 

@@ -248,6 +248,127 @@ its misleading reset-protection comments; reboot recovery remains deferred.
 
 ---
 
+### PR-006 — Vertical-velocity estimate requires real-sensor validation
+**Status:** OPEN — investigation deferred; no estimator changes in this update
+**Severity:** High (primary and backup apogee detection share this estimate)
+
+**Observed:** Hand-motion testing leaves a residual nonzero vertical velocity
+after the rocket returns to the table. This demonstrates estimation error;
+it does not by itself prove a false apogee during ascent.
+
+**Risks and evidence:** `SensorManager.cpp` integrates IMU linear acceleration
+rotated using the reported quaternion, then applies barometric velocity
+correction. Acceleration bias and orientation error accumulate into velocity
+error; RF-related barometer noise (PR-002) also affects that correction.
+`IMU.cpp` applies a calibration rotation to the quaternion while the linear
+acceleration remains in sensor axes. Verify whether these frames are consistent
+before relying on the resulting vertical acceleration. The frame mismatch is
+a code-review concern, not yet isolated as the cause of the recorded drift.
+
+Both recovery paths use `vert_vel_ms`. A persistent error can shift deployment
+early or late; increasing confirmation to 500 ms only rejects shorter sign
+excursions, not sustained estimation error. HITL injects velocity directly and
+therefore does not validate this sensor-to-velocity calculation.
+
+**Remaining actions:**
+- [ ] Verify quaternion/acceleration frame conventions and calibration behavior.
+- [ ] Record timestamped stationary and repeatable up/down tests, including
+      telemetry on/off, with an independent motion reference.
+- [ ] Measure bias, residual drift, and velocity sign/timing error over flight-like
+      durations; determine acceptable deployment timing error.
+- [ ] Evaluate pad bias/velocity initialization and improved altitude correction.
+      Do not zero velocity in flight merely because acceleration is near zero.
+
+---
+
+### PR-007 — CH2/CH3 firing GPIOs did not match the PCB
+**Status:** IMPLEMENTED — physical output verification pending
+**Severity:** Critical (CH3 backup output could not be driven)
+
+**Observed:** CH1 worked; manual ground-station CH2/CH3 commands while ARMED
+did not activate the connected e-matches.
+
+**Cause:** Firmware used pins 3/4 based on legacy labels `PyroCH2_3` and
+`PyroCH3_4`. The PCB and saved fabrication netlist instead connect Q2 to
+MCU ball E8 (`GPIO_B0_02`, Teensy pin 11) and Q3 to E7 (`GPIO_B0_01`, pin 12).
+Pins 3/4 map to unconnected MCU balls G5/H5. CH1 correctly uses pin 2/F2.
+
+**Fix:** Corrected CH2/CH3 firing pins to 11/12 and firmware comments.
+Legacy KiCad net names are retained; their suffixes must not be used as
+pin-mapping evidence. Firing duration and command restrictions are unchanged.
+
+**Remaining validation:** Upload corrected firmware with e-matches disconnected
+and verify all three channels with inert loads, including idle/off behavior
+and the commanded pulse. Software build success does not confirm assembly
+integrity or delivered output current.
+
+---
+
+### PR-008 — BNO085 H_INTN unconnected; firmware blindly polls over I2C
+**Status:** OPEN — requires a PCB revision, not a firmware-only fix
+**Severity:** Medium (no observed hang yet; risk is to loop-timing determinism)
+
+**Symptom (code/datasheet-derived, not an observed hang):** `IMU.cpp` never
+configures or reads the BNO085's `H_INTN` pin (active-low host interrupt,
+BNO085 pin 14), so the firmware has no way to know when new sensor data is
+actually ready and must poll the device over I2C instead.
+
+**Confirmed in schematic:** `PCB/main/BNO085.kicad_sch` — `H_INTN` (pin 14,
+local offset -20.32/0 on symbol `BNO1` at 88.9/57.15 → absolute 68.58/57.15)
+has an explicit `(no_connect (at 68.58 57.15))` at that exact point. Not an
+oversight; deliberately left unconnected, matching Adafruit's own BNO08x
+reference design (same convention the user independently confirmed by
+checking Adafruit's schematic).
+
+**Risk:** per the BNO080/085 datasheet (§1.2.2.2), polling the sensor over
+I2C when no new data is available triggers clock stretching (the slave holds
+SCL low) rather than a fast negative ack. Limiting how often the firmware
+polls does not bound how long any single read can stretch for. This hasn't
+been measured under normal operation or an injected sensor fault — it's a
+plausible failure mode from the datasheet, not a reproduced hang.
+
+This is sharper than "polls once per loop": `SensorManager::update()`
+(`SensorManager.cpp:161`) calls `_imu.update()` in a `for (i=0; i<6; i++)`
+drain loop, breaking early the first time a call returns no data. Each
+`_imu.update()` → `getSensorEvent()` → `sh2_service()` → one blind SHTP
+header read over I2C (`shtp.c`'s `shtp_service()`, one `pHal->read()` per
+call) — i.e. up to 6 separate, independently clock-stretch-exposed I2C
+probes back-to-back in a single 100Hz loop tick, not one. The loop exists
+because the BNO085 streams 3 reports at 100Hz each (300 events/s) into a
+100Hz loop that can't keep up in one call — 6 is a drain cap, not a protocol
+constant.
+
+**What's confirmed NOT the fix:** the secondary/slave I2C pins (`S_SCL`/
+`S_SDA`, pins 15/16) are correctly left unconnected per Adafruit's own design
+("Slave I2C keep unconnected" note in the schematic) — that's unrelated to
+this issue and should stay as-is.
+
+**Blocker:** same as PR-004 — no confirmed spare/free MIMXRT1062 GPIO pad
+from the schematic to route `H_INTN` to. Worth auditing together with PR-004
+in one pass (3 pins needed total: LoRa M0/M1 + this one) rather than two
+separate schematic audits.
+
+**Current mitigation (not yet implemented):** `Wire.setWireTimeout(timeout_us)`
+(Teensy/Arduino Wire library) can bound a stuck I2C transaction to a timeout
++ error instead of an indefinite stall. Software-only, no hardware change
+needed, doesn't require this PCB revision to land first — just hasn't been
+added yet.
+
+**Remaining actions:**
+- [ ] Add `Wire.setWireTimeout()` on the IMU's bus as an immediate, hardware-
+      independent mitigation
+- [ ] Audit schematic for a genuinely free MIMXRT1062 GPIO pad (combine with
+      PR-004's audit — see its action item)
+- [ ] Next PCB rev: route BNO085 pin 14 (`H_INTN`) to that GPIO instead of
+      leaving it no-connect
+- [ ] Firmware: configure that pin as an interrupt input in `IMU.cpp`
+      (`attachInterrupt`), gate/skip the I2C read when no interrupt is
+      pending instead of always polling
+- [ ] V&V: timing measurements of IMU read duration under normal operation
+      and an injected sensor fault, before and after the interrupt change
+
+---
+
 ## Resolved this session (reference — not exhaustive project history)
 
 Kept short and only for items that came up as candidate PRs during this same

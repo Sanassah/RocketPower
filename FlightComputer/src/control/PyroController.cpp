@@ -2,11 +2,11 @@
 #include "../config.h"
 #include <Arduino.h>
 
-// From schematic: PyroCHx_N labels give MCU pin N for each channel
+// Actual PCB-to-Teensy mapping; legacy net suffixes are incorrect for CH2/3.
 const uint8_t PyroController::_firePins[3] = {
     PYRO_CH1_FIRE_PIN,   // pin 2  — parachute
-    PYRO_CH2_FIRE_PIN,   // pin 3  — reserved (future booster/2nd stage)
-    PYRO_CH3_FIRE_PIN,   // pin 4  — backup
+    PYRO_CH2_FIRE_PIN,   // pin 11 — reserved (future booster/2nd stage)
+    PYRO_CH3_FIRE_PIN,   // pin 12 — backup
 };
 const uint8_t PyroController::_contPins[3] = {
     PYRO_CH1_CONT_PIN,   // pin 40

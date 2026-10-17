@@ -9,7 +9,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QThread, pyqtSlot
 from PyQt6.QtGui  import QFont
 
-from core.serial_worker   import SerialWorker, LinkStats, list_serial_ports
+from ui.widgets.port_selector import refresh_port_combo
+from core.serial_worker   import SerialWorker, LinkStats
 from core.packet_decoder  import TelemetryData, ACK_REJECTED
 from core.packet_encoder  import (
     encode_arm, encode_ready, encode_disarm, encode_fire_pyro,
@@ -582,18 +583,13 @@ class MainWindow(QMainWindow):
         if self._connected:
             self._stop_serial()
         else:
-            port = self._port_combo.currentText()
+            port = self._port_combo.currentData()
             baud = int(self._baud_combo.currentText())
             if port:
                 self._start_serial(port, baud)
 
     def _refresh_ports(self) -> None:
-        current = self._port_combo.currentText()
-        self._port_combo.clear()
-        ports = list_serial_ports()
-        self._port_combo.addItems(ports)
-        if current in ports:
-            self._port_combo.setCurrentText(current)
+        refresh_port_combo(self._port_combo, 'telemetry')
 
     def _start_serial(self, port: str, baud: int) -> None:
         if self._thread and self._thread.isRunning():

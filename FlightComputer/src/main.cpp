@@ -65,6 +65,9 @@ static void printSensorReport(bool sdOk) {
 
 // =================================================================
 void setup() {
+    // Release the IMU reset line before waiting for USB or initializing sensors.
+    pinMode(BNO085_RESET_PIN, OUTPUT);
+    digitalWrite(BNO085_RESET_PIN, HIGH);
     Serial.begin(115200);
     while (!Serial && millis() < 5000);
 

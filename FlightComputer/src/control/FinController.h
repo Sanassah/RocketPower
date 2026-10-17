@@ -20,9 +20,10 @@ public:
     // control loop (see AttitudeController), not bench-test choreography.
     // Relative to the per-channel trim, and unlike testSweep()/
     // preflightSequence() there's no ramping -- it writes immediately, still
-    // hard-clamped to SERVO_MIN_US/SERVO_MAX_US by _writeUs() same as
-    // everything else.
-    void setCorrectionDeg(uint8_t channel, float correctionDeg);
+    // capped at SERVO_FLIGHT_MAX_ANGLE_DEG and the available symmetric
+    // travel around saved trim. Bench demo uses the rated pulse window.
+    // benchDemo permits the wider test range; default always uses flight limits.
+    void setCorrectionDeg(uint8_t channel, float correctionDeg, bool benchDemo = false);
 
     // Blocking sweep test: trimmed center -> min -> max -> trimmed center.
     void testSweep(uint8_t channel);
@@ -64,7 +65,7 @@ private:
 
     void _loadCalibration();
 
-    // loUs/hiUs default to the flight-authority SERVO_MIN_US/MAX_US, same as
+    // loUs/hiUs default to the startup/trim SERVO_MIN_US/MAX_US, same as
     // always -- only testSweep() overrides them (to SERVO_RATED_MIN_US/MAX_US)
     // to reach further than flight ever commands for its bench diagnostic.
     void _writeUs(uint8_t idx, int32_t us, int32_t loUs = SERVO_MIN_US, int32_t hiUs = SERVO_MAX_US);
@@ -78,15 +79,15 @@ private:
     // beyond-flight-authority range.
     void _symmetricSweepLimits(uint8_t idx, int32_t& loUs, int32_t& hiUs) const;
 
-    // Same idea as _symmetricSweepLimits, but bounded by the flight-
-    // authority SERVO_MIN_US/MAX_US instead of the wider rated range --
-    // used by setCorrectionDeg() so real/HITL/demo commands also get
+    // Same idea as _symmetricSweepLimits, bounded by the absolute
+    // SERVO_MIN_US/MAX_US window instead of the wider rated range --
+    // additionally capped at SERVO_FLIGHT_MAX_ANGLE_DEG, so real/HITL commands get
     // matched authority both directions, not just the bench tests above.
     void _symmetricFlightLimits(uint8_t idx, int32_t& loUs, int32_t& hiUs) const;
 
     // Cosmetic ramps (linear, stepped) so choreography looks like intentional
     // motion instead of instant snaps. Purely visual -- no functional need.
-    // loUs/hiUs default to flight-authority SERVO_MIN_US/MAX_US, same as
+    // loUs/hiUs default to startup/trim SERVO_MIN_US/MAX_US, same as
     // _writeUs(); preflightSequence() overrides them to the wider rated range.
     void _rampTo(uint8_t idx, int32_t targetUs, uint32_t durationMs, int32_t loUs = SERVO_MIN_US, int32_t hiUs = SERVO_MAX_US);
     void _rampAllTo(const int32_t targets[SERVO_NUM_CHANNELS], uint32_t durationMs, int32_t loUs = SERVO_MIN_US, int32_t hiUs = SERVO_MAX_US);

@@ -55,6 +55,9 @@ it's built.
 5. Optional: run a fin servo preflight sequence (TELEMETRY page → FIN
    SERVOS section → **PREFLIGHT**) to visually confirm all 4 channels move
    correctly before you close up the airframe.
+   Preflight/test sweeps and hand-tilt demo allow up to +/-30 degrees from
+   saved trim. Normal flight/HITL corrections are capped at +/-15 degrees;
+   available symmetric travel may be smaller due to trim. READY ends demo mode.
 6. Confirm the camera LED blinks blue (recording). This installation starts
    recording at power-up; the telemetry recording flag is only an assumption.
    Optional: use CAMERA toggle twice to check stop/start over UART, ending

@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui  import QFont
 
-from core.serial_worker import list_serial_ports
+from ui.widgets.port_selector import refresh_port_combo
 
 _BAUD_RATES   = ['115200', '9600', '57600', '38400', '19200']
 _DEFAULT_BAUD = '115200'
@@ -107,7 +107,7 @@ class ConnectionPanel(QWidget):
         layout.addWidget(_micro_label('PORT'))
         self._port_combo = QComboBox()
         self._port_combo.setMinimumWidth(100)
-        self._port_combo.setMaximumWidth(130)
+        self._port_combo.setMaximumWidth(380)
         self._port_combo.setFixedHeight(32)
         layout.addWidget(self._port_combo)
 
@@ -192,15 +192,10 @@ class ConnectionPanel(QWidget):
         if self._connected:
             self.disconnect_requested.emit()
         else:
-            port = self._port_combo.currentText()
+            port = self._port_combo.currentData()
             baud = int(self._baud_combo.currentText())
             if port:
                 self.connect_requested.emit(port, baud)
 
     def _refresh_ports(self) -> None:
-        current = self._port_combo.currentText()
-        self._port_combo.clear()
-        ports = list_serial_ports()
-        self._port_combo.addItems(ports)
-        if current in ports:
-            self._port_combo.setCurrentText(current)
+        refresh_port_combo(self._port_combo, 'telemetry')

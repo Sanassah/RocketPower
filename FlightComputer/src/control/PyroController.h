@@ -5,8 +5,9 @@
 // ignition is handled by an external launcher system, not this flight
 // computer. From schematic (HighCurrentComponents.kicad_sch):
 //   CH1 (parachute): fire=pin2, continuity=pin40
-//   CH2 (reserved, e.g. future booster/2nd stage): fire=pin3, continuity=pin41
-//   CH3 (backup):    fire=pin4, continuity=pin39
+//   CH2 (reserved, e.g. future booster/2nd stage): fire=pin11, continuity=pin41
+//   CH3 (backup):    fire=pin12, continuity=pin39
+// Legacy schematic net suffixes _3/_4 do not identify the Teensy pins.
 class PyroController {
 public:
     bool begin();    // configure GPIO directions
