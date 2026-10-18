@@ -13,6 +13,9 @@ void StateMachine::_enterState(FlightState next, uint32_t now) {
     _decelDetecting     = false;
     _peakAscentVertVel  = 0.0f;   // fresh peak-tracker every (re-)entry to POWERED_ASCENT
     _apogeeDetecting    = false;
+    _peakAltM           = 0.0f;   // fresh peak-altitude tracker, same timing as _peakAscentVertVel
+    _baroDescendDetecting = false;
+    _peakCandidateDetecting = false;
     _landedStableMs     = 0;
 
     DEBUG_SERIAL.print("[FSM] → ");
@@ -46,6 +49,8 @@ void StateMachine::reset() {
     _burnoutFirstMs = 0;
     _decelFirstMs   = 0;
     _apogeeWindowMs = 0;
+    _baroDescendFirstMs = 0;
+    _peakCandidateFirstMs = 0;
     _landedRefAlt   = 0.0f;
 }
 
@@ -121,11 +126,16 @@ void StateMachine::update(const FlightData& d) {
             break;
         }
 
-        // ---- COAST: detect apogee via SUSTAINED non-positive vertical velocity ----
-        // Must stay <=0 continuously for the full window, cancelling
-        // immediately if it goes positive again -- vert_vel_ms can cross
-        // zero on baro noise alone (see [VELFUSE]), not just at real apogee,
-        // so a single sample can't be allowed to fire the main parachute.
+        // ---- COAST: detect apogee via SUSTAINED non-positive vertical
+        // velocity (primary), OR a SUSTAINED raw-baro drop from peak
+        // altitude (independent fallback, see BARO_APOGEE_DROP_M in
+        // config.h) -- either confirming is enough to fire. Both must stay
+        // true continuously for their full window, cancelling immediately
+        // if they recover -- vert_vel_ms can cross zero on baro noise alone
+        // (see [VELFUSE]), not just at real apogee, so a single sample
+        // can't be allowed to fire the main parachute. The raw-baro check
+        // never touches vert_vel_ms/IMU integration, so it stays a genuine
+        // second opinion if that fusion is ever wrong or stuck (see PR-006).
         case FlightState::COAST: {
             bool nonPositive = (d.vert_vel_ms <= 0.0f);
             if (nonPositive) {
@@ -133,11 +143,47 @@ void StateMachine::update(const FlightData& d) {
                     _apogeeDetecting = true;
                     _apogeeWindowMs  = now;
                 }
-                if (now - _apogeeWindowMs >= APOGEE_DETECTION_WINDOW_MS) {
-                    _enterState(FlightState::APOGEE, now);
-                }
             } else {
                 _apogeeDetecting = false;   // still climbing -- cancel, not a real apogee
+            }
+            bool velConfirmed = _apogeeDetecting &&
+                (now - _apogeeWindowMs >= APOGEE_DETECTION_WINDOW_MS);
+
+            // Debounced peak promotion -- see _peakCandidate* comment in
+            // StateMachine.h for why a single glitch sample must NOT be
+            // able to instantly/permanently inflate _peakAltM.
+            if (d.baro_alt_m > _peakAltM) {
+                if (!_peakCandidateDetecting) {
+                    _peakCandidateDetecting = true;
+                    _peakCandidateFirstMs   = now;
+                    _peakCandidateMinM      = d.baro_alt_m;
+                } else if (d.baro_alt_m < _peakCandidateMinM) {
+                    _peakCandidateMinM = d.baro_alt_m;
+                }
+                if (now - _peakCandidateFirstMs >= BARO_PEAK_CONFIRM_MS) {
+                    _peakAltM = _peakCandidateMinM;
+                    _peakCandidateDetecting = false;   // next excursion needs its own fresh window
+                }
+            } else {
+                _peakCandidateDetecting = false;
+            }
+            bool baroDescending = (d.baro_alt_m <= _peakAltM - BARO_APOGEE_DROP_M);
+            if (baroDescending) {
+                if (!_baroDescendDetecting) {
+                    _baroDescendDetecting = true;
+                    _baroDescendFirstMs   = now;
+                }
+            } else {
+                _baroDescendDetecting = false;   // back near peak -- cancel, not a real descent
+            }
+            bool baroConfirmed = _baroDescendDetecting &&
+                (now - _baroDescendFirstMs >= BARO_APOGEE_DETECTION_WINDOW_MS);
+
+            if (velConfirmed || baroConfirmed) {
+                DEBUG_SERIAL.println(velConfirmed ?
+                    "[FSM] Apogee confirmed via vert_vel_ms" :
+                    "[FSM] Apogee confirmed via raw-baro fallback (vert_vel_ms did not confirm)");
+                _enterState(FlightState::APOGEE, now);
             }
             break;
         }

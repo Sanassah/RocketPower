@@ -172,7 +172,14 @@ void SensorManager::update() {
     bool baroGotData = _baro.update();
     if (baroGotData) _lastBaroOkMs = now;
     uint32_t t2 = micros();
-    if (_accel.update()) _lastAccelOkMs = now;
+    // allowBenchDiagnostic: only in states where Accelerometer's blocking
+    // delay(15) bench diagnostic (see its own comment) can't cost real
+    // flight-timing -- never READY_FOR_FLIGHT onward.
+    bool allowAccelBenchDiagnostic =
+        (_data.state == FlightState::IDLE ||
+         _data.state == FlightState::ARMED ||
+         _data.state == FlightState::LANDED);
+    if (_accel.update(allowAccelBenchDiagnostic)) _lastAccelOkMs = now;
     uint32_t t3 = micros();
     // Rate-limited -- see GPS_POLL_INTERVAL_MS (config.h) for why: a single
     // GPS I2C read costs ~7ms regardless of chunk size (u-blox DDC clock-
@@ -276,13 +283,24 @@ void SensorManager::update() {
     // amplify noise into multi-m/s spikes (bench-reported "super reactive
     // to barometer").
     //
+    // TEMPORARY (2026-10): baro's correction into the fused estimate is
+    // disabled below (see VERT_VEL_BARO_CORRECTION_ENABLED), pending the
+    // PR-002 barometer/RF-coupling fix -- [VELFUSE] logs showed baroVel
+    // swinging tens of m/s at rest (accelVert stayed at noise floor the
+    // whole time, confirming no real motion), and MAX_PLAUSIBLE_VERT_SPEED_MS
+    // (350) is too loose to catch that, so it was leaking into fusedVel as
+    // real drift. _fusedVel_ms is IMU-integration-only until PR-002 lands;
+    // the barometer-only fallback below (IMU down) is untouched -- that's
+    // an unrelated case. Restore by re-enabling the two blocks below once
+    // PR-002's root cause (RF/antenna coupling) is actually fixed.
+    //
     // Resync on IMU recovery: VERT_VEL_ALPHA's ~15s time constant (tuned to
     // reject baro noise) is longer than most of this rocket's flights -- if
     // _fusedVel_ms were left frozen through an IMU dropout, resuming with a
     // slow blend back toward reality could mean it never catches up before
     // the flight ends. Snap straight to the current baro reading instead the
     // moment IMU comes back, rather than crawling toward it.
-    if (_data.imu_ok && !_imuWasOk) {
+    if (VERT_VEL_BARO_CORRECTION_ENABLED && _data.imu_ok && !_imuWasOk) {
         _fusedVel_ms = baro.vert_vel_ms;
     }
     _imuWasOk = _data.imu_ok;
@@ -301,7 +319,10 @@ void SensorManager::update() {
             _fusedVel_ms += accel_vert * dt;   // predict every cycle (100Hz)
             // Correct only when baro actually refreshed (~50Hz) AND the
             // sample is physically plausible -- see MAX_PLAUSIBLE_VERT_SPEED_MS.
-            if (baroGotData && fabsf(baro.vert_vel_ms) <= MAX_PLAUSIBLE_VERT_SPEED_MS) {
+            // TEMPORARY (2026-10): VERT_VEL_BARO_CORRECTION_ENABLED gates
+            // this off pending PR-002 -- see this function's top comment.
+            if (VERT_VEL_BARO_CORRECTION_ENABLED && baroGotData &&
+                fabsf(baro.vert_vel_ms) <= MAX_PLAUSIBLE_VERT_SPEED_MS) {
                 _fusedVel_ms = VERT_VEL_ALPHA * _fusedVel_ms
                              + (1.0f - VERT_VEL_ALPHA) * baro.vert_vel_ms;
             }

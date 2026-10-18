@@ -430,6 +430,28 @@
 // powered-flight accel, so it can't fire while genuinely still thrusting.
 #define POWERED_ASCENT_VELOCITY_DROP_MS 2.0f
 #define APOGEE_DETECTION_WINDOW_MS 500    // velocity must stay <= 0 for 0.5 s (primary and backup)
+
+// Second, independent apogee check in COAST: raw baro_alt_m only, no
+// vert_vel_ms (no IMU integration, no fusion) -- fires CH1 if vert_vel_ms
+// is ever wrong/stuck. 25m clears LANDED_ALT_TOLERANCE_M's 2m "ordinary
+// jitter" baseline by >12x, so it can't confuse normal baro noise for a
+// real descent; matches APOGEE_DETECTION_WINDOW_MS's 500ms sustained-window
+// duration, well clear of one TELEMETRY_INTERVAL_MS (1s) LoRa TX burst.
+// Tradeoff: near apogee vertical speed is ~0, so falling 25m takes ~2-2.5s
+// under gravity alone -- this path is slower than vert_vel_ms by design,
+// only meant to fire when the primary check has already failed.
+#define BARO_APOGEE_DROP_M                25.0f
+#define BARO_APOGEE_DETECTION_WINDOW_MS    500
+
+// _peakAltM itself must be debounced against a single RF-glitched high
+// baro_alt_m sample (confirmed bug: an un-debounced running max latches
+// instantly and permanently onto one bad high reading, making every later
+// genuine sample look like a >BARO_APOGEE_DROP_M descent even mid-ascent
+// with positive vert_vel_ms -- see StateMachine.h's _peakCandidate* comment).
+// Shorter than BARO_APOGEE_DETECTION_WINDOW_MS so legitimate peak updates
+// don't lag the descent check too much, still well clear of one
+// TELEMETRY_INTERVAL_MS (1s) LoRa TX burst.
+#define BARO_PEAK_CONFIRM_MS                300
 #define LANDED_STABLE_MS           10000  // altitude stable for this long = LANDED
 #define LANDED_ALT_TOLERANCE_M     2.0f   // ±m to count as "stable"
 
@@ -543,6 +565,17 @@
 // this repo (288.4 m/s, RocketPower_V1.ork) -- generously wide on purpose,
 // this only needs to catch nonsense, never a real (even fast) flight.
 #define MAX_PLAUSIBLE_VERT_SPEED_MS 350.0f
+
+// TEMPORARY (2026-10): disables the barometer's correction into the fused
+// vert_vel_ms (SensorManager.cpp) pending the PR-002 RF-coupling fix --
+// [VELFUSE] logs showed baroVel swinging tens of m/s at rest while
+// accelVert stayed at noise floor (confirming no real motion), and
+// MAX_PLAUSIBLE_VERT_SPEED_MS above is too loose to catch that, so it was
+// leaking into fusedVel as real drift. false = vert_vel_ms is pure IMU
+// integration while imu_ok (the barometer-only fallback for IMU-down is
+// untouched, see SensorManager.cpp). Restore to true once PR-002's actual
+// root cause (RF/antenna coupling) is fixed, not just mitigated.
+#define VERT_VEL_BARO_CORRECTION_ENABLED false
 
 // ===== Status LEDs =====
 // From main.kicad_sch: D3 "GPS LED", D4 "Altimeter LED", D5 "200G ACC LED",

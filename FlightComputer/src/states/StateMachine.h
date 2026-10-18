@@ -45,6 +45,32 @@ private:
     uint32_t _apogeeWindowMs   = 0;
     bool     _apogeeDetecting  = false;
 
+    // Second, independent apogee check: sustained raw baro_alt_m drop from
+    // peak, no vert_vel_ms involved -- see BARO_APOGEE_DROP_M in config.h.
+    // _peakAltM resets at every _enterState() (same as _peakAscentVertVel),
+    // so it effectively starts tracking at COAST entry -- harmless even
+    // though COAST begins before the real apogee, since altitude keeps
+    // rising monotonically through the rest of the climb either way.
+    float    _peakAltM            = 0.0f;
+    uint32_t _baroDescendFirstMs  = 0;
+    bool     _baroDescendDetecting = false;
+
+    // _peakAltM itself must be debounced the same way everything else in
+    // this file is -- a single RF-glitched high baro_alt_m sample must NOT
+    // be allowed to instantly and permanently inflate the peak (that would
+    // make _peakAltM - BARO_APOGEE_DROP_M look "descended past" on every
+    // later genuine reading, even mid-ascent with positive vert_vel_ms).
+    // A candidate must stay above the CURRENT confirmed _peakAltM for the
+    // full BARO_PEAK_CONFIRM_MS before promotion -- reset after every
+    // promotion (not just once at COAST entry), so a later glitch can't
+    // exploit an already-latched "still above peak" flag and get promoted
+    // instantly. Promotion uses the window's minimum sample, not whatever
+    // is live at the instant the window closes, so a glitch landing on
+    // that exact tick can't sneak through either.
+    float    _peakCandidateMinM      = 0.0f;
+    uint32_t _peakCandidateFirstMs   = 0;
+    bool     _peakCandidateDetecting = false;
+
     // Landed detection: track altitude stability
     float    _landedRefAlt     = 0.0f;
     uint32_t _landedStableMs   = 0;

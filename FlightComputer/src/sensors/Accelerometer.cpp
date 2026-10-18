@@ -21,7 +21,7 @@ bool Accelerometer::begin() {
     return true;
 }
 
-bool Accelerometer::update() {
+bool Accelerometer::update(bool allowBenchDiagnostic) {
     // getXYZ() (NOT getEvent(), which this used to call) reads all 3 axes
     // in one atomic 6-byte I2C burst. getEvent() instead calls getX()/getY()/
     // getZ() as 3 SEPARATE I2C reads -- if the chip's internal registers
@@ -40,13 +40,16 @@ bool Accelerometer::update() {
 
     // Bench diagnostic (DEBUG_SERIAL only -- separate USB port from LoRa
     // telemetry, see config.h's DEBUG_SERIAL macro -- never costs airtime).
-    // The delay+re-read below only runs right before an actual print
-    // (~every 300ms), NOT every loop -- an earlier version ran delay(15)
-    // unconditionally on every single call, silently costing 15ms/loop and
-    // tanking the loop from ~97Hz to ~29Hz (bench-reported 2026-09). One ODR
-    // period at 100Hz is 10ms, so 15ms guarantees the re-read is a genuinely
-    // new sample, not the same latched value re-read early.
-    {
+    // CONFIRMED BUG (2026-10): rate-limiting this to ~every 300ms (instead
+    // of every loop, the original 2026-09 bug) was NOT enough -- it still
+    // blocks for delay(15) once every ~30 loops, unconditionally, including
+    // during POWERED_ASCENT/COAST/APOGEE/DESCENT. 15ms exceeds the entire
+    // intended 10ms loop period by itself, stalling AttitudeController's
+    // control update and StateMachine/BackupDeploy's apogee/deployment
+    // checks whenever it fires. allowBenchDiagnostic (SensorManager: true
+    // only in IDLE/ARMED/LANDED) is the actual fix -- this block now cannot
+    // run at all once READY_FOR_FLIGHT is reached, regardless of timer.
+    if (allowBenchDiagnostic) {
         static uint32_t lastPrintMs = 0;
         if (debugPrintReady(lastPrintMs)) {
             delay(15);

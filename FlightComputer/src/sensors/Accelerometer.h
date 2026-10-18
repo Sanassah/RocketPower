@@ -11,7 +11,13 @@ struct AccelerometerData {
 class Accelerometer {
 public:
     bool begin();
-    bool update();
+
+    // allowBenchDiagnostic gates the blocking delay(15)+re-read bench
+    // diagnostic (see update()'s own comment) -- caller passes true only in
+    // flight-timing-safe states (SensorManager: IDLE/ARMED/LANDED). Defaults
+    // false so any other/future caller doesn't accidentally re-enable a
+    // 15ms stall by omission.
+    bool update(bool allowBenchDiagnostic = false);
     const AccelerometerData& data() const { return _data; }
 
 private:
