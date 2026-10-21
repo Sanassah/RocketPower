@@ -1,9 +1,9 @@
 # RocketPower
 
-<table><tr>
-<td><img src="Media/CAD/FullRocket.png" width="100%"></td>
-<td><img src="Media/CAD/WithoutBodyCoverandNoseCone.png" width="100%"></td>
-</tr></table>
+<p align="center">
+<img src="Media/CAD/FullRocket.png" height="380">
+<img src="Media/CAD/WithoutBodyCoverandNoseCone.png" height="380">
+</p>
 
 A model rocket built **from the ground up**: custom flight computer, custom PCB, active fin stabilization, and a full hardware-in-the-loop test rig.
 
@@ -14,8 +14,8 @@ A model rocket built **from the ground up**: custom flight computer, custom PCB,
 ## 🔧 Putting it together
 
 <table><tr>
-<td><img src="Media/CAD/Avionics Bay.png" width="100%"></td>
-<td><img src="Media/web/avionics_bay.gif" width="100%"></td>
+<td width="62%"><img src="Media/web/avionics_bay.gif" width="100%"></td>
+<td width="38%"><img src="Media/CAD/Avionics Bay.png" width="100%"></td>
 </tr></table>
 
 ---
@@ -28,22 +28,18 @@ A model rocket built **from the ground up**: custom flight computer, custom PCB,
 - **Custom PCB.** IMU, barometer, high-g accelerometer, GPS, power monitoring, pyro firing and continuity, and LoRa telemetry, all on one board.
 - **Ground station.** A PyQt6 desktop app for live telemetry, 3D orientation, and command/control.
 
-![Servo-actuated fin mechanism](Media/web/fin_mechanism.gif)
-
 ---
 
 ## 🧠 Architecture
 
-One MCU reads every sensor, runs the control law, and drives every output. Nothing else on the vehicle makes a decision.
+Every sensor feeds one MCU; that MCU runs the control law and drives every output.
 
 ```mermaid
 flowchart TD
-    classDef mcu fill:#F5A623,stroke:#B8780F,color:#000,stroke-width:3px
     classDef sensor fill:#4A90D9,stroke:#2C5F8A,color:#fff
+    classDef compute fill:#F5A623,stroke:#B8780F,color:#000
     classDef output fill:#7ED321,stroke:#4C8A14,color:#000
     classDef ext fill:#9B59B6,stroke:#6C3483,color:#fff
-
-    MCU["ARM Cortex-M7 MCU (NXP i.MX RT1062)<br/>Flight State Machine · PD Attitude Control · Pyro/Recovery"]:::mcu
 
     IMU[BNO085 IMU]:::sensor
     BARO[BMP390 Baro]:::sensor
@@ -51,21 +47,31 @@ flowchart TD
     GPS[ZOEM8 GPS]:::sensor
     PWR[INA260 Power]:::sensor
 
+    subgraph MCU["ARM Cortex-M7 MCU (NXP i.MX RT1062)"]
+        FSM[Flight State Machine]:::compute
+        CTRL[PD Attitude Controller]:::compute
+        PYRO[Pyro + Backup Deploy]:::compute
+    end
+
     FINS[4x Servo Fins]:::output
     CHUTE[Recovery Parachute]:::output
 
     GS[GroundStation]:::ext
     SIM[Simulink 6DOF]:::ext
 
-    MCU --- IMU
-    MCU --- BARO
-    MCU --- ACC
-    MCU --- GPS
-    MCU --- PWR
-    MCU --> FINS
-    MCU --> CHUTE
-    MCU <-->|"LoRa, E22-900T22D"| GS
-    MCU <-.->|"Serial, HITL only"| SIM
+    IMU --> FSM
+    BARO --> FSM
+    ACC --> FSM
+    GPS --> FSM
+    PWR --> FSM
+    FSM --> CTRL
+    FSM --> PYRO
+    CTRL --> FINS
+    PYRO --> CHUTE
+    FSM <-->|"LoRa, E22-900T22D"| GS
+    FSM <-.->|"Serial, HITL only"| SIM
+
+    style MCU fill:#FEF3E0,stroke:#F5A623,stroke-width:2px
 ```
 
 ---
@@ -74,10 +80,10 @@ flowchart TD
 
 Every subsystem on one custom board: IMU, barometer, high-g accelerometer, GPS, power monitoring, pyro firing/continuity, and telemetry.
 
-<table><tr>
-<td><img src="Media/LinkedIn_Post1/PCBLAYOUT.png" width="100%"></td>
-<td><img src="Media/web/pcb_render.gif" width="100%"></td>
-</tr></table>
+<p align="center">
+<img src="Media/LinkedIn_Post1/PCBLAYOUT.png" height="320">
+<img src="Media/web/pcb_render.gif" height="320">
+</p>
 
 ---
 
@@ -85,10 +91,10 @@ Every subsystem on one custom board: IMU, barometer, high-g accelerometer, GPS, 
 
 Performance is modeled before anything is built, and the same model closes the loop with real hardware once it exists.
 
-<table><tr>
-<td><img src="Media/Simulation/Simulink.png" width="100%"></td>
-<td><img src="Media/web/flight_path_animation.gif" width="100%"></td>
-</tr></table>
+<p align="center">
+<img src="Media/Simulation/Simulink.png" height="320">
+<img src="Media/web/flight_path_animation.gif" height="320">
+</p>
 
 A full powered ascent, coast, and parachute deployment, run entirely in hardware-in-the-loop: **real flight computer, simulated flight.**
 
