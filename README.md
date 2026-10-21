@@ -1,6 +1,7 @@
 # RocketPower
 
-![RocketPower build montage](Media/web/hero_highlight.gif)
+![Hardware-in-the-loop test: GroundStation dashboard tracking a full simulated flight](Media/web/hero_highlight.gif)
+<sub>A full powered ascent, coast, and parachute deployment, run entirely in hardware-in-the-loop: real flight computer, simulated flight.</sub>
 
 A model rocket built from the ground up: custom flight computer, custom PCB, active fin stabilization, and a full hardware-in-the-loop test rig, as a self-directed project to go deep on PCB design, embedded control systems, and systems simulation.
 
@@ -64,6 +65,10 @@ Custom board, designed from scratch in KiCad: flight computer, IMU, barometer, h
 <img src="Media/LinkedIn_Post1/PCBLAYOUT.png" alt="PCB layout" width="60%">
 
 ![PCB 3D render](Media/web/pcb_render.gif)
+
+Assembling the avionics bay: flight computer, antenna, and wiring harness into the airframe.
+
+![Avionics bay assembly](Media/web/avionics_bay.gif)
 
 ## Simulation and testing
 
