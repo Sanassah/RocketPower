@@ -1,11 +1,13 @@
 # RocketPower
 
+**An active fin control flight computer for model rockets.**
+
 <p align="center">
 <img src="Media/CAD/FullRocket.png" alt="Full rocket CAD render" height="600">
 <img src="Media/CAD/WithoutBodyCoverandNoseCone.png" alt="Cutaway CAD render, body cover and nose cone removed" height="600">
 </p>
 
-A model rocket built **from the ground up**: custom flight computer, custom PCB, active fin stabilization, and a full hardware-in-the-loop test rig.
+A model rocket built **from the ground up**: custom flight computer, custom PCB, active fin control for in-flight stabilization, and a full hardware-in-the-loop test rig.
 
 **Status:** in bench and hardware-in-the-loop validation ahead of first flight.
 
@@ -22,7 +24,7 @@ A model rocket built **from the ground up**: custom flight computer, custom PCB,
 
 ## 🚀 What it does
 
-- **Active attitude control.** An ARM Cortex-M7 flight computer runs a PD controller on quaternion-derived tilt plus gyro rate, driving **4 independent servo fins** in real time.
+- **Active fin control.** An ARM Cortex-M7 flight computer runs a PD controller on quaternion-derived tilt plus gyro rate, driving **4 independent servo fins** in real time for active stabilization during ascent.
 - **Redundant recovery.** Apogee detection runs on multiple independent signals, each able to trigger deployment on its own.
 - **Hardware-in-the-loop testing.** A custom 6DOF Simulink model drives the real flight computer over serial, so the control loop gets validated **before it ever has to fly**.
 - **Custom PCB.** IMU, barometer, high-g accelerometer, GPS, power monitoring, pyro firing and continuity, and LoRa telemetry, all on one board.
@@ -32,7 +34,7 @@ A model rocket built **from the ground up**: custom flight computer, custom PCB,
 
 ## 🧠 Architecture
 
-Every sensor feeds one MCU; that MCU runs the control law and drives every output.
+Every sensor feeds one MCU; that MCU runs the active fin control law and drives every output.
 
 ```mermaid
 flowchart TD
