@@ -1,8 +1,8 @@
 # RocketPower
 
 <p align="center">
-<img src="Media/CAD/FullRocket.png" height="380">
-<img src="Media/CAD/WithoutBodyCoverandNoseCone.png" height="380">
+<img src="Media/CAD/FullRocket.png" height="600">
+<img src="Media/CAD/WithoutBodyCoverandNoseCone.png" height="600">
 </p>
 
 A model rocket built **from the ground up**: custom flight computer, custom PCB, active fin stabilization, and a full hardware-in-the-loop test rig.
@@ -102,5 +102,5 @@ A full powered ascent, coast, and parachute deployment, run entirely in hardware
 
 ---
 
-<p align="center"><img src="Media/Rocket Launch/RocketLaunch.png" width="70%"></p>
+<p align="center"><img src="Media/Rocket Launch/RocketLaunch.png" width="40%"></p>
 <p align="center"><sub>Where this is headed.</sub></p>
