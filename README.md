@@ -1,8 +1,8 @@
 # RocketPower
 
 <p align="center">
-<img src="Media/CAD/FullRocket.png" height="600">
-<img src="Media/CAD/WithoutBodyCoverandNoseCone.png" height="600">
+<img src="Media/CAD/FullRocket.png" alt="Full rocket CAD render" height="600">
+<img src="Media/CAD/WithoutBodyCoverandNoseCone.png" alt="Cutaway CAD render, body cover and nose cone removed" height="600">
 </p>
 
 A model rocket built **from the ground up**: custom flight computer, custom PCB, active fin stabilization, and a full hardware-in-the-loop test rig.
@@ -14,8 +14,8 @@ A model rocket built **from the ground up**: custom flight computer, custom PCB,
 ## 🔧 Putting it together
 
 <table><tr>
-<td width="62%"><img src="Media/web/avionics_bay.gif" width="100%"></td>
-<td width="38%"><img src="Media/CAD/Avionics Bay.png" width="100%"></td>
+<td width="62%"><img src="Media/web/avionics_bay.gif" alt="Avionics bay assembly" width="100%"></td>
+<td width="38%"><img src="Media/CAD/Avionics%20Bay.png" alt="Avionics bay CAD render" width="100%"></td>
 </tr></table>
 
 ---
@@ -81,8 +81,8 @@ flowchart TD
 Every subsystem on one custom board: IMU, barometer, high-g accelerometer, GPS, power monitoring, pyro firing/continuity, and telemetry.
 
 <p align="center">
-<img src="Media/LinkedIn_Post1/PCBLAYOUT.png" height="320">
-<img src="Media/web/pcb_render.gif" height="320">
+<img src="Media/LinkedIn_Post1/PCBLAYOUT.png" alt="PCB layout" height="320">
+<img src="Media/web/pcb_render.gif" alt="PCB 3D render" height="320">
 </p>
 
 ---
@@ -92,8 +92,8 @@ Every subsystem on one custom board: IMU, barometer, high-g accelerometer, GPS, 
 Performance is modeled before anything is built, and the same model closes the loop with real hardware once it exists.
 
 <p align="center">
-<img src="Media/Simulation/Simulink.png" height="320">
-<img src="Media/web/flight_path_animation.gif" height="320">
+<img src="Media/Simulation/Simulink.png" alt="Simulink model view" height="320">
+<img src="Media/web/flight_path_animation.gif" alt="Flight path animation" height="320">
 </p>
 
 A full powered ascent, coast, and parachute deployment, run entirely in hardware-in-the-loop: **real flight computer, simulated flight.**
@@ -102,5 +102,5 @@ A full powered ascent, coast, and parachute deployment, run entirely in hardware
 
 ---
 
-<p align="center"><img src="Media/Rocket Launch/RocketLaunch.png" width="40%"></p>
+<p align="center"><img src="Media/Rocket%20Launch/RocketLaunch.png" alt="Reference launch photo" width="40%"></p>
 <p align="center"><sub>Where this is headed.</sub></p>
