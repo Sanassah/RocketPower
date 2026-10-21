@@ -5,6 +5,7 @@
 <p align="center">
 <img src="Media/CAD/FullRocket.png" alt="Full rocket CAD render" height="600">
 <img src="Media/CAD/WithoutBodyCoverandNoseCone.png" alt="Cutaway CAD render, body cover and nose cone removed" height="600">
+<img src="Media/Linkedin_Post2/ThumbnailLinkedInpost2.png" alt="Rocket igniter test" height="600">
 </p>
 
 A model rocket built **from the ground up**: custom flight computer, custom PCB, active fin control for in-flight stabilization, and a full hardware-in-the-loop test rig.
