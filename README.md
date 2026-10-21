@@ -1,6 +1,6 @@
 # RocketPower
 
-<video src="Media/web/hero_build.mp4" controls width="100%" poster="Media/Linkedin_Post2/Linkedin_Post2_Thumbnail.jpg"></video>
+![RocketPower build montage](Media/web/hero_highlight.gif)
 
 A model rocket built from the ground up: custom flight computer, custom PCB, active fin stabilization, and a full hardware-in-the-loop test rig, as a self-directed project to go deep on PCB design, embedded control systems, and systems simulation.
 
@@ -14,7 +14,7 @@ A model rocket built from the ground up: custom flight computer, custom PCB, act
 - **Custom PCB.** A from-scratch board (KiCad) integrating the IMU, barometer, high-g accelerometer, GPS, power monitoring, pyro firing/continuity, and LoRa telemetry.
 - **Ground station.** A PyQt6 desktop app for live telemetry, 3D orientation visualization, command/control, and bench test tooling.
 
-<video src="Media/web/fin_mechanism.mp4" controls width="100%"></video>
+![Servo-actuated fin mechanism, CAD animation](Media/web/fin_mechanism.gif)
 <sub>Servo-actuated fin mechanism, CAD animation.</sub>
 
 ## Architecture
@@ -63,7 +63,7 @@ Custom board, designed from scratch in KiCad: flight computer, IMU, barometer, h
 
 <img src="Media/LinkedIn_Post1/PCBLAYOUT.png" alt="PCB layout" width="60%">
 
-<video src="Media/web/pcb_render.mp4" controls width="60%"></video>
+![PCB 3D render](Media/web/pcb_render.gif)
 
 ## Simulation and testing
 
