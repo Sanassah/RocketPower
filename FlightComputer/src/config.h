@@ -540,7 +540,12 @@
 // sensors, tight enough to flag a real mid-flight dropout within half a
 // second. Purely informational -- nothing in flight-critical control logic
 // (state transitions, pyro firing) gates on these flags.
-#define SENSOR_HEALTH_TIMEOUT_MS   500
+//
+// Raised 500->900 alongside BARO_TX_BLANK_MS going 400->700 (below): baro_ok
+// must still refresh at least once within this window even while blanked
+// for most of each LoRa TX cycle, or it'd flap false every second for no
+// real reason.
+#define SENSOR_HEALTH_TIMEOUT_MS   900
 
 // Complementary filter weight for fused vertical velocity (SensorManager).
 // BENCH-MEASURED (2026-09, [VELFUSE] diagnostic, IMU.cpp/SensorManager.cpp):
@@ -577,7 +582,37 @@
 // root cause (RF/antenna coupling) is fixed, not just mitigated.
 #define VERT_VEL_BARO_CORRECTION_ENABLED false
 
-// ===== Status LEDs =====
+// TEMPORARY (2026-10): skip the barometer's I2C read entirely for a window
+// after each LoRa TX, instead of trying to filter the corrupted reading
+// after the fact -- confirmed on the bench (antenna on/off A-B test,
+// current_ma flat across both, baro noise tracking antenna state) that
+// LoRa TX is injecting noise straight onto the BMP390's own local
+// pressure reading, not just the fused vert_vel_ms (see PR-002). This
+// protects every RAW baro_alt_m consumer too (StateMachine's LANDED
+// check, the BARO_APOGEE_DROP_M fallback) -- previously unprotected,
+// since VERT_VEL_BARO_CORRECTION_ENABLED above only ever gated the fused
+// estimate.
+//
+// E22-900T22D is Mode-0 transparent UART with AUX unwired (LoRa.h), so
+// firmware has no hardware signal for when the actual over-air burst
+// ends -- only when it STARTS (TelemetryManager's own send() call,
+// relayed to SensorManager via setLastLoraTxMs()).
+//
+// MEASURED (2026-10, real build, BARO_TX_BLANK_MS was 400 at the time):
+// [BARO RAW] showed a perfectly alternating disturbed/clean/disturbed/
+// clean pattern every single sample -- the signature of 400ms blanking
+// the FRONT of each TX's disturbance but leaking its tail into the very
+// next read, then recovering by the one after. 400 -> 700 to cover that
+// tail too (400ms original airtime-based guess + ~300ms measured leak).
+// Re-verify the same way if this is ever retuned: a clean, unbroken quiet
+// baseline (no more regular disturbed samples) is the target, not just
+// "looks better."
+//
+// Mitigates the SYMPTOM (stops looking at the sensor while it's
+// corrupted), not the CAUSE -- RF is still coupling in; this does nothing
+// for any other sensor it might also be hitting. The real fix is still
+// shielding/rerouting/relocating the antenna on the next PCB rev (PR-002).
+#define BARO_TX_BLANK_MS 700
 // From main.kicad_sch: D3 "GPS LED", D4 "Altimeter LED", D5 "200G ACC LED",
 // D6 "IMU LED" each have their cathode tied to GND and their anode driven
 // through a series resistor by a dedicated MIMXRT1062 GPIO (active HIGH).

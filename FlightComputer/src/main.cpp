@@ -124,6 +124,16 @@ void setup() {
     DEBUG_SERIAL.println("[INIT] Fin servos...");
     fins.begin();
 
+    // Build/upload sanity marker -- a `teensy-gui` upload can report
+    // PlatformIO SUCCESS without the Loader app actually having been open
+    // to receive it (confirmed 2026-10: identical "Unable find Teensy
+    // Loader" warning printed on both a FAILED and a SUCCESS run back to
+    // back). Bump this string any time a firmware change needs to be
+    // positively confirmed as actually running, rather than inferred from
+    // behavior -- a fresh millis()-near-0 boot print right after an upload
+    // is the one unambiguous signal that the chip was actually reflashed.
+    DEBUG_SERIAL.println("[INIT] Build marker: BARO_TX_BLANK_MS mitigation active");
+
     DEBUG_SERIAL.println("\n[INIT] Boot complete. State: IDLE\n");
     loopTimer = 0;
 }
@@ -261,6 +271,12 @@ void loop() {
 
     // ---- 5. Telemetry (send + receive commands) ----
     telem.update(d, lastLoopElapsedUs);
+    // Relayed so next loop's SensorManager::update() can blank the baro
+    // read for BARO_TX_BLANK_MS after this TX -- see PR-002/config.h.
+    // One loop lagged (this loop's sensor read already happened above,
+    // in section 1) but that's fine: the blank window just needs to open
+    // sometime shortly after the TX that caused it, not this exact tick.
+    sensors.setLastLoraTxMs(telem.lastLoraTxMs());
     uint32_t tTelem = micros();   // TEMPORARY diagnostic, see maxSensorsUs above
 
     // ---- 5b. Execute calibration if requested by ground station ----

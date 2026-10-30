@@ -75,9 +75,14 @@ safety gap.
 ---
 
 ### PR-002 — Barometer readings corrupted by RF coupling during LoRa TX
-**Status:** OPEN — root cause confirmed, only software-mitigated (not fixed
-at the hardware level)
-**Severity:** Medium (mitigated for flight-critical use, raw data still bad)
+**Status:** OPEN — root cause confirmed and narrowed (likely near-field
+pickup on the sensor's local supply/traces, not conducted/power-rail), but
+still only software-mitigated on the bench, not fixed at the hardware
+level. Raw `baro_alt_m` is now also mitigated (TX blanking), not just the
+fused estimate — see 2026-10 update below.
+**Severity:** Medium (mitigated for flight-critical use as currently wired;
+would become higher severity if baro were ever given more weight in the
+deployment decision without the actual hardware fix landing first)
 
 **Symptom:** Barometer-derived vertical velocity showed multi-m/s noise
 spikes at rest, correlated with LoRa transmit activity ("super reactive to
@@ -101,22 +106,59 @@ raw sensor):**
 - `MAX_PLAUSIBLE_VERT_SPEED_MS` (350 m/s) sanity gate added — rejects a
   single extreme RF-glitch baro sample outright rather than blending it in
 
-**Remaining/open concern:** raw `baro_alt_m`/`pressure_hpa` are **not**
-protected by the above — they're still noisy at the source whenever LoRa is
-transmitting. `StateMachine::DESCENT`'s landed-detection reads raw
-`baro_alt_m` directly (`fabsf(d.baro_alt_m - _landedRefAlt) <
-LANDED_ALT_TOLERANCE_M`), not the fused/filtered value. **Needs explicit V&V
-testing:** confirm LANDED detection isn't falsely delayed or re-triggered by
-RF noise while telemetry is actively transmitting during descent.
+**Update (2026-10) — raw baro mitigated too, via blanking, not filtering:**
+`StateMachine::DESCENT`'s landed-detection and `BackupDeploy`'s
+altitude-gain gate both read raw `baro_alt_m` directly, unprotected by
+`VERT_VEL_ALPHA`/`MAX_PLAUSIBLE_VERT_SPEED_MS` above (those only ever
+gated the fused estimate). Follow-up bench work (antenna on/off A-B test,
+`current_ma` from the INA260 flat across both conditions while baro noise
+tracked antenna state) narrowed the mechanism further: current draw
+staying identical while noise didn't rules out a gross conducted/
+current-draw path, and the earlier decoupling-cap swaps (100-470µF) never
+having helped points the same way — this is most likely near-field
+pickup on the BMP390's own local supply/ground or traces, not something
+bulk rail capacitance or current-level changes would fix. Consistent with
+"RF/antenna-proximity coupling," just a sharper guess at *how* it's
+getting in.
+
+Mitigation: since the E22-900T22D is Mode-0 transparent UART with AUX
+unwired (`LoRa.h`), firmware can observe when a TX starts but not when the
+over-air burst actually ends. `SensorManager::update()` now skips the
+barometer's I2C read entirely for `BARO_TX_BLANK_MS` (`config.h`, 700ms)
+after every TX, holding the last good value instead of ingesting a sample
+known to be corrupted. Measured, not guessed: an initial 400ms attempt
+produced a perfectly alternating disturbed/clean/disturbed/clean pattern
+in `[BARO RAW]` (covered the front of each disturbance, leaked the tail
+into the very next read) — widened to 700ms once that tail was measured,
+which produced an unbroken clean baseline (~3-4 Pa swing) with telemetry
+actively transmitting, matching telemetry fully disconnected (~4.5 Pa).
+
+**Deliberately NOT re-enabled: `VERT_VEL_BARO_CORRECTION_ENABLED` stays
+`false`.** Raw `baro_alt_m` tolerates a 700ms/s blind window fine today
+because its only two consumers are explicitly slow and generously
+margined (a one-time altitude-gain threshold crossing; a 10s landed-
+stability check) — missing up to 700ms delays noticing something, it
+doesn't miss it. That reasoning does NOT extend to feeding baro into the
+fast, continuous `vert_vel_ms` signal that actually drives the moment-to-
+moment deployment decision: a 700ms blind spot once a second on a signal
+meant to carry real weight during a fast-moving flight is a liability, not
+a detail to paper over. Blanking is an acceptable patch for what baro is
+used for today; it is not an acceptable foundation for giving baro more
+responsibility than that.
 
 **Remaining actions:**
-- [ ] V&V test: verify DESCENT/LANDED behavior with telemetry actively
-      transmitting, not just on the bench with it disabled
-- [ ] Consider a hardware fix (ferrite bead / series resistor on the
-      barometer's supply or signal lines, or antenna relocation/shielding) —
-      discussed, never implemented
-- [ ] If hardware fix lands, confirm whether `VERT_VEL_ALPHA`/
-      `MAX_PLAUSIBLE_VERT_SPEED_MS` can be tightened back up
+- [ ] V&V test: verify DESCENT/LANDED and the altitude-gain gate behave
+      correctly with telemetry actively transmitting on real hardware,
+      not just a bench capture of the raw signal
+- [ ] **Find the actual hardware fix, not another patch** (next PCB rev):
+      shield/reroute/relocate the antenna away from the barometer's local
+      supply/traces — the real target now that the mechanism is narrowed
+      to near-field pickup, not a conducted/power-rail path
+- [ ] Once a hardware fix lands and is bench-verified clean with telemetry
+      transmitting and NO blanking active, retire `BARO_TX_BLANK_MS`
+      entirely (don't just widen it further) and reassess
+      `VERT_VEL_BARO_CORRECTION_ENABLED`/`VERT_VEL_ALPHA`/
+      `MAX_PLAUSIBLE_VERT_SPEED_MS` from a clean baseline
 
 ---
 

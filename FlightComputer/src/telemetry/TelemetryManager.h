@@ -48,6 +48,13 @@ public:
     // reset touches.
     bool resetRequested() { bool r = _resetRequested; _resetRequested = false; return r; }
 
+    // When the last LoRa TX actually fired (UART handoff to the radio, not
+    // when the over-air burst finished -- AUX isn't wired, see LoRa.h, so
+    // there's no hardware signal for that). main.cpp relays this to
+    // SensorManager every loop so Barometer can blank itself for
+    // BARO_TX_BLANK_MS afterward (config.h) -- see PR-002.
+    uint32_t lastLoraTxMs() const { return _lastLoraTxMs; }
+
 private:
     LoRaRadio&        _lora;
     StateMachine&     _sm;

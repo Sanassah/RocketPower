@@ -64,6 +64,12 @@ public:
     // sensor readings it was captured with.
     void setState(FlightState s) { _data.state = s; }
 
+    // Relayed from TelemetryManager::lastLoraTxMs() every loop (main.cpp) --
+    // lets update() blank the barometer's I2C read for BARO_TX_BLANK_MS
+    // after each LoRa TX instead of ingesting a sample taken while it's
+    // RF-corrupted. See config.h's BARO_TX_BLANK_MS comment and PR-002.
+    void setLastLoraTxMs(uint32_t ms) { _lastLoraTxMs = ms; }
+
     // Individual sensor access for diagnostics
     IMU&          imu()   { return _imu; }
     Barometer&    baro()  { return _baro; }
@@ -101,6 +107,11 @@ private:
     // data ~1Hz, so polling it every loop iteration wastes that cost on
     // reads that can't possibly find anything new.
     uint32_t _lastGpsPollMs = 0;
+
+    // See setLastLoraTxMs() above. 0 until the first TX this boot, which
+    // reads as "not within the blank window" (millis() grows away from 0
+    // immediately) -- correctly permissive before telemetry ever sends.
+    uint32_t _lastLoraTxMs = 0;
 
 #ifdef HITL_MODE
     // Waits up to timeoutMs for one full, checksum-valid SensorInjectPacket,

@@ -169,7 +169,19 @@ void SensorManager::update() {
     }
     if (imuGotData) _lastImuOkMs = now;
     uint32_t t1 = micros();
-    bool baroGotData = _baro.update();
+    // See BARO_TX_BLANK_MS (config.h) / PR-002: skip the baro read entirely
+    // for a window after each LoRa TX instead of ingesting a sample taken
+    // while it's RF-corrupted. _data.pressure_hpa/baro_alt_m/vert_vel_ms
+    // simply hold their last value through the window (no update() call
+    // means no write) -- harmless next to the 500ms/300ms confirmation
+    // windows every consumer already uses (APOGEE_DETECTION_WINDOW_MS,
+    // BARO_PEAK_CONFIRM_MS, LANDED_STABLE_MS). BARO_TX_BLANK_MS (700) is
+    // deliberately kept under SENSOR_HEALTH_TIMEOUT_MS (900) too, so
+    // baro_ok can't flap false from this alone -- the first successful
+    // read right as the window closes refreshes _lastBaroOkMs well before
+    // that timeout would trip.
+    bool inTxBlankWindow = (now - _lastLoraTxMs) < BARO_TX_BLANK_MS;
+    bool baroGotData = inTxBlankWindow ? false : _baro.update();
     if (baroGotData) _lastBaroOkMs = now;
     uint32_t t2 = micros();
     // allowBenchDiagnostic: only in states where Accelerometer's blocking

@@ -36,9 +36,12 @@ import csv
 import os
 import re
 import time
+from collections import deque
 from datetime import datetime
 from typing import Optional
 
+import numpy as np
+import pyqtgraph as pg
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QPlainTextEdit,
     QPushButton, QComboBox, QListWidget, QListWidgetItem, QScrollArea,
@@ -84,6 +87,20 @@ _BLUE    = '#3B82F6'
 
 _LOG_DIR = 'logs'
 _RECORD_INTERVAL_MS = 200   # CSV row cadence -- 5 rows/s, plenty for a bench plot
+
+# ---- PLOT view: scrolling multi-curve plot over the same key=value stream
+# the LIVE view already parses. Separate from AltitudePlot/AccelPlot (which
+# only ever show their one fixed telemetry field each) -- this one plots
+# WHATEVER numeric key the firmware happens to print on DEBUG_SERIAL, picked
+# live from a checklist, so it works for any future [TAG] key=value print
+# without touching this file again (e.g. [VELFUSE] baroVel/accelVert/fusedVel
+# while tuning the altimeter, without needing a dedicated widget per signal).
+_PLOT_WINDOW_S   = 30
+_PLOT_MAX_POINTS = 3000
+_PLOT_COLORS = [
+    '#0071E3', '#FF9F0A', '#34C759', '#FF3B30',
+    '#AF52DE', '#5AC8FA', '#FFD60A', '#8E8E93',
+]
 
 
 def _to_float(raw: str) -> Optional[float]:
@@ -143,6 +160,19 @@ class DebugLogPanel(QWidget):
         self._live_rows: dict[str, _LiveRow] = {}
         self._live_sections: dict[str, QGridLayout] = {}
         self._live_container: Optional[QVBoxLayout] = None
+
+        # PLOT view state: every numeric key ever seen gets a deque of
+        # (t, value) the moment it's first seen (cheap, always kept), but
+        # only keys checked in self._plot_key_list actually get a curve on
+        # the plot -- unchecked by default, since plotting every key at once
+        # would just be noise. self._plot_t0 anchors t=0 to this connection's
+        # first numeric sample, reset on every new CONNECT (see _start).
+        self._plot_t0: Optional[float] = None
+        self._plot_series: dict[str, tuple[deque, deque]] = {}
+        self._plot_curves: dict[str, pg.PlotDataItem] = {}
+        self._plot_key_colors: dict[str, str] = {}
+        self._plot_key_items: dict[str, QListWidgetItem] = {}
+        self._plot_color_idx = 0
 
         # CSV recording
         self._record_file = None
@@ -214,15 +244,18 @@ class DebugLogPanel(QWidget):
         mode_row = QHBoxLayout(); mode_row.setSpacing(6)
         self._log_view_btn  = QPushButton('LOG')
         self._live_view_btn = QPushButton('LIVE')
-        for b in (self._log_view_btn, self._live_view_btn):
+        self._plot_view_btn = QPushButton('PLOT')
+        for b in (self._log_view_btn, self._live_view_btn, self._plot_view_btn):
             b.setCheckable(True)
             b.setFixedHeight(24)
             b.setFont(QFont('Segoe UI', 10, QFont.Weight.Bold))
         self._log_view_btn.setChecked(True)
         self._log_view_btn.clicked.connect(lambda: self._set_view(0))
         self._live_view_btn.clicked.connect(lambda: self._set_view(1))
+        self._plot_view_btn.clicked.connect(lambda: self._set_view(2))
         mode_row.addWidget(self._log_view_btn)
         mode_row.addWidget(self._live_view_btn)
+        mode_row.addWidget(self._plot_view_btn)
         mode_row.addStretch()
 
         self._record_btn = QPushButton('● REC')
@@ -309,6 +342,7 @@ class DebugLogPanel(QWidget):
         """)
         self._stack.addWidget(self._text)                 # index 0: LOG
         self._stack.addWidget(self._build_live_view())     # index 1: LIVE
+        self._stack.addWidget(self._build_plot_view())     # index 2: PLOT
 
         body.addWidget(self._stack, stretch=1)
         root.addLayout(body, stretch=1)
@@ -340,6 +374,7 @@ class DebugLogPanel(QWidget):
         if row is None:
             row = self._add_live_row(tag, short_key, namespaced_key)
         row.set(raw_value)
+        self._feed_plot(namespaced_key, raw_value)
 
     def _add_live_row(self, tag: str, short_key: str, namespaced_key: str) -> _LiveRow:
         grid = self._live_sections.get(tag)
@@ -367,14 +402,163 @@ class DebugLogPanel(QWidget):
         self._live_rows[namespaced_key] = row
         return row
 
+    # ------------------------------------------------------------------
+    # PLOT view
+
+    def _build_plot_view(self) -> QWidget:
+        container = QWidget()
+        body = QHBoxLayout(container)
+        body.setContentsMargins(0, 0, 0, 0)
+        body.setSpacing(10)
+
+        # ---- Key picker -- same auto-discovered-checkbox pattern as the
+        # tag filter, but for individual "[TAG] key" numeric values rather
+        # than whole tags. Unchecked by default -- plotting matters most
+        # when you deliberately pick 2-3 signals to compare (e.g. baroVel
+        # vs accelVert) rather than everything at once.
+        key_col = QVBoxLayout()
+        key_col.setSpacing(4)
+        key_hdr = QLabel('PLOT')
+        key_hdr.setStyleSheet(
+            f'color:{_MUTED};font-size:10px;font-weight:800;letter-spacing:1px;'
+            f'background:transparent;border:none;'
+        )
+        key_col.addWidget(key_hdr)
+
+        key_btns = QHBoxLayout(); key_btns.setSpacing(6)
+        clear_curves_btn = QPushButton('none')
+        clear_curves_btn.setFixedHeight(18)
+        clear_curves_btn.setStyleSheet(
+            f'QPushButton{{background:transparent;color:{_MUTED};border:none;font-size:10px;}}'
+            f'QPushButton:hover{{color:{_TEXT};}}'
+        )
+        clear_curves_btn.clicked.connect(lambda: self._set_all_plot_keys(False))
+        key_btns.addWidget(clear_curves_btn); key_btns.addStretch()
+        key_col.addLayout(key_btns)
+
+        self._plot_key_list = QListWidget()
+        self._plot_key_list.setFixedWidth(150)
+        self._plot_key_list.setStyleSheet(f"""
+            QListWidget {{
+                background-color: #0F0F10;
+                color: {_TEXT};
+                border: 1px solid {_BORDER};
+                border-radius: 6px;
+                font-size: 11px;
+            }}
+            QListWidget::item {{ padding: 2px 4px; }}
+        """)
+        self._plot_key_list.itemChanged.connect(self._on_plot_key_item_changed)
+        key_col.addWidget(self._plot_key_list, stretch=1)
+        body.addLayout(key_col)
+
+        # ---- Plot widget -- dark to match this panel, scrolling window,
+        # one curve per checked key (see _redraw_curve). Y auto-ranges
+        # (signals here span anything from mm/s noise to m/s swings).
+        self._plot = pg.PlotWidget(background=_BG)
+        axis_pen   = pg.mkPen(color=_BORDER, width=1)
+        self._plot.setLabel('left',   'Value',    color=_MUTED, **{'font-size': '10px'})
+        self._plot.setLabel('bottom', 'Time (s)', color=_MUTED, **{'font-size': '10px'})
+        self._plot.showGrid(x=True, y=True, alpha=0.3)
+        self._plot.getAxis('left').setPen(axis_pen)
+        self._plot.getAxis('bottom').setPen(axis_pen)
+        self._plot.getAxis('left').setTextPen(pg.mkPen(_MUTED))
+        self._plot.getAxis('bottom').setTextPen(pg.mkPen(_MUTED))
+        self._plot.getPlotItem().getViewBox().setBorder(None)
+        self._plot.setStyleSheet('border: none;')
+        self._plot.addLegend(labelTextColor=_TEXT)
+        body.addWidget(self._plot, stretch=1)
+
+        return container
+
+    def _set_all_plot_keys(self, checked: bool) -> None:
+        state = Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked
+        self._plot_key_list.blockSignals(True)
+        for item in self._plot_key_items.values():
+            item.setCheckState(state)
+        self._plot_key_list.blockSignals(False)
+        for key in list(self._plot_key_items.keys()):
+            self._set_plot_key_active(key, checked)
+
+    def _ensure_plot_key_known(self, namespaced_key: str) -> QListWidgetItem:
+        item = self._plot_key_items.get(namespaced_key)
+        if item is not None:
+            return item
+        item = QListWidgetItem(namespaced_key)
+        item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+        item.setCheckState(Qt.CheckState.Unchecked)
+        self._plot_key_list.addItem(item)
+        self._plot_key_items[namespaced_key] = item
+        return item
+
+    @pyqtSlot('QListWidgetItem*')
+    def _on_plot_key_item_changed(self, item: QListWidgetItem) -> None:
+        key = item.text()
+        self._set_plot_key_active(key, item.checkState() == Qt.CheckState.Checked)
+
+    def _set_plot_key_active(self, key: str, active: bool) -> None:
+        if active:
+            if key in self._plot_curves:
+                return
+            color = self._plot_key_colors.get(key)
+            if color is None:
+                color = _PLOT_COLORS[self._plot_color_idx % len(_PLOT_COLORS)]
+                self._plot_key_colors[key] = color
+                self._plot_color_idx += 1
+            curve = self._plot.plot(pen=pg.mkPen(color=color, width=2), name=key)
+            self._plot_curves[key] = curve
+            times, vals = self._plot_series.get(key, (deque(), deque()))
+            if times:
+                curve.setData(np.array(times), np.array(vals))
+        else:
+            curve = self._plot_curves.pop(key, None)
+            if curve is not None:
+                self._plot.removeItem(curve)
+
+    def _feed_plot(self, namespaced_key: str, raw_value: str) -> None:
+        num = _to_float(raw_value)
+        if num is None:
+            return
+        if self._plot_t0 is None:
+            self._plot_t0 = time.time()
+        t = time.time() - self._plot_t0
+
+        self._ensure_plot_key_known(namespaced_key)
+        times, vals = self._plot_series.setdefault(
+            namespaced_key, (deque(maxlen=_PLOT_MAX_POINTS), deque(maxlen=_PLOT_MAX_POINTS))
+        )
+        times.append(t)
+        vals.append(num)
+
+        curve = self._plot_curves.get(namespaced_key)
+        if curve is None:
+            return
+        t_arr = np.array(times)
+        v_arr = np.array(vals)
+        mask  = t_arr >= (t - _PLOT_WINDOW_S)
+        curve.setData(t_arr[mask], v_arr[mask])
+        self._plot.setXRange(max(0.0, t - _PLOT_WINDOW_S), t, padding=0.02)
+
+    def _reset_plot(self) -> None:
+        for curve in self._plot_curves.values():
+            self._plot.removeItem(curve)
+        self._plot_curves.clear()
+        self._plot_series.clear()
+        self._plot_t0 = None
+        self._plot_key_list.clear()
+        self._plot_key_items.clear()
+        self._plot_key_colors.clear()
+        self._plot_color_idx = 0
+
     def _set_view(self, index: int) -> None:
         self._stack.setCurrentIndex(index)
         self._log_view_btn.setChecked(index == 0)
         self._live_view_btn.setChecked(index == 1)
+        self._plot_view_btn.setChecked(index == 2)
         self._update_view_btn_styles()
 
     def _update_view_btn_styles(self) -> None:
-        for btn in (self._log_view_btn, self._live_view_btn):
+        for btn in (self._log_view_btn, self._live_view_btn, self._plot_view_btn):
             if btn.isChecked():
                 btn.setStyleSheet(f"""
                     QPushButton {{ background-color:{_BLUE};color:#fff;border:none;border-radius:4px;font-weight:700; }}
@@ -512,6 +696,7 @@ class DebugLogPanel(QWidget):
         if self._thread and self._thread.isRunning():
             self._stop()
 
+        self._reset_plot()
         self._open_file()
 
         self._worker = RawSerialWorker(port, 115200)
